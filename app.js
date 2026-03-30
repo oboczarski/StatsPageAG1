@@ -181,6 +181,8 @@ const CATEGORY_FILTERS = {
     (row.POS === "TE" && state.receivingFilters.TE),
 };
 
+const MOBILE_BREAKPOINT = 719;
+
 const COLUMN_WIDTHS = {
   RK: 78,
   PLAYER: 244,
@@ -248,6 +250,73 @@ const COLUMN_WIDTHS = {
   "RZ Tgt": 98,
 };
 
+const MOBILE_COLUMN_WIDTHS = {
+  RK: 52,
+  PLAYER: 116,
+  POS: 48,
+  TM: 52,
+  AGE: 54,
+  FPTS: 70,
+  PPG: 62,
+  VALUE: 62,
+  ADP: 62,
+  "POS·ADP": 74,
+  G: 46,
+  "SNP%": 62,
+  "YDS(t)": 68,
+  "YPG(t)": 62,
+  OPP: 58,
+  IMP: 56,
+  "IMP/OPP": 68,
+  "CSTY%": 60,
+  CL: 52,
+  paYDS: 68,
+  paTD: 56,
+  "CMP%": 62,
+  paATT: 60,
+  paRTG: 60,
+  "EPA/DB": 62,
+  CPOE: 58,
+  CMP: 56,
+  paYPG: 62,
+  ruYDS: 62,
+  ruTD: 54,
+  pa1D: 54,
+  "IMP/G": 62,
+  pIMP: 56,
+  "pIMP/A": 66,
+  CAR: 52,
+  YPC: 52,
+  TTT: 52,
+  "PRS%": 58,
+  SAC: 50,
+  INT: 50,
+  FUM: 50,
+  FPOE: 60,
+  REC: 52,
+  recYDS: 64,
+  TGT: 52,
+  ELU: 52,
+  "MTF/A": 60,
+  "YCO/A": 60,
+  MTF: 52,
+  YCO: 52,
+  "EXPLSV%": 68,
+  ru1D: 52,
+  RYOE: 60,
+  recTD: 54,
+  rec1D: 54,
+  YAC: 56,
+  "TS%": 56,
+  YPRR: 56,
+  "1DRR": 56,
+  recYPG: 62,
+  "AY%": 54,
+  YPR: 52,
+  RR: 52,
+  "RZ Tgt": 64,
+};
+
 const state = {
   primaryTab: "1-QB",
   activeCategory: "overview",
@@ -257,6 +326,7 @@ const state = {
   },
   searchText: "",
   rows: [],
+  isCompactViewport: isCompactViewport(),
 };
 
 const mainTitle = document.querySelector("#main-title");
@@ -313,8 +383,8 @@ const gridOptions = {
   maintainColumnOrder: true,
   suppressMovableColumns: true,
   cacheQuickFilter: true,
-  rowHeight: 44,
-  headerHeight: 50,
+  rowHeight: getRowHeight(),
+  headerHeight: getHeaderHeight(),
   tooltipShowDelay: 120,
   overlayLoadingTemplate:
     '<span class="ag-overlay-loading-center">Preparing Data Hub…</span>',
@@ -374,6 +444,8 @@ function attachEventListeners() {
 
   filePickerButton.addEventListener("click", () => filePickerInput.click());
   filePickerInput.addEventListener("change", handlePickedFile);
+
+  window.addEventListener("resize", handleViewportResize, { passive: true });
 }
 
 async function loadInitialData() {
@@ -494,12 +566,13 @@ function buildColumnDefs() {
   return columns.map((columnName, index) => {
     const isLabelColumn = LABEL_COLUMNS.has(columnName);
     const isNumericColumn = !isLabelColumn;
+    const columnWidth = getColumnWidth(columnName);
 
     return {
       headerName: columnName,
       field: columnName,
-      width: COLUMN_WIDTHS[columnName] ?? 94,
-      minWidth: COLUMN_WIDTHS[columnName] ?? 94,
+      width: columnWidth,
+      minWidth: columnWidth,
       pinned: index < 3 ? "left" : null,
       lockPinned: index < 3,
       suppressMovable: true,
@@ -517,6 +590,40 @@ function buildColumnDefs() {
 function getVisibleRows() {
   const predicate = CATEGORY_FILTERS[state.activeCategory];
   return state.rows.filter((row) => predicate(row, state));
+}
+
+function getColumnWidth(columnName) {
+  const widths = state.isCompactViewport ? MOBILE_COLUMN_WIDTHS : COLUMN_WIDTHS;
+  return widths[columnName] ?? (state.isCompactViewport ? 58 : 94);
+}
+
+function isCompactViewport() {
+  return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+}
+
+function getRowHeight() {
+  return state.isCompactViewport ? 38 : 44;
+}
+
+function getHeaderHeight() {
+  return state.isCompactViewport ? 40 : 50;
+}
+
+let resizeFrame = 0;
+
+function handleViewportResize() {
+  cancelAnimationFrame(resizeFrame);
+  resizeFrame = requestAnimationFrame(() => {
+    const nextCompact = isCompactViewport();
+    if (nextCompact === state.isCompactViewport) {
+      return;
+    }
+
+    state.isCompactViewport = nextCompact;
+    gridApi.setGridOption("rowHeight", getRowHeight());
+    gridApi.setGridOption("headerHeight", getHeaderHeight());
+    refreshGrid();
+  });
 }
 
 function normalizeRow(sourceRow) {

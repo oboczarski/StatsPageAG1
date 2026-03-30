@@ -35,7 +35,7 @@
           </h1>
         </div>
 
-        <div class="control-rail">
+        <div class="hero-actions">
           <div class="top-tabs" role="tablist" aria-label="League format">
             <button
               type="button"
@@ -55,88 +55,88 @@
             >
               SFLX
             </button>
-            <button type="button" class="top-pill top-pill--ghost" aria-disabled="true">
-              PICK VALUES
-            </button>
           </div>
+          <button type="button" class="top-pill top-pill--ghost" aria-disabled="true">
+            PICK VALUES
+          </button>
         </div>
       </section>
 
       <section class="controls-shell glass-panel" aria-label="Filters and controls">
         <div class="controls-cluster">
-          <div class="control-rail control-rail--category">
-            <div class="category-row" role="tablist" aria-label="Stat categories">
-              <button
-                type="button"
-                class="category-chip is-active"
-                data-category="overview"
-                role="tab"
-                aria-selected="true"
-              >
-                OVERVIEW (ALL)
-              </button>
-              <button
-                type="button"
-                class="category-chip"
-                data-category="passing"
-                role="tab"
-                aria-selected="false"
-              >
-                PASSING (QB)
-              </button>
-              <button
-                type="button"
-                class="category-chip"
-                data-category="rushing"
-                role="tab"
-                aria-selected="false"
-              >
-                RUSHING (RB)
-              </button>
-              <button
-                type="button"
-                class="category-chip"
-                data-category="receiving"
-                role="tab"
-                aria-selected="false"
-              >
-                RECEIVING (W/T)
-              </button>
-            </div>
+          <div class="category-row" role="tablist" aria-label="Stat categories">
+            <button
+              type="button"
+              class="category-chip is-active"
+              data-category="overview"
+              role="tab"
+              aria-selected="true"
+              aria-label="OVERVIEW (ALL)"
+            >
+              <span class="category-chip__label">OVERVIEW</span>
+              <span class="category-chip__meta">(ALL)</span>
+            </button>
+            <button
+              type="button"
+              class="category-chip"
+              data-category="passing"
+              role="tab"
+              aria-selected="false"
+              aria-label="PASSING (QB)"
+            >
+              <span class="category-chip__label">PASSING</span>
+              <span class="category-chip__meta">(QB)</span>
+            </button>
+            <button
+              type="button"
+              class="category-chip"
+              data-category="rushing"
+              role="tab"
+              aria-selected="false"
+              aria-label="RUSHING (RB)"
+            >
+              <span class="category-chip__label">RUSHING</span>
+              <span class="category-chip__meta">(RB)</span>
+            </button>
+            <button
+              type="button"
+              class="category-chip"
+              data-category="receiving"
+              role="tab"
+              aria-selected="false"
+              aria-label="RECEIVING (W/T)"
+            >
+              <span class="category-chip__label">RECEIVING</span>
+              <span class="category-chip__meta">(W/T)</span>
+            </button>
           </div>
 
-          <div class="control-rail control-rail--subfilters">
-            <div
-              id="receiving-subfilters"
-              class="receiving-subfilters"
-              aria-label="Receiving position filters"
-              hidden
+          <div
+            id="receiving-subfilters"
+            class="receiving-subfilters"
+            aria-label="Receiving position filters"
+            hidden
+          >
+            <button
+              type="button"
+              class="subfilter-chip is-active"
+              data-receiving-filter="WR"
+              aria-pressed="true"
             >
-              <button
-                type="button"
-                class="subfilter-chip is-active"
-                data-receiving-filter="WR"
-                aria-pressed="true"
-              >
-                WR
-              </button>
-              <button
-                type="button"
-                class="subfilter-chip is-active"
-                data-receiving-filter="TE"
-                aria-pressed="true"
-              >
-                TE
-              </button>
-            </div>
+              WR
+            </button>
+            <button
+              type="button"
+              class="subfilter-chip is-active"
+              data-receiving-filter="TE"
+              aria-pressed="true"
+            >
+              TE
+            </button>
           </div>
         </div>
 
         <div class="utility-row">
-          <button type="button" class="mini-chip mini-chip--ghost" aria-disabled="true">
-            ROOKIES
-          </button>
-
           <button type="button" class="mini-chip mini-chip--icon" aria-disabled="true">
             <svg
               class="mini-chip__icon"
