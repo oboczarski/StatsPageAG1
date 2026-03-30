@@ -343,6 +343,21 @@ const state = {
   columnFormatting: Object.create(null),
 };
 
+const PROVIDED_HEADER_TEMPLATE = `
+  <div class="ag-cell-label-container dh-header-template" role="presentation">
+    <div data-ref="eLabel" class="ag-header-cell-label dh-header-label" role="presentation">
+      <span data-ref="eText" class="ag-header-cell-text" role="columnheader"></span>
+      <span class="dh-header-icons" aria-hidden="true">
+        <span data-ref="eSortOrder" class="ag-header-icon ag-header-label-icon ag-sort-order ag-hidden" aria-hidden="true"></span>
+        <span data-ref="eSortAsc" class="ag-header-icon ag-header-label-icon ag-sort-ascending-icon ag-hidden" aria-hidden="true"></span>
+        <span data-ref="eSortDesc" class="ag-header-icon ag-header-label-icon ag-sort-descending-icon ag-hidden" aria-hidden="true"></span>
+        <span data-ref="eSortAbsoluteAsc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-ascending-icon ag-hidden" aria-hidden="true"></span>
+        <span data-ref="eSortAbsoluteDesc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-descending-icon ag-hidden" aria-hidden="true"></span>
+        <span data-ref="eSortMixed" class="ag-header-icon ag-header-label-icon ag-sort-mixed-icon ag-hidden" aria-hidden="true"></span>
+      </span>
+    </div>
+  </div>`;
+
 const mainTitle = document.querySelector("#main-title");
 const activeViewLabel = document.querySelector("#active-view-label");
 const rowCount = document.querySelector("#row-count");
@@ -408,8 +423,11 @@ const gridOptions = {
   defaultColDef: {
     sortable: true,
     resizable: true,
-    filter: true,
+    filter: false,
     minWidth: 84,
+    headerComponentParams: {
+      template: PROVIDED_HEADER_TEMPLATE,
+    },
     cellClass: getCellClass,
     comparator: compareGridValues,
   },
@@ -592,11 +610,11 @@ function buildColumnDefs() {
       pinned: index < 3 ? "left" : null,
       lockPinned: index < 3,
       suppressMovable: true,
-      filter: isLabelColumn ? "agTextColumnFilter" : "agNumberColumnFilter",
       type: isNumericColumn ? "numericColumn" : undefined,
       headerClass: "dh-header-cell",
+      valueFormatter: formatGridValue,
       tooltipValueGetter: getTooltipValue,
-      cellRenderer: renderCell,
+      cellRenderer: columnName === FPTS_COLUMN ? renderFptsCell : undefined,
       cellClass: getCellClass,
       comparator: compareGridValues,
     };
@@ -732,6 +750,7 @@ function parseCsv(csvText) {
 function getCellClass(params) {
   const classes = ["dh-grid-cell"];
   const columnName = params.colDef.field;
+  const missingValue = isMissingValue(params.value);
 
   if (columnName === PLAYER_COLUMN) {
     classes.push("player-cell");
@@ -745,8 +764,20 @@ function getCellClass(params) {
     classes.push("formatted-cell");
   }
 
-  if (isMissingValue(params.value)) {
+  if (missingValue) {
     classes.push("na-cell");
+    return classes.join(" ");
+  }
+
+  if (columnName === FPTS_COLUMN) {
+    classes.push("fpts-cell", `fpts-cell--tier-${getFormattingTier(columnName, params.value)}`);
+    return classes.join(" ");
+  }
+
+  if (!NON_FORMATTED_COLUMNS.has(columnName)) {
+    const family = NEUTRAL_COLUMNS.has(columnName) ? "neutral" : "heat";
+    const tier = getFormattingTier(columnName, params.value);
+    classes.push("heat-cell", `heat-cell--${family}`, `heat-cell--tier-${tier}`);
   }
 
   return classes.join(" ");
@@ -756,31 +787,24 @@ function formatCellValue(value) {
   return isMissingValue(value) ? "NA" : value;
 }
 
+function formatGridValue(params) {
+  return formatDisplayValue(params.colDef.field, params.value);
+}
+
 function getTooltipValue(params) {
   return formatCellValue(params.value);
 }
 
-function renderCell(params) {
-  const columnName = params.colDef.field;
-  const displayValue = formatDisplayValue(columnName, params.value);
-  const safeValue = escapeHtml(displayValue);
+function renderFptsCell(params) {
+  const displayValue = params.valueFormatted ?? formatDisplayValue(FPTS_COLUMN, params.value);
 
   if (isMissingValue(params.value)) {
-    return `<span class="dh-cell-text dh-cell-text--na">${safeValue}</span>`;
+    return displayValue;
   }
 
-  if (columnName === FPTS_COLUMN) {
-    const tier = getFormattingTier(columnName, params.value);
-    return `<span class="dh-fpts-chip dh-fpts-chip--tier-${tier}">${safeValue}</span>`;
-  }
-
-  if (!NON_FORMATTED_COLUMNS.has(columnName)) {
-    const family = NEUTRAL_COLUMNS.has(columnName) ? "neutral" : "heat";
-    const tier = getFormattingTier(columnName, params.value);
-    return `<span class="dh-heat-text dh-heat-text--${family} dh-heat-text--tier-${tier}">${safeValue}</span>`;
-  }
-
-  return `<span class="dh-cell-text">${safeValue}</span>`;
+  const safeValue = escapeHtml(displayValue);
+  const tier = getFormattingTier(FPTS_COLUMN, params.value);
+  return `<span class="dh-fpts-chip dh-fpts-chip--tier-${tier}">${safeValue}</span>`;
 }
 
 function formatDisplayValue(columnName, value) {

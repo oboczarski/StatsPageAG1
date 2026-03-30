@@ -424,6 +424,19 @@ body::after {
   padding: 10px;
 }
 
+.grid-shell.glass-panel {
+  background:
+    linear-gradient(180deg, rgba(9, 16, 27, 0.56), rgba(7, 13, 22, 0.38)),
+    rgba(8, 14, 24, 0.22);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.grid-shell.glass-panel::before {
+  display: none;
+}
+
 .grid-shell__meta {
   display: flex;
   flex-wrap: wrap;
@@ -475,9 +488,7 @@ body::after {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0.006)),
-    rgba(6, 13, 22, 0.12);
+  background: rgba(6, 13, 22, 0.04);
 }
 
 .data-grid {
@@ -625,7 +636,7 @@ body::after {
 
 .ag-theme-balham .ag-header,
 .ag-theme-balham .ag-pinned-left-header {
-  background: rgba(10, 18, 30, 0.16);
+  background: rgba(10, 18, 30, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: none;
   backdrop-filter: none;
@@ -633,7 +644,7 @@ body::after {
 }
 
 .ag-theme-balham .ag-pinned-left-cols-container {
-  background: rgba(10, 18, 30, 0.06);
+  background: rgba(10, 18, 30, 0.03);
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.1);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -645,8 +656,16 @@ body::after {
 .ag-theme-balham .ag-center-cols-clipper,
 .ag-theme-balham .ag-body-viewport,
 .ag-theme-balham .ag-header-viewport,
-.ag-theme-balham .ag-header-container {
+.ag-theme-balham .ag-header-container,
+.ag-theme-balham .ag-body-horizontal-scroll-viewport {
   background: transparent;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.ag-theme-balham .ag-header-container,
+.ag-theme-balham .ag-center-cols-container {
+  will-change: transform;
 }
 
 .ag-theme-balham .ag-header-cell,
@@ -655,23 +674,37 @@ body::after {
   letter-spacing: 0.03em;
 }
 
-.ag-theme-balham .ag-header-cell-label {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+.ag-theme-balham .ag-header-cell-comp-wrapper,
+.ag-theme-balham .dh-header-template {
   width: 100%;
-  min-width: 0;
   height: 100%;
 }
 
-.ag-theme-balham .ag-header-cell-text {
-  position: absolute;
-  left: calc(50% + 7px);
-  transform: translateX(-50%);
+.ag-theme-balham .dh-header-template {
+  display: flex;
+  align-items: stretch;
+}
+
+.ag-theme-balham .ag-header-cell-label.dh-header-label {
   display: block;
-  max-width: calc(100% - 32px);
+  width: 100%;
   min-width: 0;
+  height: 100%;
+  padding: 0;
+  position: relative;
+}
+
+.ag-theme-balham .ag-header-cell-text {
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  min-width: 0;
+  padding: 0 4px;
+  box-sizing: border-box;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -679,11 +712,25 @@ body::after {
   pointer-events: none;
 }
 
+.ag-theme-balham .dh-header-icons {
+  position: absolute;
+  top: 50%;
+  right: 2px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1px;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.ag-theme-balham .dh-header-icons .ag-header-icon,
 .ag-theme-balham .ag-sort-indicator-container,
 .ag-theme-balham .ag-header-label-icon,
 .ag-theme-balham .ag-header-icon {
-  margin-left: auto;
-  position: relative;
+  margin: 0;
+  position: static;
   z-index: 1;
 }
 
@@ -720,6 +767,9 @@ body::after {
   width: 100%;
   min-height: 100%;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: rgba(236, 242, 252, 0.92);
 }
 
 .ag-theme-balham .ag-cell.center-cell {
@@ -736,8 +786,16 @@ body::after {
   justify-content: flex-start;
 }
 
-.ag-theme-balham .dh-cell-text,
-.ag-theme-balham .dh-heat-text,
+.ag-theme-balham .ag-cell.formatted-cell .ag-cell-value {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-shadow: none;
+}
+
+.ag-theme-balham .ag-cell.na-cell .ag-cell-value {
+  color: rgba(171, 186, 208, 0.48);
+}
+
 .ag-theme-balham .dh-fpts-chip {
   display: inline-flex;
   align-items: center;
@@ -751,73 +809,50 @@ body::after {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.ag-theme-balham .dh-cell-text {
-  color: rgba(236, 242, 252, 0.92);
-}
-
-.ag-theme-balham .dh-heat-text {
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  background: transparent;
-  text-shadow: none;
-}
-
-.ag-theme-balham .dh-cell-text--na {
-  color: rgba(171, 186, 208, 0.48);
-}
-
-.ag-theme-balham .dh-fpts-chip {
   border: 1px solid transparent;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.ag-theme-balham .dh-heat-text--heat.dh-heat-text--tier-0 {
+.ag-theme-balham .ag-cell.heat-cell--heat.heat-cell--tier-0 .ag-cell-value {
   color: rgba(212, 222, 240, 0.74);
 }
 
-.ag-theme-balham .dh-heat-text--heat.dh-heat-text--tier-1 {
+.ag-theme-balham .ag-cell.heat-cell--heat.heat-cell--tier-1 .ag-cell-value {
   color: rgba(194, 232, 255, 0.82);
 }
 
-.ag-theme-balham .dh-heat-text--heat.dh-heat-text--tier-2 {
+.ag-theme-balham .ag-cell.heat-cell--heat.heat-cell--tier-2 .ag-cell-value {
   color: rgba(171, 225, 255, 0.92);
 }
 
-.ag-theme-balham .dh-heat-text--heat.dh-heat-text--tier-3 {
+.ag-theme-balham .ag-cell.heat-cell--heat.heat-cell--tier-3 .ag-cell-value {
   color: rgba(141, 225, 255, 0.98);
 }
 
-.ag-theme-balham .dh-heat-text--heat.dh-heat-text--tier-4 {
+.ag-theme-balham .ag-cell.heat-cell--heat.heat-cell--tier-4 .ag-cell-value {
   color: rgba(122, 233, 255, 1);
-  text-shadow: 0 0 10px rgba(102, 215, 255, 0.08);
 }
 
-.ag-theme-balham .dh-heat-text--neutral.dh-heat-text--tier-0 {
+.ag-theme-balham .ag-cell.heat-cell--neutral.heat-cell--tier-0 .ag-cell-value {
   color: rgba(214, 221, 234, 0.74);
 }
 
-.ag-theme-balham .dh-heat-text--neutral.dh-heat-text--tier-1 {
+.ag-theme-balham .ag-cell.heat-cell--neutral.heat-cell--tier-1 .ag-cell-value {
   color: rgba(223, 227, 238, 0.82);
 }
 
-.ag-theme-balham .dh-heat-text--neutral.dh-heat-text--tier-2 {
+.ag-theme-balham .ag-cell.heat-cell--neutral.heat-cell--tier-2 .ag-cell-value {
   color: rgba(235, 228, 215, 0.9);
 }
 
-.ag-theme-balham .dh-heat-text--neutral.dh-heat-text--tier-3 {
+.ag-theme-balham .ag-cell.heat-cell--neutral.heat-cell--tier-3 .ag-cell-value {
   color: rgba(248, 222, 182, 0.96);
 }
 
-.ag-theme-balham .dh-heat-text--neutral.dh-heat-text--tier-4 {
+.ag-theme-balham .ag-cell.heat-cell--neutral.heat-cell--tier-4 .ag-cell-value {
   color: rgba(255, 214, 158, 1);
-  text-shadow: 0 0 10px rgba(255, 184, 102, 0.08);
-}
-
-.ag-theme-balham .dh-fpts-chip {
-  font-weight: 700;
-  letter-spacing: 0.01em;
 }
 
 .ag-theme-balham .dh-fpts-chip--tier-0 {
@@ -932,11 +967,9 @@ body::after {
   }
 
   .ag-theme-balham .ag-header-cell-text {
-    max-width: calc(100% - 24px);
+    padding: 0 3px;
   }
 
-  .ag-theme-balham .dh-cell-text,
-  .ag-theme-balham .dh-heat-text,
   .ag-theme-balham .dh-fpts-chip {
     min-height: 22px;
     padding: 0 6px;
