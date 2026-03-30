@@ -577,19 +577,19 @@ body::after {
   --ag-header-text-color: rgba(202, 222, 247, 0.88);
   --ag-secondary-foreground-color: rgba(165, 184, 209, 0.74);
   --ag-subtle-text-color: rgba(165, 184, 209, 0.74);
-  --ag-border-color: rgba(255, 255, 255, 0.08);
-  --ag-row-border-color: rgba(255, 255, 255, 0.04);
-  --ag-column-border: 1px solid rgba(255, 255, 255, 0.032);
-  --ag-cell-horizontal-border: solid rgba(255, 255, 255, 0.032);
-  --ag-header-column-separator-color: rgba(255, 255, 255, 0.08);
+  --ag-border-color: transparent;
+  --ag-row-border-color: rgba(255, 255, 255, 0.06);
+  --ag-column-border: 0 none transparent;
+  --ag-cell-horizontal-border: solid transparent;
+  --ag-header-column-separator-color: rgba(255, 255, 255, 0.1);
   --ag-header-column-border: 1px solid rgba(255, 255, 255, 0.08);
   --ag-accent-color: var(--accent-cyan);
   --ag-active-color: var(--accent-cyan);
   --ag-balham-active-color: var(--accent-cyan);
   --ag-range-selection-border-color: rgba(102, 215, 255, 0.46);
   --ag-selected-row-background-color: rgba(102, 215, 255, 0.08);
-  --ag-row-hover-color: rgba(255, 255, 255, 0.04);
-  --ag-header-cell-hover-background-color: rgba(255, 255, 255, 0.03);
+  --ag-row-hover-color: transparent;
+  --ag-header-cell-hover-background-color: rgba(255, 255, 255, 0.02);
   --ag-input-focus-border-color: rgba(128, 220, 255, 0.6);
   --ag-focus-shadow: 0 0 0 1px rgba(128, 220, 255, 0.5),
     0 0 0 4px rgba(57, 135, 255, 0.18);
@@ -623,35 +623,32 @@ body::after {
   box-shadow: none;
 }
 
-.ag-theme-balham .ag-header {
+.ag-theme-balham .ag-header,
+.ag-theme-balham .ag-pinned-left-header {
   position: relative;
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
   background:
-    linear-gradient(180deg, rgba(11, 20, 33, 0.24), rgba(11, 20, 33, 0.12));
-  box-shadow:
-    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
-    0 10px 26px rgba(0, 0, 0, 0.08);
+    linear-gradient(180deg, rgba(10, 18, 30, 0.24), rgba(10, 18, 30, 0.14));
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-.ag-theme-balham .ag-pinned-left-header,
 .ag-theme-balham .ag-pinned-left-cols-container {
   background:
-    linear-gradient(180deg, rgba(15, 25, 41, 0.2), rgba(12, 21, 35, 0.1));
-  backdrop-filter: blur(20px) saturate(145%);
-  -webkit-backdrop-filter: blur(20px) saturate(145%);
-  box-shadow:
-    inset -1px 0 0 rgba(255, 255, 255, 0.08),
-    16px 0 22px -18px rgba(10, 18, 30, 0.28);
+    linear-gradient(180deg, rgba(10, 18, 30, 0.08), rgba(10, 18, 30, 0.03));
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-.ag-theme-balham .ag-pinned-left-cols-viewport {
-  background: linear-gradient(180deg, rgba(12, 22, 37, 0.08), rgba(8, 16, 28, 0.03));
-}
-
-.ag-theme-balham .ag-cell,
-.ag-theme-balham .ag-header-cell {
-  border-color: rgba(255, 255, 255, 0.045);
+.ag-theme-balham .ag-pinned-left-cols-viewport,
+.ag-theme-balham .ag-center-cols-viewport,
+.ag-theme-balham .ag-center-cols-container,
+.ag-theme-balham .ag-center-cols-clipper,
+.ag-theme-balham .ag-body-viewport,
+.ag-theme-balham .ag-header-viewport,
+.ag-theme-balham .ag-header-container {
+  background: transparent;
 }
 
 .ag-theme-balham .ag-header-cell,
@@ -660,55 +657,229 @@ body::after {
   letter-spacing: 0.03em;
 }
 
+.ag-theme-balham .ag-header-cell-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+}
+
+.ag-theme-balham .ag-header-cell-comp-wrapper {
+  position: absolute;
+  inset: 0 24px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.ag-theme-balham .dh-inner-header {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ag-theme-balham .ag-sort-indicator-container {
+  margin-left: auto;
+}
+
 .ag-theme-balham .ag-header-cell::after,
 .ag-theme-balham .ag-header-group-cell::after {
-  opacity: 0.65;
+  opacity: 0.78;
 }
 
 .ag-theme-balham .ag-row {
   border-color: rgba(255, 255, 255, 0.06);
 }
 
-.ag-theme-balham .ag-row-even {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.008), rgba(255, 255, 255, 0.003));
-}
-
-.ag-theme-balham .ag-row-odd {
-  background: linear-gradient(90deg, rgba(120, 210, 255, 0.016), rgba(120, 210, 255, 0.004));
-}
-
+.ag-theme-balham .ag-row-even,
+.ag-theme-balham .ag-row-odd,
 .ag-theme-balham .ag-row-hover {
-  background:
-    linear-gradient(90deg, rgba(102, 215, 255, 0.06), rgba(162, 127, 255, 0.034)) !important;
+  background: transparent !important;
 }
 
 .ag-theme-balham .ag-row-focus,
 .ag-theme-balham .ag-row-selected {
-  background:
-    linear-gradient(90deg, rgba(102, 215, 255, 0.08), rgba(162, 127, 255, 0.05)) !important;
+  background: rgba(102, 215, 255, 0.04) !important;
 }
 
 .ag-theme-balham .ag-cell {
   display: flex;
   align-items: center;
+  border: 0 !important;
+  overflow: visible;
 }
 
-.ag-theme-balham .ag-cell.numeric-cell {
-  justify-content: flex-end;
+.ag-theme-balham .ag-cell-value {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 100%;
+}
+
+.ag-theme-balham .ag-cell.center-cell {
+  justify-content: center;
   font-variant-numeric: tabular-nums;
 }
 
-.ag-theme-balham .ag-cell.label-cell,
-.ag-theme-balham .ag-header-cell.label-column .ag-header-cell-label {
+.ag-theme-balham .ag-cell.center-cell .ag-cell-value {
+  justify-content: center;
+}
+
+.ag-theme-balham .ag-cell.player-cell,
+.ag-theme-balham .ag-cell.player-cell .ag-cell-value {
   justify-content: flex-start;
 }
 
-.ag-theme-balham .ag-header-cell.numeric-column .ag-header-cell-label {
-  justify-content: flex-end;
+.ag-theme-balham .dh-cell-text,
+.ag-theme-balham .dh-heat-text,
+.ag-theme-balham .dh-fpts-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 0 8px;
+  border-radius: 999px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.ag-theme-balham .ag-cell.na-cell {
+.ag-theme-balham .dh-cell-text {
+  color: rgba(236, 242, 252, 0.92);
+}
+
+.ag-theme-balham .dh-heat-text {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  background: transparent;
+}
+
+.ag-theme-balham .dh-cell-text--na {
   color: rgba(171, 186, 208, 0.48);
+}
+
+.ag-theme-balham .dh-fpts-chip {
+  border: 1px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.ag-theme-balham .dh-heat-text--heat.dh-heat-text--tier-0 {
+  color: rgba(212, 222, 240, 0.74);
+  text-shadow: none;
+}
+
+.ag-theme-balham .dh-heat-text--heat.dh-heat-text--tier-1 {
+  color: rgba(194, 232, 255, 0.82);
+  text-shadow: 0 0 10px rgba(102, 215, 255, 0.04);
+}
+
+.ag-theme-balham .dh-heat-text--heat.dh-heat-text--tier-2 {
+  color: rgba(171, 225, 255, 0.92);
+  text-shadow: 0 0 12px rgba(102, 215, 255, 0.07);
+}
+
+.ag-theme-balham .dh-heat-text--heat.dh-heat-text--tier-3 {
+  color: rgba(141, 225, 255, 0.98);
+  text-shadow:
+    0 0 14px rgba(102, 215, 255, 0.11),
+    0 0 22px rgba(162, 127, 255, 0.05);
+}
+
+.ag-theme-balham .dh-heat-text--heat.dh-heat-text--tier-4 {
+  color: rgba(122, 233, 255, 1);
+  text-shadow:
+    0 0 16px rgba(102, 215, 255, 0.15),
+    0 0 28px rgba(162, 127, 255, 0.07);
+}
+
+.ag-theme-balham .dh-heat-text--neutral.dh-heat-text--tier-0 {
+  color: rgba(214, 221, 234, 0.74);
+  text-shadow: none;
+}
+
+.ag-theme-balham .dh-heat-text--neutral.dh-heat-text--tier-1 {
+  color: rgba(223, 227, 238, 0.82);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.035);
+}
+
+.ag-theme-balham .dh-heat-text--neutral.dh-heat-text--tier-2 {
+  color: rgba(235, 228, 215, 0.9);
+  text-shadow: 0 0 10px rgba(255, 196, 132, 0.05);
+}
+
+.ag-theme-balham .dh-heat-text--neutral.dh-heat-text--tier-3 {
+  color: rgba(248, 222, 182, 0.96);
+  text-shadow:
+    0 0 12px rgba(255, 190, 120, 0.09),
+    0 0 18px rgba(255, 255, 255, 0.03);
+}
+
+.ag-theme-balham .dh-heat-text--neutral.dh-heat-text--tier-4 {
+  color: rgba(255, 214, 158, 1);
+  text-shadow:
+    0 0 14px rgba(255, 184, 102, 0.12),
+    0 0 22px rgba(255, 255, 255, 0.04);
+}
+
+.ag-theme-balham .dh-fpts-chip {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.ag-theme-balham .dh-fpts-chip--tier-0 {
+  background:
+    linear-gradient(180deg, rgba(102, 215, 255, 0.08), rgba(162, 127, 255, 0.04)),
+    rgba(255, 255, 255, 0.02);
+  border-color: rgba(130, 214, 255, 0.12);
+}
+
+.ag-theme-balham .dh-fpts-chip--tier-1 {
+  background:
+    linear-gradient(180deg, rgba(102, 215, 255, 0.12), rgba(162, 127, 255, 0.06)),
+    rgba(255, 255, 255, 0.02);
+  border-color: rgba(130, 214, 255, 0.16);
+}
+
+.ag-theme-balham .dh-fpts-chip--tier-2 {
+  background:
+    linear-gradient(180deg, rgba(102, 215, 255, 0.16), rgba(162, 127, 255, 0.08)),
+    rgba(255, 255, 255, 0.02);
+  border-color: rgba(130, 214, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 20px rgba(102, 215, 255, 0.08);
+}
+
+.ag-theme-balham .dh-fpts-chip--tier-3 {
+  background:
+    linear-gradient(180deg, rgba(102, 215, 255, 0.22), rgba(162, 127, 255, 0.12)),
+    rgba(255, 255, 255, 0.02);
+  border-color: rgba(135, 220, 255, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 24px rgba(102, 215, 255, 0.12);
+}
+
+.ag-theme-balham .dh-fpts-chip--tier-4 {
+  background:
+    linear-gradient(180deg, rgba(102, 215, 255, 0.28), rgba(162, 127, 255, 0.16)),
+    rgba(255, 255, 255, 0.02);
+  border-color: rgba(145, 224, 255, 0.36);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 30px rgba(102, 215, 255, 0.16);
 }
 
 .ag-theme-balham .ag-overlay-no-rows-center,
@@ -776,6 +947,17 @@ body::after {
   .ag-theme-balham .ag-header-cell {
     padding-left: 6px;
     padding-right: 6px;
+  }
+
+  .ag-theme-balham .ag-header-cell-comp-wrapper {
+    inset: 0 20px 0 0;
+  }
+
+  .ag-theme-balham .dh-cell-text,
+  .ag-theme-balham .dh-heat-text,
+  .ag-theme-balham .dh-fpts-chip {
+    min-height: 22px;
+    padding: 0 6px;
   }
 }
 
