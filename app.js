@@ -171,6 +171,19 @@ const SOURCE_ALIASES = {
 };
 
 const LABEL_COLUMNS = new Set(["PLAYER", "POS", "TM"]);
+const NON_FORMATTED_COLUMNS = new Set(["PLAYER", "POS", "TM", "AGE", "G"]);
+const INVERTED_COLUMNS = new Set([
+  "RK",
+  "ADP",
+  "POS·ADP",
+  "INT",
+  "FUM",
+  "PRS%",
+  "CSTY%",
+]);
+const NEUTRAL_COLUMNS = new Set(["TTT", "CL"]);
+const PLAYER_COLUMN = "PLAYER";
+const FPTS_COLUMN = "FPTS";
 
 const CATEGORY_FILTERS = {
   overview: (row) => Boolean(row.POS && row.POS !== "NA"),
@@ -181,9 +194,11 @@ const CATEGORY_FILTERS = {
     (row.POS === "TE" && state.receivingFilters.TE),
 };
 
+const MOBILE_BREAKPOINT = 719;
+
 const COLUMN_WIDTHS = {
   RK: 78,
-  PLAYER: 244,
+  PLAYER: 196,
   POS: 74,
   TM: 82,
   AGE: 78,
@@ -248,6 +263,73 @@ const COLUMN_WIDTHS = {
   "RZ Tgt": 98,
 };
 
+const MOBILE_COLUMN_WIDTHS = {
+  RK: 44,
+  PLAYER: 92,
+  POS: 48,
+  TM: 52,
+  AGE: 54,
+  FPTS: 70,
+  PPG: 62,
+  VALUE: 62,
+  ADP: 62,
+  "POS·ADP": 74,
+  G: 46,
+  "SNP%": 62,
+  "YDS(t)": 68,
+  "YPG(t)": 62,
+  OPP: 58,
+  IMP: 56,
+  "IMP/OPP": 68,
+  "CSTY%": 60,
+  CL: 52,
+  paYDS: 68,
+  paTD: 56,
+  "CMP%": 62,
+  paATT: 60,
+  paRTG: 60,
+  "EPA/DB": 62,
+  CPOE: 58,
+  CMP: 56,
+  paYPG: 62,
+  ruYDS: 62,
+  ruTD: 54,
+  pa1D: 54,
+  "IMP/G": 62,
+  pIMP: 56,
+  "pIMP/A": 66,
+  CAR: 52,
+  YPC: 52,
+  TTT: 52,
+  "PRS%": 58,
+  SAC: 50,
+  INT: 50,
+  FUM: 50,
+  FPOE: 60,
+  REC: 52,
+  recYDS: 64,
+  TGT: 52,
+  ELU: 52,
+  "MTF/A": 60,
+  "YCO/A": 60,
+  MTF: 52,
+  YCO: 52,
+  "EXPLSV%": 68,
+  ru1D: 52,
+  RYOE: 60,
+  recTD: 54,
+  rec1D: 54,
+  YAC: 56,
+  "TS%": 56,
+  YPRR: 56,
+  "1DRR": 56,
+  recYPG: 62,
+  "AY%": 54,
+  YPR: 52,
+  RR: 52,
+  "RZ Tgt": 64,
+};
+
 const state = {
   primaryTab: "1-QB",
   activeCategory: "overview",
@@ -257,7 +339,26 @@ const state = {
   },
   searchText: "",
   rows: [],
+  isCompactViewport: isCompactViewport(),
+  columnFormatting: Object.create(null),
 };
+
+class CenteredInnerHeader {
+  init(params) {
+    this.eGui = document.createElement("span");
+    this.eGui.className = "dh-inner-header";
+    this.eGui.textContent = params.displayName;
+  }
+
+  getGui() {
+    return this.eGui;
+  }
+
+  refresh(params) {
+    this.eGui.textContent = params.displayName;
+    return true;
+  }
+}
 
 const mainTitle = document.querySelector("#main-title");
 const activeViewLabel = document.querySelector("#active-view-label");
@@ -308,13 +409,14 @@ const gridOptions = {
   columnDefs: buildColumnDefs(),
   rowData: [],
   loading: true,
-  animateRows: true,
+  animateRows: false,
   suppressCellFocus: false,
+  suppressRowHoverHighlight: true,
   maintainColumnOrder: true,
   suppressMovableColumns: true,
   cacheQuickFilter: true,
-  rowHeight: 44,
-  headerHeight: 50,
+  rowHeight: getRowHeight(),
+  headerHeight: getHeaderHeight(),
   tooltipShowDelay: 120,
   overlayLoadingTemplate:
     '<span class="ag-overlay-loading-center">Preparing Data Hub…</span>',
@@ -327,6 +429,9 @@ const gridOptions = {
     minWidth: 84,
     cellClass: getCellClass,
     comparator: compareGridValues,
+  },
+  components: {
+    centeredInnerHeader: CenteredInnerHeader,
   },
 };
 
@@ -374,6 +479,8 @@ function attachEventListeners() {
 
   filePickerButton.addEventListener("click", () => filePickerInput.click());
   filePickerInput.addEventListener("change", handlePickedFile);
+
+  window.addEventListener("resize", handleViewportResize, { passive: true });
 }
 
 async function loadInitialData() {
@@ -443,6 +550,7 @@ function applyCsvText(csvText) {
 
 function refreshGrid() {
   const visibleRows = getVisibleRows();
+  state.columnFormatting = buildColumnFormatting(visibleRows);
   gridApi.setGridOption("columnDefs", buildColumnDefs());
   gridApi.setGridOption("rowData", visibleRows);
   gridApi.setGridOption("quickFilterText", state.searchText);
@@ -494,20 +602,24 @@ function buildColumnDefs() {
   return columns.map((columnName, index) => {
     const isLabelColumn = LABEL_COLUMNS.has(columnName);
     const isNumericColumn = !isLabelColumn;
+    const columnWidth = getColumnWidth(columnName);
 
     return {
       headerName: columnName,
       field: columnName,
-      width: COLUMN_WIDTHS[columnName] ?? 94,
-      minWidth: COLUMN_WIDTHS[columnName] ?? 94,
+      width: columnWidth,
+      minWidth: columnWidth,
       pinned: index < 3 ? "left" : null,
       lockPinned: index < 3,
       suppressMovable: true,
       filter: isLabelColumn ? "agTextColumnFilter" : "agNumberColumnFilter",
       type: isNumericColumn ? "numericColumn" : undefined,
-      headerClass: isNumericColumn ? "numeric-column" : "label-column",
-      valueFormatter: ({ value }) => formatCellValue(value),
-      tooltipValueGetter: ({ value }) => formatCellValue(value),
+      headerClass: "dh-header-cell",
+      headerComponentParams: {
+        innerHeaderComponent: "centeredInnerHeader",
+      },
+      tooltipValueGetter: getTooltipValue,
+      cellRenderer: renderCell,
       cellClass: getCellClass,
       comparator: compareGridValues,
     };
@@ -517,6 +629,40 @@ function buildColumnDefs() {
 function getVisibleRows() {
   const predicate = CATEGORY_FILTERS[state.activeCategory];
   return state.rows.filter((row) => predicate(row, state));
+}
+
+function getColumnWidth(columnName) {
+  const widths = state.isCompactViewport ? MOBILE_COLUMN_WIDTHS : COLUMN_WIDTHS;
+  return widths[columnName] ?? (state.isCompactViewport ? 58 : 94);
+}
+
+function isCompactViewport() {
+  return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+}
+
+function getRowHeight() {
+  return state.isCompactViewport ? 38 : 44;
+}
+
+function getHeaderHeight() {
+  return state.isCompactViewport ? 40 : 50;
+}
+
+let resizeFrame = 0;
+
+function handleViewportResize() {
+  cancelAnimationFrame(resizeFrame);
+  resizeFrame = requestAnimationFrame(() => {
+    const nextCompact = isCompactViewport();
+    if (nextCompact === state.isCompactViewport) {
+      return;
+    }
+
+    state.isCompactViewport = nextCompact;
+    gridApi.setGridOption("rowHeight", getRowHeight());
+    gridApi.setGridOption("headerHeight", getHeaderHeight());
+    refreshGrid();
+  });
 }
 
 function normalizeRow(sourceRow) {
@@ -607,13 +753,19 @@ function parseCsv(csvText) {
 }
 
 function getCellClass(params) {
-  const classes = [];
+  const classes = ["dh-grid-cell"];
   const columnName = params.colDef.field;
 
-  if (LABEL_COLUMNS.has(columnName)) {
-    classes.push("label-cell");
+  if (columnName === PLAYER_COLUMN) {
+    classes.push("player-cell");
   } else {
-    classes.push("numeric-cell");
+    classes.push("center-cell");
+  }
+
+  if (NON_FORMATTED_COLUMNS.has(columnName)) {
+    classes.push("plain-cell");
+  } else {
+    classes.push("formatted-cell");
   }
 
   if (isMissingValue(params.value)) {
@@ -625,6 +777,138 @@ function getCellClass(params) {
 
 function formatCellValue(value) {
   return isMissingValue(value) ? "NA" : value;
+}
+
+function getTooltipValue(params) {
+  return formatCellValue(params.value);
+}
+
+function renderCell(params) {
+  const columnName = params.colDef.field;
+  const displayValue = formatDisplayValue(columnName, params.value);
+  const safeValue = escapeHtml(displayValue);
+
+  if (isMissingValue(params.value)) {
+    return `<span class="dh-cell-text dh-cell-text--na">${safeValue}</span>`;
+  }
+
+  if (columnName === FPTS_COLUMN) {
+    const tier = getFormattingTier(columnName, params.value);
+    return `<span class="dh-fpts-chip dh-fpts-chip--tier-${tier}">${safeValue}</span>`;
+  }
+
+  if (!NON_FORMATTED_COLUMNS.has(columnName)) {
+    const family = NEUTRAL_COLUMNS.has(columnName) ? "neutral" : "heat";
+    const tier = getFormattingTier(columnName, params.value);
+    return `<span class="dh-heat-text dh-heat-text--${family} dh-heat-text--tier-${tier}">${safeValue}</span>`;
+  }
+
+  return `<span class="dh-cell-text">${safeValue}</span>`;
+}
+
+function formatDisplayValue(columnName, value) {
+  const formattedValue = formatCellValue(value);
+
+  if (columnName !== PLAYER_COLUMN || !state.isCompactViewport) {
+    return formattedValue;
+  }
+
+  return abbreviatePlayerName(formattedValue);
+}
+
+function abbreviatePlayerName(name) {
+  if (isMissingValue(name)) {
+    return "NA";
+  }
+
+  const parts = String(name).trim().split(/\s+/);
+  if (parts.length < 2) {
+    return String(name);
+  }
+
+  const [first, ...rest] = parts;
+  return `${first.charAt(0)}. ${rest.join(" ")}`;
+}
+
+function buildColumnFormatting(rows) {
+  const formatting = Object.create(null);
+  const columns = COLUMN_SETS[state.activeCategory];
+
+  columns.forEach((columnName) => {
+    if (NON_FORMATTED_COLUMNS.has(columnName)) {
+      return;
+    }
+
+    const values = rows
+      .map((row) => toComparableNumber(row[columnName]))
+      .filter((numericValue) => numericValue != null);
+
+    if (!values.length) {
+      return;
+    }
+
+    formatting[columnName] = createColumnMetric(values);
+  });
+
+  return formatting;
+}
+
+function createColumnMetric(values) {
+  const sorted = [...values].sort((left, right) => left - right);
+
+  return {
+    sorted,
+    isFlat: sorted[0] === sorted[sorted.length - 1],
+  };
+}
+
+function getFormattingTier(columnName, value) {
+  const metric = state.columnFormatting[columnName];
+  const numericValue = toComparableNumber(value);
+
+  if (!metric || numericValue == null) {
+    return 0;
+  }
+
+  if (metric.isFlat) {
+    return 2;
+  }
+
+  const percentile = getPercentileRank(metric.sorted, numericValue);
+  const normalized = INVERTED_COLUMNS.has(columnName)
+    ? 1 - percentile
+    : percentile;
+
+  return clamp(Math.round(normalized * 4), 0, 4);
+}
+
+function getPercentileRank(sortedValues, value) {
+  if (sortedValues.length <= 1) {
+    return 0.5;
+  }
+
+  const upperIndex = upperBound(sortedValues, value) - 1;
+  return clamp(upperIndex / (sortedValues.length - 1), 0, 1);
+}
+
+function upperBound(values, target) {
+  let low = 0;
+  let high = values.length;
+
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (values[middle] <= target) {
+      low = middle + 1;
+    } else {
+      high = middle;
+    }
+  }
+
+  return low;
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
 }
 
 function compareGridValues(valueA, valueB) {
@@ -662,18 +946,41 @@ function toComparableValue(value) {
   }
 
   const raw = String(value).trim();
-  const normalized = raw.replace(/,/g, "").replace(/%$/g, "");
-  const parsedNumber = Number(normalized);
+  const parsedNumber = toComparableNumber(raw);
 
-  if (!Number.isNaN(parsedNumber)) {
+  if (parsedNumber != null) {
     return parsedNumber;
   }
 
   return raw.toUpperCase();
 }
 
+function toComparableNumber(value) {
+  if (isMissingValue(value)) {
+    return null;
+  }
+
+  const normalized = String(value).trim().replace(/,/g, "").replace(/%$/g, "");
+  const parsedNumber = Number(normalized);
+
+  if (Number.isNaN(parsedNumber)) {
+    return null;
+  }
+
+  return parsedNumber;
+}
+
 function isMissingValue(value) {
   return value == null || value === "" || value === "NA" || value === "#N/A";
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 function showOverlay({ title, description, showActions = false }) {
