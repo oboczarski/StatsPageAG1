@@ -1,0 +1,688 @@
+import {
+  AllCommunityModule,
+  ModuleRegistry,
+  createGrid,
+  themeBalham,
+} from "https://cdn.jsdelivr.net/npm/ag-grid-community@35.2.0/+esm";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
+
+const PRIMARY_TITLES = {
+  "1-QB": "1QB ADP, TRADE VALUES & 2025 STATS",
+  SFLX: "SFLX ADP, TRADE VALUES & 2025 STATS",
+};
+
+const CATEGORY_LABELS = {
+  overview: "OVERVIEW (ALL)",
+  passing: "PASSING (QB)",
+  rushing: "RUSHING (RB)",
+  receiving: "RECEIVING (W/T)",
+};
+
+const COLUMN_SETS = {
+  overview: [
+    "RK",
+    "PLAYER",
+    "POS",
+    "TM",
+    "AGE",
+    "FPTS",
+    "PPG",
+    "VALUE",
+    "ADP",
+    "POS·ADP",
+    "G",
+    "SNP%",
+    "YDS(t)",
+    "YPG(t)",
+    "OPP",
+    "IMP",
+    "IMP/OPP",
+    "CSTY%",
+    "CL",
+  ],
+  passing: [
+    "RK",
+    "PLAYER",
+    "POS",
+    "TM",
+    "AGE",
+    "G",
+    "FPTS",
+    "PPG",
+    "VALUE",
+    "ADP",
+    "POS·ADP",
+    "paYDS",
+    "paTD",
+    "CMP%",
+    "paATT",
+    "paRTG",
+    "EPA/DB",
+    "CPOE",
+    "CMP",
+    "YDS(t)",
+    "paYPG",
+    "ruYDS",
+    "ruTD",
+    "pa1D",
+    "IMP/G",
+    "pIMP",
+    "pIMP/A",
+    "CAR",
+    "YPC",
+    "TTT",
+    "PRS%",
+    "SAC",
+    "INT",
+    "FUM",
+    "FPOE",
+    "CSTY%",
+    "CL",
+  ],
+  rushing: [
+    "RK",
+    "PLAYER",
+    "POS",
+    "TM",
+    "AGE",
+    "G",
+    "FPTS",
+    "PPG",
+    "VALUE",
+    "ADP",
+    "POS·ADP",
+    "SNP%",
+    "CAR",
+    "ruYDS",
+    "YPC",
+    "ruTD",
+    "REC",
+    "recYDS",
+    "TGT",
+    "YDS(t)",
+    "ruYPG",
+    "ELU",
+    "MTF/A",
+    "YCO/A",
+    "MTF",
+    "YCO",
+    "EXPLSV%",
+    "ru1D",
+    "RYOE",
+    "recTD",
+    "rec1D",
+    "YAC",
+    "IMP/G",
+    "FUM",
+    "FPOE",
+    "CSTY%",
+    "CL",
+  ],
+  receiving: [
+    "RK",
+    "PLAYER",
+    "POS",
+    "TM",
+    "AGE",
+    "G",
+    "FPTS",
+    "PPG",
+    "VALUE",
+    "ADP",
+    "POS·ADP",
+    "SNP%",
+    "TGT",
+    "REC",
+    "TS%",
+    "recYDS",
+    "recTD",
+    "YPRR",
+    "rec1D",
+    "1DRR",
+    "recYPG",
+    "AY%",
+    "YAC",
+    "YPR",
+    "IMP/G",
+    "RR",
+    "FPOE",
+    "YDS(t)",
+    "RZ Tgt",
+    "CAR",
+    "ruYDS",
+    "ruTD",
+    "YPC",
+    "FUM",
+    "CSTY%",
+    "CL",
+  ],
+};
+
+const SOURCE_ALIASES = {
+  PLAYER: "NM",
+  RK: "PRK_PPR",
+  FPTS: "FPT_PPR",
+  G: "GM",
+  VALUE: null,
+  ADP: null,
+  "POS·ADP": null,
+  PPG: null,
+};
+
+const LABEL_COLUMNS = new Set(["PLAYER", "POS", "TM"]);
+
+const CATEGORY_FILTERS = {
+  overview: (row) => Boolean(row.POS && row.POS !== "NA"),
+  passing: (row) => row.POS === "QB",
+  rushing: (row) => row.POS === "RB",
+  receiving: (row, state) =>
+    (row.POS === "WR" && state.receivingFilters.WR) ||
+    (row.POS === "TE" && state.receivingFilters.TE),
+};
+
+const COLUMN_WIDTHS = {
+  RK: 78,
+  PLAYER: 244,
+  POS: 74,
+  TM: 82,
+  AGE: 78,
+  FPTS: 110,
+  PPG: 92,
+  VALUE: 100,
+  ADP: 92,
+  "POS·ADP": 116,
+  G: 72,
+  "SNP%": 94,
+  "YDS(t)": 108,
+  "YPG(t)": 102,
+  OPP: 90,
+  IMP: 88,
+  "IMP/OPP": 102,
+  "CSTY%": 94,
+  CL: 86,
+  paYDS: 104,
+  paTD: 90,
+  "CMP%": 92,
+  paATT: 96,
+  paRTG: 98,
+  "EPA/DB": 96,
+  CPOE: 94,
+  CMP: 90,
+  paYPG: 96,
+  ruYDS: 100,
+  ruTD: 88,
+  pa1D: 88,
+  "IMP/G": 96,
+  pIMP: 90,
+  "pIMP/A": 96,
+  CAR: 88,
+  YPC: 88,
+  TTT: 88,
+  "PRS%": 90,
+  SAC: 82,
+  INT: 82,
+  FUM: 84,
+  FPOE: 92,
+  REC: 88,
+  recYDS: 104,
+  TGT: 88,
+  ELU: 88,
+  "MTF/A": 92,
+  "YCO/A": 92,
+  MTF: 86,
+  YCO: 86,
+  "EXPLSV%": 96,
+  ru1D: 86,
+  RYOE: 92,
+  recTD: 88,
+  rec1D: 88,
+  YAC: 88,
+  "TS%": 86,
+  YPRR: 88,
+  "1DRR": 88,
+  recYPG: 96,
+  "AY%": 84,
+  YPR: 84,
+  RR: 84,
+  "RZ Tgt": 98,
+};
+
+const state = {
+  primaryTab: "1-QB",
+  activeCategory: "overview",
+  receivingFilters: {
+    WR: true,
+    TE: true,
+  },
+  searchText: "",
+  rows: [],
+};
+
+const mainTitle = document.querySelector("#main-title");
+const activeViewLabel = document.querySelector("#active-view-label");
+const rowCount = document.querySelector("#row-count");
+const overlay = document.querySelector("#grid-overlay");
+const overlayTitle = document.querySelector("#overlay-title");
+const overlayDescription = document.querySelector("#overlay-description");
+const overlayActions = document.querySelector("#overlay-actions");
+const filePickerButton = document.querySelector("#file-picker-button");
+const filePickerInput = document.querySelector("#file-picker-input");
+const playerSearch = document.querySelector("#player-search");
+const primaryTabButtons = Array.from(
+  document.querySelectorAll("[data-primary-tab]"),
+);
+const categoryButtons = Array.from(
+  document.querySelectorAll("[data-category]"),
+);
+const receivingSubfilters = document.querySelector("#receiving-subfilters");
+const receivingButtons = Array.from(
+  document.querySelectorAll("[data-receiving-filter]"),
+);
+
+const gridTheme = themeBalham.withParams({
+  spacing: 7,
+  fontFamily: "var(--font-sans)",
+  fontSize: 13,
+  dataFontSize: 13,
+  headerFontWeight: 600,
+  borderRadius: 18,
+  backgroundColor: "rgba(8, 15, 26, 0.01)",
+  headerBackgroundColor: "rgba(10, 18, 30, 0.2)",
+  chromeBackgroundColor: "rgba(10, 18, 30, 0.18)",
+  foregroundColor: "rgba(236, 242, 252, 0.94)",
+  textColor: "rgba(236, 242, 252, 0.94)",
+  headerTextColor: "rgba(202, 222, 247, 0.88)",
+  borderColor: "rgba(255, 255, 255, 0.08)",
+  accentColor: "rgba(102, 215, 255, 0.92)",
+  browserColorScheme: "dark",
+  cardShadow: "0 18px 42px rgba(0, 0, 0, 0.28)",
+  popupShadow: "0 22px 48px rgba(0, 0, 0, 0.44)",
+  menuShadow: "0 22px 48px rgba(0, 0, 0, 0.44)",
+  headerHeight: 50,
+  iconSize: 14,
+});
+
+const gridOptions = {
+  theme: gridTheme,
+  columnDefs: buildColumnDefs(),
+  rowData: [],
+  loading: true,
+  animateRows: true,
+  suppressCellFocus: false,
+  maintainColumnOrder: true,
+  suppressMovableColumns: true,
+  cacheQuickFilter: true,
+  rowHeight: 44,
+  headerHeight: 50,
+  tooltipShowDelay: 120,
+  overlayLoadingTemplate:
+    '<span class="ag-overlay-loading-center">Preparing Data Hub…</span>',
+  overlayNoRowsTemplate:
+    '<span class="ag-overlay-no-rows-center">No players match the current view.</span>',
+  defaultColDef: {
+    sortable: true,
+    resizable: true,
+    filter: true,
+    minWidth: 84,
+    cellClass: getCellClass,
+    comparator: compareGridValues,
+  },
+};
+
+const gridApi = createGrid(document.querySelector("#player-grid"), gridOptions);
+
+attachEventListeners();
+syncUiState();
+showOverlay({
+  title: "Preparing SZN.csv",
+  description:
+    "Building the Data Hub grid and mapping the requested stat views.",
+});
+loadInitialData();
+
+function attachEventListeners() {
+  primaryTabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.primaryTab = button.dataset.primaryTab;
+      syncUiState();
+    });
+  });
+
+  categoryButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.activeCategory = button.dataset.category;
+      syncUiState();
+      refreshGrid();
+    });
+  });
+
+  receivingButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const key = button.dataset.receivingFilter;
+      state.receivingFilters[key] = !state.receivingFilters[key];
+      syncUiState();
+      refreshGrid();
+    });
+  });
+
+  playerSearch.addEventListener("input", (event) => {
+    state.searchText = event.target.value;
+    gridApi.setGridOption("quickFilterText", state.searchText);
+    updateRowCount();
+  });
+
+  filePickerButton.addEventListener("click", () => filePickerInput.click());
+  filePickerInput.addEventListener("change", handlePickedFile);
+}
+
+async function loadInitialData() {
+  try {
+    const csvText = await fetchCsvText();
+    applyCsvText(csvText);
+    hideOverlay();
+  } catch (error) {
+    console.error(error);
+    gridApi.setGridOption("loading", false);
+    showOverlay({
+      title: "Local browser access blocked",
+      description:
+        "This browser blocked direct access to SZN.csv from file://. Select the same local SZN.csv file to finish loading the Data Hub.",
+      showActions: true,
+    });
+  }
+}
+
+async function fetchCsvText() {
+  const response = await fetch("./SZN.csv", { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Unable to load SZN.csv (${response.status})`);
+  }
+  return response.text();
+}
+
+async function handlePickedFile(event) {
+  const [file] = event.target.files || [];
+  if (!file) {
+    return;
+  }
+
+  try {
+    showOverlay({
+      title: "Importing SZN.csv",
+      description:
+        "Parsing the selected local file and rebuilding the category views.",
+    });
+    gridApi.setGridOption("loading", true);
+    const csvText = await file.text();
+    applyCsvText(csvText);
+    hideOverlay();
+  } catch (error) {
+    console.error(error);
+    gridApi.setGridOption("loading", false);
+    showOverlay({
+      title: "Could not read the selected file",
+      description:
+        "Select the local SZN.csv file from this folder and try again.",
+      showActions: true,
+    });
+  } finally {
+    filePickerInput.value = "";
+  }
+}
+
+function applyCsvText(csvText) {
+  const parsedRows = parseCsv(csvText);
+  state.rows = parsedRows
+    .filter((row) => (row.NM || "").trim() || (row.POS || "").trim())
+    .map(normalizeRow);
+
+  gridApi.setGridOption("loading", false);
+  refreshGrid();
+}
+
+function refreshGrid() {
+  const visibleRows = getVisibleRows();
+  gridApi.setGridOption("columnDefs", buildColumnDefs());
+  gridApi.setGridOption("rowData", visibleRows);
+  gridApi.setGridOption("quickFilterText", state.searchText);
+
+  if (visibleRows.length === 0 && !gridApi.getGridOption("loading")) {
+    gridApi.showNoRowsOverlay();
+  } else if (!gridApi.getGridOption("loading")) {
+    gridApi.hideOverlay();
+  }
+
+  updateRowCount();
+}
+
+function syncUiState() {
+  mainTitle.textContent = PRIMARY_TITLES[state.primaryTab];
+  activeViewLabel.textContent = CATEGORY_LABELS[state.activeCategory];
+
+  primaryTabButtons.forEach((button) => {
+    const isActive = button.dataset.primaryTab === state.primaryTab;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+
+  categoryButtons.forEach((button) => {
+    const isActive = button.dataset.category === state.activeCategory;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+
+  const showReceivingFilters = state.activeCategory === "receiving";
+  receivingSubfilters.hidden = !showReceivingFilters;
+
+  receivingButtons.forEach((button) => {
+    const key = button.dataset.receivingFilter;
+    const isActive = Boolean(state.receivingFilters[key]);
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+function updateRowCount() {
+  const displayedRows = gridApi.getDisplayedRowCount();
+  rowCount.textContent = `${displayedRows} row${displayedRows === 1 ? "" : "s"}`;
+}
+
+function buildColumnDefs() {
+  const columns = COLUMN_SETS[state.activeCategory];
+
+  return columns.map((columnName, index) => {
+    const isLabelColumn = LABEL_COLUMNS.has(columnName);
+    const isNumericColumn = !isLabelColumn;
+
+    return {
+      headerName: columnName,
+      field: columnName,
+      width: COLUMN_WIDTHS[columnName] ?? 94,
+      minWidth: COLUMN_WIDTHS[columnName] ?? 94,
+      pinned: index < 3 ? "left" : null,
+      lockPinned: index < 3,
+      suppressMovable: true,
+      filter: isLabelColumn ? "agTextColumnFilter" : "agNumberColumnFilter",
+      type: isNumericColumn ? "numericColumn" : undefined,
+      headerClass: isNumericColumn ? "numeric-column" : "label-column",
+      valueFormatter: ({ value }) => formatCellValue(value),
+      tooltipValueGetter: ({ value }) => formatCellValue(value),
+      cellClass: getCellClass,
+      comparator: compareGridValues,
+    };
+  });
+}
+
+function getVisibleRows() {
+  const predicate = CATEGORY_FILTERS[state.activeCategory];
+  return state.rows.filter((row) => predicate(row, state));
+}
+
+function normalizeRow(sourceRow) {
+  const allColumns = new Set(Object.values(COLUMN_SETS).flat());
+  const normalized = {};
+
+  for (const columnName of allColumns) {
+    const alias = Object.prototype.hasOwnProperty.call(SOURCE_ALIASES, columnName)
+      ? SOURCE_ALIASES[columnName]
+      : columnName;
+
+    if (alias === null) {
+      normalized[columnName] = "NA";
+      continue;
+    }
+
+    const rawValue = sourceRow[alias];
+    normalized[columnName] = sanitizeValue(rawValue);
+  }
+
+  return normalized;
+}
+
+function sanitizeValue(value) {
+  const text = typeof value === "string" ? value.trim() : value;
+  if (text === "" || text == null || text === "#N/A") {
+    return "NA";
+  }
+  return String(text);
+}
+
+function parseCsv(csvText) {
+  const rows = [];
+  let current = "";
+  let row = [];
+  let insideQuotes = false;
+
+  for (let index = 0; index < csvText.length; index += 1) {
+    const char = csvText[index];
+    const nextChar = csvText[index + 1];
+
+    if (char === '"') {
+      if (insideQuotes && nextChar === '"') {
+        current += '"';
+        index += 1;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+      continue;
+    }
+
+    if (char === "," && !insideQuotes) {
+      row.push(current);
+      current = "";
+      continue;
+    }
+
+    if ((char === "\n" || char === "\r") && !insideQuotes) {
+      if (char === "\r" && nextChar === "\n") {
+        index += 1;
+      }
+      row.push(current);
+      current = "";
+      rows.push(row);
+      row = [];
+      continue;
+    }
+
+    current += char;
+  }
+
+  if (current.length > 0 || row.length > 0) {
+    row.push(current);
+    rows.push(row);
+  }
+
+  const [headerRow = [], ...dataRows] = rows;
+  const headers = headerRow.map((header) => header.replace(/^\uFEFF/, "").trim());
+
+  return dataRows
+    .filter((values) => values.some((value) => value !== ""))
+    .map((values) =>
+      headers.reduce((record, header, index) => {
+        record[header] = values[index] ?? "";
+        return record;
+      }, {}),
+    );
+}
+
+function getCellClass(params) {
+  const classes = [];
+  const columnName = params.colDef.field;
+
+  if (LABEL_COLUMNS.has(columnName)) {
+    classes.push("label-cell");
+  } else {
+    classes.push("numeric-cell");
+  }
+
+  if (isMissingValue(params.value)) {
+    classes.push("na-cell");
+  }
+
+  return classes.join(" ");
+}
+
+function formatCellValue(value) {
+  return isMissingValue(value) ? "NA" : value;
+}
+
+function compareGridValues(valueA, valueB) {
+  const parsedA = toComparableValue(valueA);
+  const parsedB = toComparableValue(valueB);
+
+  const aMissing = parsedA == null;
+  const bMissing = parsedB == null;
+
+  if (aMissing && bMissing) {
+    return 0;
+  }
+
+  if (aMissing) {
+    return 1;
+  }
+
+  if (bMissing) {
+    return -1;
+  }
+
+  if (typeof parsedA === "number" && typeof parsedB === "number") {
+    return parsedA - parsedB;
+  }
+
+  return String(parsedA).localeCompare(String(parsedB), undefined, {
+    numeric: true,
+    sensitivity: "base",
+  });
+}
+
+function toComparableValue(value) {
+  if (isMissingValue(value)) {
+    return null;
+  }
+
+  const raw = String(value).trim();
+  const normalized = raw.replace(/,/g, "").replace(/%$/g, "");
+  const parsedNumber = Number(normalized);
+
+  if (!Number.isNaN(parsedNumber)) {
+    return parsedNumber;
+  }
+
+  return raw.toUpperCase();
+}
+
+function isMissingValue(value) {
+  return value == null || value === "" || value === "NA" || value === "#N/A";
+}
+
+function showOverlay({ title, description, showActions = false }) {
+  overlayTitle.textContent = title;
+  overlayDescription.textContent = description;
+  overlayActions.hidden = !showActions;
+  overlay.classList.remove("is-hidden");
+}
+
+function hideOverlay() {
+  overlay.classList.add("is-hidden");
+}
