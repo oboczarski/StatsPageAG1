@@ -154,8 +154,13 @@ body::after {
 
 .hero-shell {
   display: grid;
-  gap: 20px;
-  padding: 18px;
+  gap: 14px;
+  padding: 15px;
+}
+
+.hero-copy {
+  display: grid;
+  gap: 4px;
 }
 
 .eyebrow,
@@ -170,20 +175,64 @@ body::after {
 
 .page-title {
   margin: 6px 0 0;
-  max-width: 14ch;
-  font-size: clamp(1.7rem, 4vw, 3.5rem);
-  line-height: 0.96;
+  max-width: none;
+  font-size: clamp(1.52rem, 6.3vw, 3.5rem);
+  line-height: 0.98;
   letter-spacing: -0.05em;
   text-wrap: balance;
 }
 
+.control-rail {
+  position: relative;
+}
+
+.control-rail::before,
+.control-rail::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.control-rail::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(11, 20, 33, 0.76), rgba(11, 20, 33, 0));
+}
+
+.control-rail::after {
+  right: 0;
+  background: linear-gradient(90deg, rgba(11, 20, 33, 0), rgba(11, 20, 33, 0.82));
+}
+
 .top-tabs,
-.utility-row,
 .category-row,
 .receiving-subfilters {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 2px 1px 1px;
+  margin: 0 -1px;
+  scroll-snap-type: x proximity;
+}
+
+.top-tabs::-webkit-scrollbar,
+.category-row::-webkit-scrollbar,
+.receiving-subfilters::-webkit-scrollbar {
+  display: none;
+}
+
+.utility-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  align-items: center;
 }
 
 .top-tab,
@@ -212,6 +261,9 @@ body::after {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
     0 10px 24px rgba(0, 0, 0, 0.24);
+  flex: 0 0 auto;
+  white-space: nowrap;
+  scroll-snap-align: start;
 }
 
 .top-tab:hover,
@@ -240,9 +292,9 @@ body::after {
 
 .top-tab,
 .top-pill {
-  min-height: 46px;
-  padding: 0 18px;
-  font-size: 0.92rem;
+  min-height: 42px;
+  padding: 0 15px;
+  font-size: 0.82rem;
 }
 
 .top-tab.is-active,
@@ -271,61 +323,60 @@ body::after {
 .controls-shell {
   margin-top: 14px;
   display: grid;
-  gap: 16px;
-  padding: 14px;
+  gap: 12px;
+  padding: 12px;
 }
 
 .controls-cluster {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .category-chip {
-  min-height: 44px;
-  padding: 0 14px;
-  font-size: 0.84rem;
+  min-height: 38px;
+  padding: 0 12px;
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
 }
 
 .receiving-subfilters {
-  min-height: 40px;
+  min-height: 34px;
   align-items: center;
 }
 
 .subfilter-chip {
-  min-height: 36px;
-  min-width: 62px;
-  padding: 0 14px;
-  font-size: 0.8rem;
-}
-
-.utility-row {
-  align-items: center;
+  min-height: 32px;
+  min-width: 52px;
+  padding: 0 12px;
+  font-size: 0.74rem;
 }
 
 .mini-chip {
-  min-height: 40px;
-  padding: 0 15px;
-  font-size: 0.82rem;
+  min-height: 38px;
+  padding: 0 12px;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
 }
 
 .mini-chip--icon {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .mini-chip__icon {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   fill: currentColor;
 }
 
 .search-shell {
   position: relative;
-  flex: 1 1 100%;
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   align-items: center;
-  min-height: 46px;
+  min-height: 40px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
   background:
@@ -338,21 +389,21 @@ body::after {
 
 .search-shell__icon {
   position: absolute;
-  left: 16px;
-  width: 17px;
-  height: 17px;
+  left: 14px;
+  width: 15px;
+  height: 15px;
   fill: rgba(189, 206, 232, 0.72);
 }
 
 .search-shell__input {
   width: 100%;
-  min-height: 46px;
-  padding: 0 16px 0 44px;
+  min-height: 40px;
+  padding: 0 14px 0 40px;
   border: 0;
   background: transparent;
   color: var(--text-primary);
   font: inherit;
-  font-size: 0.92rem;
+  font-size: 0.84rem;
 }
 
 .search-shell__input::placeholder {
@@ -365,7 +416,7 @@ body::after {
 
 .grid-shell {
   margin-top: 14px;
-  padding: 14px;
+  padding: 12px;
 }
 
 .grid-shell__meta {
@@ -388,7 +439,7 @@ body::after {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 8px;
 }
 
@@ -396,15 +447,15 @@ body::after {
 .meta-count {
   display: inline-flex;
   align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
+  min-height: 32px;
+  padding: 0 11px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
     rgba(10, 18, 30, 0.5);
   color: var(--text-secondary);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   letter-spacing: 0.04em;
 }
 
@@ -722,21 +773,96 @@ body::after {
   .hero-shell {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: end;
+    gap: 20px;
     padding: 24px;
+  }
+
+  .page-title {
+    max-width: 14ch;
+    font-size: clamp(1.7rem, 4vw, 3.5rem);
+    line-height: 0.96;
+  }
+
+  .top-tabs,
+  .category-row,
+  .receiving-subfilters {
+    flex-wrap: wrap;
+    overflow: visible;
+    padding: 0;
+    margin: 0;
+    scroll-snap-type: none;
+  }
+
+  .control-rail::before,
+  .control-rail::after {
+    display: none;
   }
 
   .controls-shell {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: end;
+    gap: 16px;
     padding: 18px;
   }
 
   .utility-row {
+    display: flex;
+    gap: 10px;
     justify-content: flex-end;
   }
 
+  .top-tab,
+  .top-pill {
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: 0.92rem;
+  }
+
+  .category-chip {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 0.84rem;
+  }
+
+  .receiving-subfilters {
+    min-height: 40px;
+  }
+
+  .subfilter-chip {
+    min-height: 36px;
+    min-width: 62px;
+    padding: 0 14px;
+    font-size: 0.8rem;
+  }
+
+  .mini-chip {
+    min-height: 40px;
+    padding: 0 15px;
+    font-size: 0.82rem;
+  }
+
+  .mini-chip--ghost,
+  .mini-chip--icon,
   .search-shell {
+    grid-column: auto;
+  }
+
+  .search-shell {
+    justify-content: flex-end;
     flex: 0 1 360px;
+    min-height: 46px;
+  }
+
+  .search-shell__icon {
+    left: 16px;
+    width: 17px;
+    height: 17px;
+  }
+
+  .search-shell__input {
+    min-height: 46px;
+    padding: 0 16px 0 44px;
+    font-size: 0.92rem;
   }
 
   .grid-shell {
