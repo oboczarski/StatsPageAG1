@@ -345,16 +345,18 @@ const state = {
 
 const PROVIDED_HEADER_TEMPLATE = `
   <div class="ag-cell-label-container dh-header-template" role="presentation">
-    <div data-ref="eLabel" class="ag-header-cell-label dh-header-label" role="presentation">
-      <span data-ref="eText" class="ag-header-cell-text" role="columnheader"></span>
-      <span class="dh-header-icons" aria-hidden="true">
-        <span data-ref="eSortOrder" class="ag-header-icon ag-header-label-icon ag-sort-order ag-hidden" aria-hidden="true"></span>
-        <span data-ref="eSortAsc" class="ag-header-icon ag-header-label-icon ag-sort-ascending-icon ag-hidden" aria-hidden="true"></span>
-        <span data-ref="eSortDesc" class="ag-header-icon ag-header-label-icon ag-sort-descending-icon ag-hidden" aria-hidden="true"></span>
-        <span data-ref="eSortAbsoluteAsc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-ascending-icon ag-hidden" aria-hidden="true"></span>
-        <span data-ref="eSortAbsoluteDesc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-descending-icon ag-hidden" aria-hidden="true"></span>
-        <span data-ref="eSortMixed" class="ag-header-icon ag-header-label-icon ag-sort-mixed-icon ag-hidden" aria-hidden="true"></span>
-      </span>
+    <span data-ref="eMenu" class="ag-header-icon ag-header-cell-menu-button" aria-hidden="true"></span>
+    <span data-ref="eFilterButton" class="ag-header-icon ag-header-cell-filter-button" aria-hidden="true"></span>
+    <div data-ref="eLabel" class="ag-header-cell-label" role="presentation">
+      <span data-ref="eText" class="ag-header-cell-text"></span>
+      <span data-ref="eFilter" class="ag-header-icon ag-header-label-icon ag-filter-icon" aria-hidden="true"></span>
+      <span data-ref="eSortOrder" class="ag-header-icon ag-header-label-icon ag-sort-order" aria-hidden="true"></span>
+      <span data-ref="eSortAsc" class="ag-header-icon ag-header-label-icon ag-sort-ascending-icon" aria-hidden="true"></span>
+      <span data-ref="eSortDesc" class="ag-header-icon ag-header-label-icon ag-sort-descending-icon" aria-hidden="true"></span>
+      <span data-ref="eSortAbsoluteAsc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-ascending-icon ag-hidden" aria-hidden="true"></span>
+      <span data-ref="eSortAbsoluteDesc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-descending-icon ag-hidden" aria-hidden="true"></span>
+      <span data-ref="eSortMixed" class="ag-header-icon ag-header-label-icon ag-sort-mixed-icon ag-hidden" aria-hidden="true"></span>
+      <span data-ref="eSortNone" class="ag-header-icon ag-header-label-icon ag-sort-none-icon" aria-hidden="true"></span>
     </div>
   </div>`;
 
@@ -423,7 +425,7 @@ const gridOptions = {
   defaultColDef: {
     sortable: true,
     resizable: true,
-    filter: false,
+    filter: true,
     minWidth: 84,
     headerComponentParams: {
       template: PROVIDED_HEADER_TEMPLATE,
@@ -610,6 +612,7 @@ function buildColumnDefs() {
       pinned: index < 3 ? "left" : null,
       lockPinned: index < 3,
       suppressMovable: true,
+      filter: isLabelColumn ? "agTextColumnFilter" : "agNumberColumnFilter",
       type: isNumericColumn ? "numericColumn" : undefined,
       headerClass: "dh-header-cell",
       valueFormatter: formatGridValue,
