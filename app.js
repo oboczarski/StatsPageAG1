@@ -343,23 +343,6 @@ const state = {
   columnFormatting: Object.create(null),
 };
 
-class CenteredInnerHeader {
-  init(params) {
-    this.eGui = document.createElement("span");
-    this.eGui.className = "dh-inner-header";
-    this.eGui.textContent = params.displayName;
-  }
-
-  getGui() {
-    return this.eGui;
-  }
-
-  refresh(params) {
-    this.eGui.textContent = params.displayName;
-    return true;
-  }
-}
-
 const mainTitle = document.querySelector("#main-title");
 const activeViewLabel = document.querySelector("#active-view-label");
 const rowCount = document.querySelector("#row-count");
@@ -429,9 +412,6 @@ const gridOptions = {
     minWidth: 84,
     cellClass: getCellClass,
     comparator: compareGridValues,
-  },
-  components: {
-    centeredInnerHeader: CenteredInnerHeader,
   },
 };
 
@@ -615,9 +595,6 @@ function buildColumnDefs() {
       filter: isLabelColumn ? "agTextColumnFilter" : "agNumberColumnFilter",
       type: isNumericColumn ? "numericColumn" : undefined,
       headerClass: "dh-header-cell",
-      headerComponentParams: {
-        innerHeaderComponent: "centeredInnerHeader",
-      },
       tooltipValueGetter: getTooltipValue,
       cellRenderer: renderCell,
       cellClass: getCellClass,
