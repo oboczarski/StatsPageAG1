@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DH Data Hub – Advanced Analytics</title>
+    <meta name="description" content="DH Data Hub – Advanced fantasy football analytics with ADP, trade values, and 2025 stats for 1QB and Superflex leagues.">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Product+Sans:wght@100;200;300;400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans:100,200,300,400,500,600,700" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- AG Grid Community CDN – legacy theme CSS + JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@35.1.0/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@35.1.0/styles/ag-theme-balham.css">
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@35.1.0/dist/ag-grid-community.min.js"></script>
+
+    <!-- App Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app-shell">
+        <!-- Background layers -->
+        <div id="bg-layer"></div>
+        <div id="bg-noise"></div>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <!-- Top Label -->
+            <div id="top-label">DH DATA HUB – ADVANCED ANALYTICS</div>
+
+            <!-- Primary Tabs Row -->
+            <div id="primary-tabs-row">
+                <div id="primary-tabs" class="glass-pill-group">
+                    <button class="primary-tab active" data-tab="1qb">1-QB</button>
+                    <button class="primary-tab" data-tab="sflx">SFLX</button>
+                </div>
+                <button id="pick-values-btn" class="glass-btn small">PICK VALUES</button>
+            </div>
+
+            <!-- Main Title -->
+            <h1 id="main-title">1QB ADP, TRADE VALUES & 2025 STATS</h1>
+
+            <!-- Filter Controls -->
+            <div id="filter-controls">
+                <div id="category-buttons">
+                    <button class="cat-btn active" data-category="overview">OVERVIEW (ALL)</button>
+                    <button class="cat-btn" data-category="passing">PASSING (QB)</button>
+                    <button class="cat-btn" data-category="rushing">RUSHING (RB)</button>
+                    <button class="cat-btn has-sub" data-category="receiving">RECEIVING (W/T)</button>
+                </div>
+                <div id="sub-filter-row" class="hidden">
+                    <span class="sub-label">FILTER:</span>
+                    <button class="sub-toggle active" data-pos="WR">WR</button>
+                    <button class="sub-toggle active" data-pos="TE">TE</button>
+                </div>
+                <div id="controls-right">
+                    <button id="rookies-btn" class="glass-btn small">ROOKIES</button>
+                    <button id="key-btn" class="glass-btn small icon-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                        KEY
+                    </button>
+                    <div id="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="search-input" placeholder="Search players..." autocomplete="off">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Container -->
+            <div id="grid-wrapper" class="glass-panel">
+                <div id="myGrid" class="ag-theme-balham"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- App Script -->
+    <script src="app.js"></script>
+</body>
+</html>
