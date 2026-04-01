@@ -636,8 +636,8 @@ body::after {
 
 .ag-theme-balham .ag-header,
 .ag-theme-balham .ag-pinned-left-header {
-  background: rgba(10, 18, 30, 0.16);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  border-bottom: none;
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -664,6 +664,7 @@ body::after {
 .ag-theme-balham .ag-header-group-cell {
   font-weight: 600;
   letter-spacing: 0.03em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .ag-theme-balham .ag-header-cell-label {
