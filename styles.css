@@ -424,19 +424,6 @@ body::after {
   padding: 10px;
 }
 
-.grid-shell.glass-panel {
-  background:
-    linear-gradient(180deg, rgba(9, 16, 27, 0.56), rgba(7, 13, 22, 0.38)),
-    rgba(8, 14, 24, 0.22);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-.grid-shell.glass-panel::before {
-  display: none;
-}
-
 .grid-shell__meta {
   display: flex;
   flex-wrap: wrap;
@@ -484,12 +471,15 @@ body::after {
 
 .grid-stage {
   position: relative;
+  min-height: 60vh;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   /* clip instead of hidden: visually clips rounded corners without becoming a
      scroll container, which would silently break position:sticky on the header */
   overflow: clip;
-  background: rgba(6, 13, 22, 0.04);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0.006)),
+    rgba(6, 13, 22, 0.12);
 }
 
 .grid-scroll-wrapper {
@@ -977,11 +967,13 @@ body::after {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(8, 15, 27, 0.92);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.32);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  background:
+    linear-gradient(180deg, rgba(10, 18, 30, 0.24), rgba(10, 18, 30, 0.14)),
+    rgba(8, 15, 27, 0.86);
+  border-bottom: 0;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .stats-table tbody td {
@@ -994,7 +986,7 @@ body::after {
 }
 
 .stats-table tbody tr:hover > td:not(.stats-table__cell--sticky) {
-  background: rgba(102, 215, 255, 0.04);
+  background: transparent;
 }
 
 .stats-table__cell--sticky {
@@ -1004,15 +996,18 @@ body::after {
 
 .stats-table__body-cell.stats-table__cell--sticky {
   background:
-    linear-gradient(180deg, rgba(12, 20, 34, 0.96), rgba(9, 16, 27, 0.94)),
-    rgba(8, 15, 27, 0.96);
+    linear-gradient(180deg, rgba(10, 18, 30, 0.08), rgba(10, 18, 30, 0.03)),
+    rgba(8, 15, 27, 0.72);
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.1);
 }
 
 .stats-table__header-cell.stats-table__cell--sticky {
+  background:
+    linear-gradient(180deg, rgba(10, 18, 30, 0.24), rgba(10, 18, 30, 0.14)),
+    rgba(8, 15, 27, 0.86);
   box-shadow:
-    inset -1px 0 0 rgba(255, 255, 255, 0.12),
-    0 2px 12px rgba(0, 0, 0, 0.32);
+    inset -1px 0 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .stats-table__cell--sticky-0 {
@@ -1086,8 +1081,8 @@ body::after {
 }
 
 .stats-table__sort-indicator.is-active {
-  opacity: 0.95;
-  color: var(--accent-cyan);
+  opacity: 0.82;
+  color: rgba(202, 222, 247, 0.88);
 }
 
 .stats-table__cell-content {
@@ -1097,6 +1092,8 @@ body::after {
   width: 100%;
   min-height: 44px;
   padding: 0 10px;
+  box-sizing: border-box;
+  border-radius: 999px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1116,6 +1113,7 @@ body::after {
 .formatted-cell .stats-table__cell-content {
   font-weight: 600;
   letter-spacing: 0.01em;
+  text-shadow: none;
 }
 
 .na-cell .stats-table__cell-content {
@@ -1131,6 +1129,7 @@ body::after {
   min-height: 26px;
   padding: 0 8px;
   border-radius: 999px;
+  box-sizing: border-box;
   border: 1px solid transparent;
   white-space: nowrap;
   overflow: hidden;
@@ -1142,44 +1141,60 @@ body::after {
 
 .heat-cell--heat.heat-cell--tier-0 .stats-table__cell-content {
   color: rgba(212, 222, 240, 0.74);
+  text-shadow: none;
 }
 
 .heat-cell--heat.heat-cell--tier-1 .stats-table__cell-content {
   color: rgba(194, 232, 255, 0.82);
+  text-shadow: 0 0 10px rgba(102, 215, 255, 0.04);
 }
 
 .heat-cell--heat.heat-cell--tier-2 .stats-table__cell-content {
   color: rgba(171, 225, 255, 0.92);
+  text-shadow: 0 0 12px rgba(102, 215, 255, 0.07);
 }
 
 .heat-cell--heat.heat-cell--tier-3 .stats-table__cell-content {
   color: rgba(141, 225, 255, 0.98);
+  text-shadow:
+    0 0 14px rgba(102, 215, 255, 0.11),
+    0 0 22px rgba(162, 127, 255, 0.05);
 }
 
 .heat-cell--heat.heat-cell--tier-4 .stats-table__cell-content {
   color: rgba(122, 233, 255, 1);
-  text-shadow: 0 0 7px rgba(102, 215, 255, 0.05);
+  text-shadow:
+    0 0 16px rgba(102, 215, 255, 0.15),
+    0 0 28px rgba(162, 127, 255, 0.07);
 }
 
 .heat-cell--neutral.heat-cell--tier-0 .stats-table__cell-content {
   color: rgba(214, 221, 234, 0.74);
+  text-shadow: none;
 }
 
 .heat-cell--neutral.heat-cell--tier-1 .stats-table__cell-content {
   color: rgba(223, 227, 238, 0.82);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.035);
 }
 
 .heat-cell--neutral.heat-cell--tier-2 .stats-table__cell-content {
   color: rgba(235, 228, 215, 0.9);
+  text-shadow: 0 0 10px rgba(255, 196, 132, 0.05);
 }
 
 .heat-cell--neutral.heat-cell--tier-3 .stats-table__cell-content {
   color: rgba(248, 222, 182, 0.96);
+  text-shadow:
+    0 0 12px rgba(255, 190, 120, 0.09),
+    0 0 18px rgba(255, 255, 255, 0.03);
 }
 
 .heat-cell--neutral.heat-cell--tier-4 .stats-table__cell-content {
   color: rgba(255, 214, 158, 1);
-  text-shadow: 0 0 7px rgba(255, 184, 102, 0.05);
+  text-shadow:
+    0 0 14px rgba(255, 184, 102, 0.12),
+    0 0 22px rgba(255, 255, 255, 0.04);
 }
 
 .stats-table__fpts-chip--tier-0 {
