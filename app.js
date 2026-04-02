@@ -406,6 +406,7 @@ const gridTheme = themeBalham.withParams({
 
 const gridOptions = {
   theme: gridTheme,
+  domLayout: "autoHeight",
   columnDefs: buildColumnDefs(),
   rowData: [],
   loading: true,
@@ -415,6 +416,7 @@ const gridOptions = {
   maintainColumnOrder: true,
   suppressMovableColumns: true,
   cacheQuickFilter: true,
+  alwaysShowHorizontalScroll: true,
   rowHeight: getRowHeight(),
   headerHeight: getHeaderHeight(),
   tooltipShowDelay: 120,

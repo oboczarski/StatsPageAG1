@@ -484,22 +484,52 @@ body::after {
 
 .grid-stage {
   position: relative;
-  min-height: 60vh;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
-  overflow: hidden;
+  /* clip instead of hidden: visually clips rounded corners without becoming a
+     scroll container, which would silently break position:sticky on the header */
+  overflow: clip;
   background: rgba(6, 13, 22, 0.04);
+}
+
+.grid-scroll-wrapper {
+  /* Single unified scroll container — header and body are one element here */
+  overflow-y: auto;
+  /* overflow-y:auto collapses overflow-x to auto too; that is intentional so
+     AG Grid's internal horizontal scrollbar is still reachable at the bottom */
+  max-height: clamp(500px, 62vh, 900px);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 24px;
+}
+
+.grid-scroll-wrapper::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+.grid-scroll-wrapper::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background: linear-gradient(180deg, rgba(131, 214, 255, 0.5), rgba(162, 127, 255, 0.5));
+  background-clip: padding-box;
+}
+
+.grid-scroll-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .data-grid {
   width: 100%;
-  height: clamp(500px, 62vh, 900px);
+  /* height must be auto in autoHeight domLayout — the wrapper controls height */
+  height: auto;
   background: transparent;
 }
 
 .grid-stage__overlay {
   position: absolute;
   inset: 0;
+  z-index: 50; /* above sticky header (z-index: 20) and scrollbar */
   display: grid;
   place-items: center;
   padding: 18px;
@@ -632,15 +662,23 @@ body::after {
   border: 0;
   border-radius: 0;
   box-shadow: none;
+  /* Must be visible so position:sticky on .ag-header can scroll with
+     .grid-scroll-wrapper rather than being clipped by this ancestor */
+  overflow: visible !important;
 }
 
 .ag-theme-balham .ag-header,
 .ag-theme-balham .ag-pinned-left-header {
-  background: rgba(10, 18, 30, 0.16);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  /* Sticky frozen header — sticks to the top of .grid-scroll-wrapper */
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  /* Opaque background + blur so row content doesn't bleed through during scroll */
+  background: rgba(8, 15, 27, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
 }
 
 .ag-theme-balham .ag-pinned-left-cols-container {
@@ -658,6 +696,11 @@ body::after {
 .ag-theme-balham .ag-header-viewport,
 .ag-theme-balham .ag-header-container {
   background: transparent;
+}
+
+/* Required by AG Grid when domLayout='autoHeight' */
+.ag-theme-balham .ag-center-cols-viewport {
+  min-height: unset !important;
 }
 
 .ag-theme-balham .ag-header-cell,
@@ -912,6 +955,10 @@ body::after {
 }
 
 @media (max-width: 719px) {
+  .grid-scroll-wrapper {
+    max-height: clamp(420px, 55vh, 700px);
+  }
+
   .ag-theme-balham {
     --ag-font-size: 11px;
     --ag-data-font-size: 11px;
@@ -1105,8 +1152,8 @@ body::after {
     padding: 22px;
   }
 
-  .data-grid {
-    height: clamp(620px, 72vh, 940px);
+  .grid-scroll-wrapper {
+    max-height: clamp(620px, 72vh, 940px);
   }
 }
 
