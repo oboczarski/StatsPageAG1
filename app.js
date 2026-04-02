@@ -1,12 +1,3 @@
-import {
-  AllCommunityModule,
-  ModuleRegistry,
-  createGrid,
-  themeBalham,
-} from "https://cdn.jsdelivr.net/npm/ag-grid-community@35.2.0/+esm";
-
-ModuleRegistry.registerModules([AllCommunityModule]);
-
 const PRIMARY_TITLES = {
   "1-QB": "1QB ADP, TRADE VALUES & 2025 STATS",
   SFLX: "SFLX ADP, TRADE VALUES & 2025 STATS",
@@ -184,6 +175,8 @@ const INVERTED_COLUMNS = new Set([
 const NEUTRAL_COLUMNS = new Set(["TTT", "CL"]);
 const PLAYER_COLUMN = "PLAYER";
 const FPTS_COLUMN = "FPTS";
+const STICKY_COLUMN_COUNT = 3;
+const ALL_COLUMNS = [...new Set(Object.values(COLUMN_SETS).flat())];
 
 const CATEGORY_FILTERS = {
   overview: (row) => Boolean(row.POS && row.POS !== "NA"),
@@ -339,26 +332,14 @@ const state = {
   },
   searchText: "",
   rows: [],
+  displayedRows: [],
+  sort: {
+    column: "RK",
+    direction: "asc",
+  },
   isCompactViewport: isCompactViewport(),
   columnFormatting: Object.create(null),
 };
-
-const PROVIDED_HEADER_TEMPLATE = `
-  <div class="ag-cell-label-container dh-header-template" role="presentation">
-    <span data-ref="eMenu" class="ag-header-icon ag-header-cell-menu-button" aria-hidden="true"></span>
-    <span data-ref="eFilterButton" class="ag-header-icon ag-header-cell-filter-button" aria-hidden="true"></span>
-    <div data-ref="eLabel" class="ag-header-cell-label" role="presentation">
-      <span data-ref="eText" class="ag-header-cell-text"></span>
-      <span data-ref="eFilter" class="ag-header-icon ag-header-label-icon ag-filter-icon" aria-hidden="true"></span>
-      <span data-ref="eSortOrder" class="ag-header-icon ag-header-label-icon ag-sort-order" aria-hidden="true"></span>
-      <span data-ref="eSortAsc" class="ag-header-icon ag-header-label-icon ag-sort-ascending-icon" aria-hidden="true"></span>
-      <span data-ref="eSortDesc" class="ag-header-icon ag-header-label-icon ag-sort-descending-icon" aria-hidden="true"></span>
-      <span data-ref="eSortAbsoluteAsc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-ascending-icon ag-hidden" aria-hidden="true"></span>
-      <span data-ref="eSortAbsoluteDesc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-descending-icon ag-hidden" aria-hidden="true"></span>
-      <span data-ref="eSortMixed" class="ag-header-icon ag-header-label-icon ag-sort-mixed-icon ag-hidden" aria-hidden="true"></span>
-      <span data-ref="eSortNone" class="ag-header-icon ag-header-label-icon ag-sort-none-icon" aria-hidden="true"></span>
-    </div>
-  </div>`;
 
 const mainTitle = document.querySelector("#main-title");
 const activeViewLabel = document.querySelector("#active-view-label");
@@ -370,6 +351,7 @@ const overlayActions = document.querySelector("#overlay-actions");
 const filePickerButton = document.querySelector("#file-picker-button");
 const filePickerInput = document.querySelector("#file-picker-input");
 const playerSearch = document.querySelector("#player-search");
+const gridContainer = document.querySelector("#player-grid");
 const primaryTabButtons = Array.from(
   document.querySelectorAll("[data-primary-tab]"),
 );
@@ -381,70 +363,13 @@ const receivingButtons = Array.from(
   document.querySelectorAll("[data-receiving-filter]"),
 );
 
-const gridTheme = themeBalham.withParams({
-  spacing: 7,
-  fontFamily: "var(--font-sans)",
-  fontSize: 13,
-  dataFontSize: 13,
-  headerFontWeight: 600,
-  borderRadius: 18,
-  backgroundColor: "rgba(8, 15, 26, 0.01)",
-  headerBackgroundColor: "rgba(10, 18, 30, 0.2)",
-  chromeBackgroundColor: "rgba(10, 18, 30, 0.18)",
-  foregroundColor: "rgba(236, 242, 252, 0.94)",
-  textColor: "rgba(236, 242, 252, 0.94)",
-  headerTextColor: "rgba(202, 222, 247, 0.88)",
-  borderColor: "rgba(255, 255, 255, 0.08)",
-  accentColor: "rgba(102, 215, 255, 0.92)",
-  browserColorScheme: "dark",
-  cardShadow: "0 18px 42px rgba(0, 0, 0, 0.28)",
-  popupShadow: "0 22px 48px rgba(0, 0, 0, 0.44)",
-  menuShadow: "0 22px 48px rgba(0, 0, 0, 0.44)",
-  headerHeight: 50,
-  iconSize: 14,
-});
-
-const gridOptions = {
-  theme: gridTheme,
-  domLayout: "autoHeight",
-  columnDefs: buildColumnDefs(),
-  rowData: [],
-  loading: true,
-  animateRows: false,
-  suppressCellFocus: false,
-  suppressRowHoverHighlight: true,
-  maintainColumnOrder: true,
-  suppressMovableColumns: true,
-  cacheQuickFilter: true,
-  alwaysShowHorizontalScroll: true,
-  rowHeight: getRowHeight(),
-  headerHeight: getHeaderHeight(),
-  tooltipShowDelay: 120,
-  overlayLoadingTemplate:
-    '<span class="ag-overlay-loading-center">Preparing Data Hub…</span>',
-  overlayNoRowsTemplate:
-    '<span class="ag-overlay-no-rows-center">No players match the current view.</span>',
-  defaultColDef: {
-    sortable: true,
-    resizable: true,
-    filter: true,
-    minWidth: 84,
-    headerComponentParams: {
-      template: PROVIDED_HEADER_TEMPLATE,
-    },
-    cellClass: getCellClass,
-    comparator: compareGridValues,
-  },
-};
-
-const gridApi = createGrid(document.querySelector("#player-grid"), gridOptions);
-
 attachEventListeners();
 syncUiState();
+renderTable();
 showOverlay({
   title: "Preparing SZN.csv",
   description:
-    "Building the Data Hub grid and mapping the requested stat views.",
+    "Building the Data Hub table and mapping the requested stat views.",
 });
 loadInitialData();
 
@@ -475,8 +400,7 @@ function attachEventListeners() {
 
   playerSearch.addEventListener("input", (event) => {
     state.searchText = event.target.value;
-    gridApi.setGridOption("quickFilterText", state.searchText);
-    updateRowCount();
+    refreshGrid();
   });
 
   filePickerButton.addEventListener("click", () => filePickerInput.click());
@@ -492,7 +416,6 @@ async function loadInitialData() {
     hideOverlay();
   } catch (error) {
     console.error(error);
-    gridApi.setGridOption("loading", false);
     showOverlay({
       title: "Local browser access blocked",
       description:
@@ -522,13 +445,11 @@ async function handlePickedFile(event) {
       description:
         "Parsing the selected local file and rebuilding the category views.",
     });
-    gridApi.setGridOption("loading", true);
     const csvText = await file.text();
     applyCsvText(csvText);
     hideOverlay();
   } catch (error) {
     console.error(error);
-    gridApi.setGridOption("loading", false);
     showOverlay({
       title: "Could not read the selected file",
       description:
@@ -546,23 +467,15 @@ function applyCsvText(csvText) {
     .filter((row) => (row.NM || "").trim() || (row.POS || "").trim())
     .map(normalizeRow);
 
-  gridApi.setGridOption("loading", false);
   refreshGrid();
 }
 
 function refreshGrid() {
   const visibleRows = getVisibleRows();
   state.columnFormatting = buildColumnFormatting(visibleRows);
-  gridApi.setGridOption("columnDefs", buildColumnDefs());
-  gridApi.setGridOption("rowData", visibleRows);
-  gridApi.setGridOption("quickFilterText", state.searchText);
-
-  if (visibleRows.length === 0 && !gridApi.getGridOption("loading")) {
-    gridApi.showNoRowsOverlay();
-  } else if (!gridApi.getGridOption("loading")) {
-    gridApi.hideOverlay();
-  }
-
+  const searchedRows = visibleRows.filter(matchesSearch);
+  state.displayedRows = sortRows(searchedRows);
+  renderTable();
   updateRowCount();
 }
 
@@ -594,41 +507,260 @@ function syncUiState() {
 }
 
 function updateRowCount() {
-  const displayedRows = gridApi.getDisplayedRowCount();
+  const displayedRows = state.displayedRows.length;
   rowCount.textContent = `${displayedRows} row${displayedRows === 1 ? "" : "s"}`;
 }
 
-function buildColumnDefs() {
-  const columns = COLUMN_SETS[state.activeCategory];
+function renderTable() {
+  const { columns, totalWidth } = buildColumnLayout(
+    COLUMN_SETS[state.activeCategory],
+  );
+  const table = document.createElement("table");
+  table.className = "stats-table";
+  table.setAttribute("aria-label", "Player stats table");
+  table.style.setProperty("--table-width", `${totalWidth}px`);
 
-  return columns.map((columnName, index) => {
-    const isLabelColumn = LABEL_COLUMNS.has(columnName);
-    const isNumericColumn = !isLabelColumn;
-    const columnWidth = getColumnWidth(columnName);
-
-    return {
-      headerName: columnName,
-      field: columnName,
-      width: columnWidth,
-      minWidth: columnWidth,
-      pinned: index < 3 ? "left" : null,
-      lockPinned: index < 3,
-      suppressMovable: true,
-      filter: isLabelColumn ? "agTextColumnFilter" : "agNumberColumnFilter",
-      type: isNumericColumn ? "numericColumn" : undefined,
-      headerClass: "dh-header-cell",
-      valueFormatter: formatGridValue,
-      tooltipValueGetter: getTooltipValue,
-      cellRenderer: columnName === FPTS_COLUMN ? renderFptsCell : undefined,
-      cellClass: getCellClass,
-      comparator: compareGridValues,
-    };
+  const colgroup = document.createElement("colgroup");
+  columns.forEach((column) => {
+    const col = document.createElement("col");
+    col.style.width = `${column.width}px`;
+    col.style.minWidth = `${column.width}px`;
+    col.style.maxWidth = `${column.width}px`;
+    colgroup.append(col);
   });
+  table.append(colgroup);
+
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  columns.forEach((column) => {
+    headerRow.append(createHeaderCell(column));
+  });
+  thead.append(headerRow);
+  table.append(thead);
+
+  const tbody = document.createElement("tbody");
+  if (!state.displayedRows.length) {
+    tbody.append(createEmptyStateRow(columns.length));
+  } else {
+    state.displayedRows.forEach((row) => {
+      tbody.append(createBodyRow(row, columns));
+    });
+  }
+  table.append(tbody);
+
+  gridContainer.replaceChildren(table);
+}
+
+function buildColumnLayout(columnNames) {
+  let totalWidth = 0;
+  let stickyLeft = 0;
+
+  const columns = columnNames.map((name, index) => {
+    const width = getColumnWidth(name);
+    const column = {
+      name,
+      index,
+      width,
+      isSticky: index < STICKY_COLUMN_COUNT,
+      stickyLeft,
+    };
+
+    totalWidth += width;
+    if (column.isSticky) {
+      stickyLeft += width;
+    }
+
+    return column;
+  });
+
+  return {
+    columns,
+    totalWidth,
+  };
+}
+
+function createHeaderCell(column) {
+  const th = document.createElement("th");
+  th.className = "stats-table__header-cell";
+  th.scope = "col";
+  applyColumnStyle(th, column);
+  applyStickyCellState(th, column);
+  th.setAttribute("aria-sort", getAriaSort(column.name));
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "stats-table__head-button";
+  button.setAttribute("aria-label", `Sort by ${column.name}`);
+  button.addEventListener("click", () => handleHeaderSort(column.name));
+
+  const label = document.createElement("span");
+  label.className = "stats-table__head-label";
+  label.textContent = column.name;
+
+  const indicator = document.createElement("span");
+  indicator.className = "stats-table__sort-indicator";
+  indicator.textContent = getSortIndicator(column.name);
+  indicator.setAttribute("aria-hidden", "true");
+
+  if (getActiveSortColumn() === column.name) {
+    indicator.classList.add("is-active");
+  }
+
+  button.append(label, indicator);
+  th.append(button);
+  return th;
+}
+
+function createBodyRow(row, columns) {
+  const tr = document.createElement("tr");
+  columns.forEach((column) => {
+    tr.append(createBodyCell(row, column));
+  });
+  return tr;
+}
+
+function createBodyCell(row, column) {
+  const value = row[column.name];
+  const td = document.createElement("td");
+  td.classList.add("stats-table__body-cell");
+  applyColumnStyle(td, column);
+  applyStickyCellState(td, column);
+
+  const cellClasses = getCellClass({
+    colDef: { field: column.name },
+    value,
+  })
+    .split(/\s+/)
+    .filter(Boolean);
+
+  td.classList.add(...cellClasses);
+  td.title = formatCellValue(value);
+
+  const content = document.createElement("div");
+  content.className = "stats-table__cell-content";
+
+  if (column.name === FPTS_COLUMN && !isMissingValue(value)) {
+    content.append(createFptsChip(value));
+  } else {
+    content.textContent = formatDisplayValue(column.name, value);
+  }
+
+  td.append(content);
+  return td;
+}
+
+function createFptsChip(value) {
+  const chip = document.createElement("span");
+  const tier = getFormattingTier(FPTS_COLUMN, value);
+  chip.className = `stats-table__fpts-chip stats-table__fpts-chip--tier-${tier}`;
+  chip.textContent = formatDisplayValue(FPTS_COLUMN, value);
+  return chip;
+}
+
+function createEmptyStateRow(columnCount) {
+  const tr = document.createElement("tr");
+  tr.className = "stats-table__empty-row";
+
+  const td = document.createElement("td");
+  td.className = "stats-table__empty-cell";
+  td.colSpan = columnCount;
+  td.textContent = "No players match the current view.";
+
+  tr.append(td);
+  return tr;
+}
+
+function applyColumnStyle(cell, column) {
+  cell.style.setProperty("--column-width", `${column.width}px`);
+}
+
+function applyStickyCellState(cell, column) {
+  if (!column.isSticky) {
+    return;
+  }
+
+  cell.classList.add(
+    "stats-table__cell--sticky",
+    `stats-table__cell--sticky-${column.index}`,
+  );
+  cell.style.setProperty("--sticky-left", `${column.stickyLeft}px`);
+}
+
+function getAriaSort(columnName) {
+  if (getActiveSortColumn() !== columnName) {
+    return "none";
+  }
+
+  return state.sort.direction === "asc" ? "ascending" : "descending";
+}
+
+function getSortIndicator(columnName) {
+  if (getActiveSortColumn() !== columnName) {
+    return "↕";
+  }
+
+  return state.sort.direction === "asc" ? "▲" : "▼";
+}
+
+function handleHeaderSort(columnName) {
+  if (state.sort.column === columnName) {
+    state.sort.direction = state.sort.direction === "asc" ? "desc" : "asc";
+  } else {
+    state.sort = {
+      column: columnName,
+      direction: "asc",
+    };
+  }
+
+  refreshGrid();
 }
 
 function getVisibleRows() {
   const predicate = CATEGORY_FILTERS[state.activeCategory];
   return state.rows.filter((row) => predicate(row, state));
+}
+
+function matchesSearch(row) {
+  const query = state.searchText.trim().toLowerCase();
+  if (!query) {
+    return true;
+  }
+
+  return COLUMN_SETS[state.activeCategory].some((columnName) => {
+    const value = row[columnName];
+    return !isMissingValue(value) && String(value).toLowerCase().includes(query);
+  });
+}
+
+function sortRows(rows) {
+  const sortColumn = getActiveSortColumn();
+  const directionMultiplier = state.sort.direction === "desc" ? -1 : 1;
+
+  return [...rows].sort((left, right) => {
+    const primaryResult = compareGridValues(left[sortColumn], right[sortColumn]);
+    if (primaryResult !== 0) {
+      return primaryResult * directionMultiplier;
+    }
+
+    if (sortColumn !== "RK") {
+      const rankFallback = compareGridValues(left.RK, right.RK);
+      if (rankFallback !== 0) {
+        return rankFallback;
+      }
+    }
+
+    const playerFallback = compareGridValues(left.PLAYER, right.PLAYER);
+    if (playerFallback !== 0) {
+      return playerFallback;
+    }
+
+    return compareGridValues(left.POS, right.POS);
+  });
+}
+
+function getActiveSortColumn() {
+  const columns = COLUMN_SETS[state.activeCategory];
+  return columns.includes(state.sort.column) ? state.sort.column : "RK";
 }
 
 function getColumnWidth(columnName) {
@@ -638,14 +770,6 @@ function getColumnWidth(columnName) {
 
 function isCompactViewport() {
   return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
-}
-
-function getRowHeight() {
-  return state.isCompactViewport ? 38 : 44;
-}
-
-function getHeaderHeight() {
-  return state.isCompactViewport ? 40 : 50;
 }
 
 let resizeFrame = 0;
@@ -659,17 +783,14 @@ function handleViewportResize() {
     }
 
     state.isCompactViewport = nextCompact;
-    gridApi.setGridOption("rowHeight", getRowHeight());
-    gridApi.setGridOption("headerHeight", getHeaderHeight());
     refreshGrid();
   });
 }
 
 function normalizeRow(sourceRow) {
-  const allColumns = new Set(Object.values(COLUMN_SETS).flat());
   const normalized = {};
 
-  for (const columnName of allColumns) {
+  for (const columnName of ALL_COLUMNS) {
     const alias = Object.prototype.hasOwnProperty.call(SOURCE_ALIASES, columnName)
       ? SOURCE_ALIASES[columnName]
       : columnName;
@@ -790,26 +911,6 @@ function getCellClass(params) {
 
 function formatCellValue(value) {
   return isMissingValue(value) ? "NA" : value;
-}
-
-function formatGridValue(params) {
-  return formatDisplayValue(params.colDef.field, params.value);
-}
-
-function getTooltipValue(params) {
-  return formatCellValue(params.value);
-}
-
-function renderFptsCell(params) {
-  const displayValue = params.valueFormatted ?? formatDisplayValue(FPTS_COLUMN, params.value);
-
-  if (isMissingValue(params.value)) {
-    return displayValue;
-  }
-
-  const safeValue = escapeHtml(displayValue);
-  const tier = getFormattingTier(FPTS_COLUMN, params.value);
-  return `<span class="dh-fpts-chip dh-fpts-chip--tier-${tier}">${safeValue}</span>`;
 }
 
 function formatDisplayValue(columnName, value) {
@@ -978,15 +1079,6 @@ function toComparableNumber(value) {
 
 function isMissingValue(value) {
   return value == null || value === "" || value === "NA" || value === "#N/A";
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
 }
 
 function showOverlay({ title, description, showActions = false }) {

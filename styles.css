@@ -493,10 +493,8 @@ body::after {
 }
 
 .grid-scroll-wrapper {
-  /* Single unified scroll container — header and body are one element here */
-  overflow-y: auto;
-  /* overflow-y:auto collapses overflow-x to auto too; that is intentional so
-     AG Grid's internal horizontal scrollbar is still reachable at the bottom */
+  /* Single unified scroll container for the semantic table */
+  overflow: auto;
   max-height: clamp(500px, 62vh, 900px);
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -954,9 +952,315 @@ body::after {
   background: rgba(255, 255, 255, 0.04);
 }
 
+.stats-table {
+  width: max(100%, var(--table-width, 0px));
+  min-width: max(100%, var(--table-width, 0px));
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  color: rgba(236, 242, 252, 0.94);
+  background: transparent;
+  font-size: 13px;
+}
+
+.stats-table__header-cell,
+.stats-table__body-cell {
+  width: var(--column-width);
+  min-width: var(--column-width);
+  max-width: var(--column-width);
+  padding: 0;
+  border: 0;
+  vertical-align: middle;
+}
+
+.stats-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(8, 15, 27, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+}
+
+.stats-table tbody td {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.stats-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.stats-table tbody tr:hover > td:not(.stats-table__cell--sticky) {
+  background: rgba(102, 215, 255, 0.04);
+}
+
+.stats-table__cell--sticky {
+  position: sticky;
+  left: var(--sticky-left);
+}
+
+.stats-table__body-cell.stats-table__cell--sticky {
+  background:
+    linear-gradient(180deg, rgba(12, 20, 34, 0.96), rgba(9, 16, 27, 0.94)),
+    rgba(8, 15, 27, 0.96);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.stats-table__header-cell.stats-table__cell--sticky {
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, 0.12),
+    0 2px 12px rgba(0, 0, 0, 0.32);
+}
+
+.stats-table__cell--sticky-0 {
+  z-index: 6;
+}
+
+.stats-table__cell--sticky-1 {
+  z-index: 5;
+}
+
+.stats-table__cell--sticky-2 {
+  z-index: 4;
+}
+
+.stats-table__header-cell.stats-table__cell--sticky-0 {
+  z-index: 17;
+}
+
+.stats-table__header-cell.stats-table__cell--sticky-1 {
+  z-index: 16;
+}
+
+.stats-table__header-cell.stats-table__cell--sticky-2 {
+  z-index: 15;
+}
+
+.stats-table__head-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 18px 0 10px;
+  border: 0;
+  background: transparent;
+  color: rgba(202, 222, 247, 0.88);
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.stats-table__head-button:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.stats-table__head-button:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(128, 220, 255, 0.5);
+}
+
+.stats-table__head-label {
+  display: block;
+  width: 100%;
+  padding: 0 2px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.stats-table__sort-indicator {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  opacity: 0.34;
+  color: rgba(202, 222, 247, 0.7);
+}
+
+.stats-table__sort-indicator.is-active {
+  opacity: 0.95;
+  color: var(--accent-cyan);
+}
+
+.stats-table__cell-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: rgba(236, 242, 252, 0.92);
+  font-variant-numeric: tabular-nums;
+}
+
+.player-cell .stats-table__cell-content {
+  justify-content: flex-start;
+  font-variant-numeric: normal;
+}
+
+.center-cell .stats-table__cell-content {
+  justify-content: center;
+}
+
+.formatted-cell .stats-table__cell-content {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.na-cell .stats-table__cell-content {
+  color: rgba(171, 186, 208, 0.48);
+}
+
+.stats-table__fpts-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.heat-cell--heat.heat-cell--tier-0 .stats-table__cell-content {
+  color: rgba(212, 222, 240, 0.74);
+}
+
+.heat-cell--heat.heat-cell--tier-1 .stats-table__cell-content {
+  color: rgba(194, 232, 255, 0.82);
+}
+
+.heat-cell--heat.heat-cell--tier-2 .stats-table__cell-content {
+  color: rgba(171, 225, 255, 0.92);
+}
+
+.heat-cell--heat.heat-cell--tier-3 .stats-table__cell-content {
+  color: rgba(141, 225, 255, 0.98);
+}
+
+.heat-cell--heat.heat-cell--tier-4 .stats-table__cell-content {
+  color: rgba(122, 233, 255, 1);
+  text-shadow: 0 0 7px rgba(102, 215, 255, 0.05);
+}
+
+.heat-cell--neutral.heat-cell--tier-0 .stats-table__cell-content {
+  color: rgba(214, 221, 234, 0.74);
+}
+
+.heat-cell--neutral.heat-cell--tier-1 .stats-table__cell-content {
+  color: rgba(223, 227, 238, 0.82);
+}
+
+.heat-cell--neutral.heat-cell--tier-2 .stats-table__cell-content {
+  color: rgba(235, 228, 215, 0.9);
+}
+
+.heat-cell--neutral.heat-cell--tier-3 .stats-table__cell-content {
+  color: rgba(248, 222, 182, 0.96);
+}
+
+.heat-cell--neutral.heat-cell--tier-4 .stats-table__cell-content {
+  color: rgba(255, 214, 158, 1);
+  text-shadow: 0 0 7px rgba(255, 184, 102, 0.05);
+}
+
+.stats-table__fpts-chip--tier-0 {
+  background:
+    linear-gradient(180deg, rgba(102, 215, 255, 0.08), rgba(162, 127, 255, 0.04)),
+    rgba(255, 255, 255, 0.02);
+  border-color: rgba(130, 214, 255, 0.12);
+}
+
+.stats-table__fpts-chip--tier-1 {
+  background:
+    linear-gradient(180deg, rgba(102, 215, 255, 0.12), rgba(162, 127, 255, 0.06)),
+    rgba(255, 255, 255, 0.02);
+  border-color: rgba(130, 214, 255, 0.16);
+}
+
+.stats-table__fpts-chip--tier-2 {
+  background:
+    linear-gradient(180deg, rgba(102, 215, 255, 0.16), rgba(162, 127, 255, 0.08)),
+    rgba(255, 255, 255, 0.02);
+  border-color: rgba(130, 214, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 20px rgba(102, 215, 255, 0.08);
+}
+
+.stats-table__fpts-chip--tier-3 {
+  background:
+    linear-gradient(180deg, rgba(102, 215, 255, 0.22), rgba(162, 127, 255, 0.12)),
+    rgba(255, 255, 255, 0.02);
+  border-color: rgba(135, 220, 255, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 24px rgba(102, 215, 255, 0.12);
+}
+
+.stats-table__fpts-chip--tier-4 {
+  background:
+    linear-gradient(180deg, rgba(102, 215, 255, 0.28), rgba(162, 127, 255, 0.16)),
+    rgba(255, 255, 255, 0.02);
+  border-color: rgba(145, 224, 255, 0.36);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 30px rgba(102, 215, 255, 0.16);
+}
+
+.stats-table__empty-cell {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-weight: 500;
+  background: transparent !important;
+}
+
 @media (max-width: 719px) {
   .grid-scroll-wrapper {
     max-height: clamp(420px, 55vh, 700px);
+  }
+
+  .stats-table {
+    font-size: 11px;
+  }
+
+  .stats-table__head-button {
+    min-height: 40px;
+    padding: 0 16px 0 8px;
+  }
+
+  .stats-table__sort-indicator {
+    right: 6px;
+    font-size: 9px;
+  }
+
+  .stats-table__cell-content {
+    min-height: 38px;
+    padding: 0 8px;
+  }
+
+  .stats-table__fpts-chip {
+    min-height: 22px;
+    padding: 0 6px;
   }
 
   .ag-theme-balham {
