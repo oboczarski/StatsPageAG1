@@ -19,145 +19,114 @@ const CATEGORY_LABELS = {
   receiving: "RECEIVING (W/T)",
 };
 
-const COLUMN_SETS = {
+/**
+ * @typedef {Object} HeaderMeta
+ * @property {string} shortLabel
+ * @property {string} longLabel
+ * @property {string} headerIcon
+ * @property {string} filter
+ * @property {{ desktop: number, mobile: number }} widths
+ * @property {{ desktop: number, mobile: number }} minWidths
+ * @property {("fptsChip" | "posChip" | null)} renderer
+ */
+
+/**
+ * @typedef {Object} GroupSpec
+ * @property {string} headerName
+ * @property {string[]} columns
+ */
+
+/** @typedef {Record<string, GroupSpec[]>} ViewGroupSpec */
+
+const VIEW_GROUPS = /** @type {ViewGroupSpec} */ ({
   overview: [
-    "RK",
-    "PLAYER",
-    "POS",
-    "TM",
-    "AGE",
-    "FPTS",
-    "PPG",
-    "VALUE",
-    "ADP",
-    "POS·ADP",
-    "G",
-    "SNP%",
-    "YDS(t)",
-    "YPG(t)",
-    "OPP",
-    "IMP",
-    "IMP/OPP",
-    "CSTY%",
-    "CL",
+    createGroup("GENERAL", ["RK", "PLAYER", "POS"]),
+    createGroup("INFO", ["TM", "AGE"]),
+    createGroup("FANTASY", ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"]),
+    createGroup("OVERVIEW STATS", [
+      "G",
+      "SNP%",
+      "YDS(t)",
+      "YPG(t)",
+      "OPP",
+      "IMP",
+      "IMP/OPP",
+      "CSTY%",
+      "CL",
+    ]),
   ],
   passing: [
-    "RK",
-    "PLAYER",
-    "POS",
-    "TM",
-    "AGE",
-    "G",
-    "FPTS",
-    "PPG",
-    "VALUE",
-    "ADP",
-    "POS·ADP",
-    "paYDS",
-    "paTD",
-    "CMP%",
-    "paATT",
-    "paRTG",
-    "EPA/DB",
-    "CPOE",
-    "CMP",
-    "YDS(t)",
-    "paYPG",
-    "ruYDS",
-    "ruTD",
-    "pa1D",
-    "IMP/G",
-    "pIMP",
-    "pIMP/A",
-    "CAR",
-    "YPC",
-    "TTT",
-    "PRS%",
-    "SAC",
-    "INT",
-    "FUM",
-    "FPOE",
-    "CSTY%",
-    "CL",
+    createGroup("GENERAL", ["RK", "PLAYER", "POS"]),
+    createGroup("INFO", ["TM", "AGE", "G"]),
+    createGroup("FANTASY", ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"]),
+    createGroup("PASSING", [
+      "paYDS",
+      "paTD",
+      "CMP%",
+      "paATT",
+      "paRTG",
+      "EPA/DB",
+      "CPOE",
+      "CMP",
+      "YDS(t)",
+      "paYPG",
+      "pa1D",
+      "IMP/G",
+      "pIMP",
+      "pIMP/A",
+      "TTT",
+      "PRS%",
+      "SAC",
+      "INT",
+    ]),
+    createGroup("RUSHING", ["ruYDS", "ruTD", "CAR", "YPC", "FUM"]),
+    createGroup("CEILING & CONSISTENCY", ["FPOE", "CSTY%", "CL"]),
   ],
   rushing: [
-    "RK",
-    "PLAYER",
-    "POS",
-    "TM",
-    "AGE",
-    "G",
-    "FPTS",
-    "PPG",
-    "VALUE",
-    "ADP",
-    "POS·ADP",
-    "SNP%",
-    "CAR",
-    "ruYDS",
-    "YPC",
-    "ruTD",
-    "REC",
-    "recYDS",
-    "TGT",
-    "YDS(t)",
-    "ruYPG",
-    "ELU",
-    "MTF/A",
-    "YCO/A",
-    "MTF",
-    "YCO",
-    "EXPLSV%",
-    "ru1D",
-    "RYOE",
-    "recTD",
-    "rec1D",
-    "YAC",
-    "IMP/G",
-    "FUM",
-    "FPOE",
-    "CSTY%",
-    "CL",
+    createGroup("GENERAL", ["RK", "PLAYER", "POS"]),
+    createGroup("INFO", ["TM", "AGE", "G"]),
+    createGroup("FANTASY", ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"]),
+    createGroup("RUSHING EFFICIENCY", ["SNP%", "YPC", "ruYPG", "IMP/G"]),
+    createGroup("RUSHING PRODUCTION", ["CAR", "ruYDS", "ruTD", "ru1D", "YDS(t)", "FUM"]),
+    createGroup("RECEIVING", ["REC", "recYDS", "recTD", "rec1D", "YAC", "TGT"]),
+    createGroup("ADVANCED RUSHING", [
+      "ELU",
+      "MTF/A",
+      "YCO/A",
+      "MTF",
+      "YCO",
+      "RYOE",
+      "EXPLSV%",
+    ]),
+    createGroup("CEILING & CONSISTENCY", ["FPOE", "CSTY%", "CL"]),
   ],
   receiving: [
-    "RK",
-    "PLAYER",
-    "POS",
-    "TM",
-    "AGE",
-    "G",
-    "FPTS",
-    "PPG",
-    "VALUE",
-    "ADP",
-    "POS·ADP",
-    "SNP%",
-    "TGT",
-    "REC",
-    "TS%",
-    "recYDS",
-    "recTD",
-    "YPRR",
-    "rec1D",
-    "1DRR",
-    "recYPG",
-    "AY%",
-    "YAC",
-    "YPR",
-    "IMP/G",
-    "RR",
-    "FPOE",
-    "YDS(t)",
-    "RZ Tgt",
-    "CAR",
-    "ruYDS",
-    "ruTD",
-    "YPC",
-    "FUM",
-    "CSTY%",
-    "CL",
+    createGroup("GENERAL", ["RK", "PLAYER", "POS"]),
+    createGroup("INFO", ["TM", "AGE", "G"]),
+    createGroup("FANTASY", ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"]),
+    createGroup("RECEIVING", [
+      "SNP%",
+      "TGT",
+      "REC",
+      "TS%",
+      "recYDS",
+      "recTD",
+      "YPRR",
+      "rec1D",
+      "1DRR",
+      "recYPG",
+      "AY%",
+      "YAC",
+      "YPR",
+      "IMP/G",
+      "RR",
+      "YDS(t)",
+      "RZ Tgt",
+    ]),
+    createGroup("RUSHING", ["CAR", "ruYDS", "ruTD", "YPC", "FUM"]),
+    createGroup("CEILING & CONSISTENCY", ["FPOE", "CSTY%", "CL"]),
   ],
-};
+});
 
 const SOURCE_ALIASES = {
   PLAYER: "NM",
@@ -170,6 +139,7 @@ const SOURCE_ALIASES = {
   PPG: null,
 };
 
+const PINNED_COLUMNS = new Set(["RK", "PLAYER", "POS"]);
 const LABEL_COLUMNS = new Set(["PLAYER", "POS", "TM"]);
 const NON_FORMATTED_COLUMNS = new Set(["PLAYER", "POS", "TM", "AGE", "G"]);
 const INVERTED_COLUMNS = new Set([
@@ -182,8 +152,6 @@ const INVERTED_COLUMNS = new Set([
   "CSTY%",
 ]);
 const NEUTRAL_COLUMNS = new Set(["TTT", "CL"]);
-const PLAYER_COLUMN = "PLAYER";
-const FPTS_COLUMN = "FPTS";
 
 const CATEGORY_FILTERS = {
   overview: (row) => Boolean(row.POS && row.POS !== "NA"),
@@ -195,6 +163,9 @@ const CATEGORY_FILTERS = {
 };
 
 const MOBILE_BREAKPOINT = 719;
+const PLAYER_COLUMN = "PLAYER";
+const POS_COLUMN = "POS";
+const FPTS_COLUMN = "FPTS";
 
 const COLUMN_WIDTHS = {
   RK: 78,
@@ -330,6 +301,106 @@ const MOBILE_COLUMN_WIDTHS = {
   "RZ Tgt": 64,
 };
 
+const HEADER_META = /** @type {Record<string, HeaderMeta>} */ (
+  createHeaderMeta({
+    RK: { longLabel: "Rank", headerIcon: "rank" },
+    PLAYER: {
+      longLabel: "Player",
+      headerIcon: "player",
+    },
+    POS: {
+      longLabel: "Position",
+      headerIcon: "position",
+      renderer: "posChip",
+    },
+    TM: { longLabel: "Team", headerIcon: "team" },
+    AGE: { longLabel: "Age", headerIcon: "age" },
+    G: { longLabel: "Games Played", headerIcon: "games" },
+    FPTS: {
+      longLabel: "Fantasy Points",
+      headerIcon: "fantasy",
+      renderer: "fptsChip",
+    },
+    PPG: { longLabel: "Fantasy Points Per Game", headerIcon: "fantasy" },
+    VALUE: { longLabel: "Trade Value", headerIcon: "trade" },
+    ADP: { longLabel: "Average Draft Position", headerIcon: "draft" },
+    "POS·ADP": { longLabel: "Positional ADP", headerIcon: "draft" },
+    "SNP%": { longLabel: "Snap Percentage", headerIcon: "snap" },
+    "YDS(t)": { longLabel: "Total Yards", headerIcon: "yards" },
+    "YPG(t)": { longLabel: "Total Yards Per Game", headerIcon: "yards" },
+    OPP: { longLabel: "Opportunity", headerIcon: "opportunity" },
+    IMP: { longLabel: "Impact", headerIcon: "impact" },
+    "IMP/OPP": { longLabel: "Impact Per Opportunity", headerIcon: "impact" },
+    "CSTY%": { longLabel: "Consistency Percentage", headerIcon: "consistency" },
+    CL: { longLabel: "Ceiling", headerIcon: "ceiling" },
+    paYDS: { longLabel: "Passing Yards", headerIcon: "passing" },
+    paTD: { longLabel: "Passing Touchdowns", headerIcon: "passing" },
+    "CMP%": { longLabel: "Completion Percentage", headerIcon: "passing" },
+    paATT: { longLabel: "Pass Attempts", headerIcon: "passing" },
+    paRTG: { longLabel: "Passer Rating", headerIcon: "passing" },
+    "EPA/DB": {
+      longLabel: "Expected Points Added Per Dropback",
+      headerIcon: "advanced",
+    },
+    CPOE: {
+      longLabel: "Completion Percentage Over Expected",
+      headerIcon: "advanced",
+    },
+    CMP: { longLabel: "Completions", headerIcon: "passing" },
+    paYPG: { longLabel: "Passing Yards Per Game", headerIcon: "passing" },
+    ruYDS: { longLabel: "Rushing Yards", headerIcon: "rushing" },
+    ruTD: { longLabel: "Rushing Touchdowns", headerIcon: "rushing" },
+    pa1D: { longLabel: "Passing First Downs", headerIcon: "passing" },
+    "IMP/G": { longLabel: "Impact Per Game", headerIcon: "impact" },
+    pIMP: { longLabel: "Passing Impact", headerIcon: "impact" },
+    "pIMP/A": { longLabel: "Passing Impact Per Attempt", headerIcon: "impact" },
+    CAR: { longLabel: "Carries", headerIcon: "rushing" },
+    YPC: { longLabel: "Yards Per Carry", headerIcon: "efficiency" },
+    TTT: { longLabel: "Time To Throw", headerIcon: "time" },
+    "PRS%": { longLabel: "Pressure Percentage", headerIcon: "risk" },
+    SAC: { longLabel: "Sacks", headerIcon: "risk" },
+    INT: { longLabel: "Interceptions", headerIcon: "risk" },
+    FUM: { longLabel: "Fumbles", headerIcon: "risk" },
+    FPOE: { longLabel: "Fantasy Points Over Expected", headerIcon: "ceiling" },
+    REC: { longLabel: "Receptions", headerIcon: "receiving" },
+    recYDS: { longLabel: "Receiving Yards", headerIcon: "receiving" },
+    TGT: { longLabel: "Targets", headerIcon: "target" },
+    ELU: { longLabel: "Elusiveness Rating", headerIcon: "advanced" },
+    "MTF/A": {
+      longLabel: "Missed Tackles Forced Per Attempt",
+      headerIcon: "brokenTackle",
+    },
+    "YCO/A": {
+      longLabel: "Yards Created Per Attempt",
+      headerIcon: "created",
+    },
+    MTF: { longLabel: "Missed Tackles Forced", headerIcon: "brokenTackle" },
+    YCO: { longLabel: "Yards Created", headerIcon: "created" },
+    "EXPLSV%": { longLabel: "Explosive Rush Rate", headerIcon: "burst" },
+    ru1D: { longLabel: "Rushing First Downs", headerIcon: "rushing" },
+    RYOE: { longLabel: "Rushing Yards Over Expected", headerIcon: "advanced" },
+    recTD: { longLabel: "Receiving Touchdowns", headerIcon: "receiving" },
+    rec1D: { longLabel: "Receiving First Downs", headerIcon: "receiving" },
+    YAC: { longLabel: "Yards After Catch", headerIcon: "yac" },
+    "TS%": { longLabel: "Target Share", headerIcon: "target" },
+    YPRR: { longLabel: "Yards Per Route Run", headerIcon: "route" },
+    "1DRR": { longLabel: "First Downs Per Route Run", headerIcon: "route" },
+    recYPG: { longLabel: "Receiving Yards Per Game", headerIcon: "receiving" },
+    "AY%": { longLabel: "Air Yards Share", headerIcon: "air" },
+    YPR: { longLabel: "Yards Per Reception", headerIcon: "efficiency" },
+    RR: { longLabel: "Routes Run", headerIcon: "route" },
+    "RZ Tgt": { longLabel: "Red Zone Targets", headerIcon: "target" },
+  })
+);
+
+const ALL_COLUMNS = Array.from(
+  new Set(
+    Object.values(VIEW_GROUPS).flatMap((groups) =>
+      groups.flatMap((group) => group.columns),
+    ),
+  ),
+);
+
 const state = {
   primaryTab: "1-QB",
   activeCategory: "overview",
@@ -359,6 +430,142 @@ const PROVIDED_HEADER_TEMPLATE = `
       <span data-ref="eSortNone" class="ag-header-icon ag-header-label-icon ag-sort-none-icon" aria-hidden="true"></span>
     </div>
   </div>`;
+
+const HEADER_ICON_MARKUP = Object.freeze({
+  rank: createSvgIcon(
+    '<path d="M8 4h8v4a4 4 0 0 1-8 0Z"/><path d="M8 4H5a3 3 0 0 0 3 4"/><path d="M16 4h3a3 3 0 0 1-3 4"/><path d="M9 14h6"/><path d="M10 18h4"/>',
+  ),
+  player: createSvgIcon(
+    '<circle cx="12" cy="8" r="3"/><path d="M5 19c1.9-3 4.3-4.5 7-4.5s5.1 1.5 7 4.5"/>',
+  ),
+  position: createSvgIcon(
+    '<path d="m12 4 7 4-7 4-7-4 7-4Z"/><path d="m5 12 7 4 7-4"/><path d="m5 16 7 4 7-4"/>',
+  ),
+  team: createSvgIcon(
+    '<path d="M6 20V4"/><path d="M7 5h10l-2 3 2 3H7"/>',
+  ),
+  age: createSvgIcon(
+    '<circle cx="12" cy="12" r="7"/><path d="M12 8v4l3 2"/>',
+  ),
+  games: createSvgIcon(
+    '<rect x="4" y="6" width="16" height="13" rx="2"/><path d="M8 3v6"/><path d="M16 3v6"/><path d="M4 10h16"/>',
+  ),
+  fantasy: createSvgIcon(
+    '<path d="m12 3 2.3 5 5.4.5-4 3.6 1.2 5.4L12 15l-4.9 2.5 1.2-5.4-4-3.6 5.4-.5L12 3Z"/>',
+  ),
+  trade: createSvgIcon(
+    '<path d="M7 7h10"/><path d="m13 3 4 4-4 4"/><path d="M17 17H7"/><path d="m11 13-4 4 4 4"/>',
+  ),
+  draft: createSvgIcon(
+    '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/><path d="M12 5v2"/><path d="M12 17v2"/><path d="M5 12h2"/><path d="M17 12h2"/>',
+  ),
+  snap: createSvgIcon(
+    '<path d="M5 18V9"/><path d="M10 18V6"/><path d="M15 18v-4"/><path d="M20 18V8"/>',
+  ),
+  yards: createSvgIcon(
+    '<path d="M4 16h12"/><path d="m12 12 4 4-4 4"/><path d="M4 8h12"/><path d="m12 4 4 4-4 4"/>',
+  ),
+  opportunity: createSvgIcon(
+    '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/><path d="M12 5v2"/><path d="M19 12h-2"/>',
+  ),
+  impact: createSvgIcon(
+    '<path d="m13 3-7 10h5l-1 8 8-11h-5l0-7Z"/>',
+  ),
+  consistency: createSvgIcon(
+    '<path d="M4 16c2-2 4-2 6 0s4 2 6 0 4-2 4 0"/>',
+  ),
+  ceiling: createSvgIcon(
+    '<path d="M4 19 10 9l3 4 3-6 4 12"/><path d="M17 4h3v3"/>',
+  ),
+  passing: createSvgIcon(
+    '<path d="M4 15c4-5 9-7 16-6"/><path d="m15 5 5 4-5 4"/><path d="M6 17c1.5 0 3 .5 4 1.5"/>',
+  ),
+  rushing: createSvgIcon(
+    '<path d="M5 18c3-5 5-9 6-12"/><path d="M11 6c2 3 4 5 8 6"/><path d="M10 15c2 1 4 2.5 5 5"/>',
+  ),
+  receiving: createSvgIcon(
+    '<path d="M4 9c3 0 5 1 7 3"/><path d="M20 9c-3 0-5 1-7 3"/><path d="M12 12v8"/><path d="M8 20h8"/>',
+  ),
+  target: createSvgIcon(
+    '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3"/><path d="M21 12h-3"/><path d="M12 21v-3"/><path d="M3 12h3"/>',
+  ),
+  efficiency: createSvgIcon(
+    '<path d="M5 16a7 7 0 1 1 14 0"/><path d="m12 12 4-3"/><path d="M12 16v1"/>',
+  ),
+  time: createSvgIcon(
+    '<path d="M9 4h6"/><path d="M10 4v4l4 4"/><path d="M14 4v4l-4 4"/><path d="M9 20h6"/>',
+  ),
+  risk: createSvgIcon(
+    '<path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4Z"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  ),
+  advanced: createSvgIcon(
+    '<path d="M12 3v18"/><path d="M4.5 7.5 19.5 16.5"/><path d="M4.5 16.5 19.5 7.5"/><circle cx="12" cy="12" r="2"/>',
+  ),
+  brokenTackle: createSvgIcon(
+    '<path d="m6 6 3 3"/><path d="m15 15 3 3"/><path d="M7 17c2-5 6-9 11-11"/><path d="m14 6 4 1-1 4"/>',
+  ),
+  created: createSvgIcon(
+    '<path d="M5 19 19 5"/><path d="m12 5 7 7"/><path d="M8 16h6"/>',
+  ),
+  burst: createSvgIcon(
+    '<path d="m12 4 1.6 4.4L18 10l-4.4 1.6L12 16l-1.6-4.4L6 10l4.4-1.6L12 4Z"/><path d="m18 4 1 2"/><path d="m5 18 1 2"/>',
+  ),
+  yac: createSvgIcon(
+    '<path d="M5 18c3-4 7-6 13-6"/><path d="m14 8 4 4-4 4"/><path d="M5 10h4"/>',
+  ),
+  route: createSvgIcon(
+    '<circle cx="6" cy="18" r="1.5"/><circle cx="12" cy="10" r="1.5"/><circle cx="18" cy="5" r="1.5"/><path d="M7.5 17 11 11.5"/><path d="M13.5 8.5 16.7 6"/>',
+  ),
+  air: createSvgIcon(
+    '<path d="M5 16c2.5-5 6-8 11-9"/><path d="m13 5 3-1-1 3"/><path d="M8 20h8"/>',
+  ),
+  stat: createSvgIcon(
+    '<path d="M5 18V9"/><path d="M10 18V6"/><path d="M15 18v-3"/><path d="M20 18V11"/>',
+  ),
+});
+
+const GRID_ICON_OVERRIDES = Object.freeze({
+  menu: createSvgIcon('<path d="M5 7h14"/><path d="M8 12h8"/><path d="M11 17h2"/>'),
+  menuAlt: createSvgIcon('<path d="M5 7h14"/><path d="M8 12h8"/><path d="M11 17h2"/>'),
+  filter: createSvgIcon('<path d="M4 6h16l-6 7v5l-4-2v-3L4 6Z"/>'),
+  filterActive: createSvgIcon(
+    '<path d="M4 6h16l-6 7v5l-4-2v-3L4 6Z"/><circle cx="18" cy="6" r="2.2" fill="currentColor" stroke="none"/>',
+  ),
+  sortAscending: createSvgIcon('<path d="m8 14 4-4 4 4"/><path d="M12 10v9"/>'),
+  sortDescending: createSvgIcon('<path d="m8 10 4 4 4-4"/><path d="M12 5v9"/>'),
+  sortUnSort: createSvgIcon('<path d="m8 9 4-4 4 4"/><path d="m8 15 4 4 4-4"/><path d="M12 5v14"/>'),
+  columnGroupOpened: createSvgIcon('<path d="m7 10 5 5 5-5"/>'),
+  columnGroupClosed: createSvgIcon('<path d="m10 7 5 5-5 5"/>'),
+});
+
+class DataHubInnerHeader {
+  init(params) {
+    this.eGui = document.createElement("span");
+    this.eGui.className = "dh-inner-header";
+
+    this.eIcon = document.createElement("span");
+    this.eIcon.className = "dh-inner-header__icon";
+    this.eLabel = document.createElement("span");
+    this.eLabel.className = "dh-inner-header__label";
+
+    this.eGui.append(this.eIcon, this.eLabel);
+    this.refresh(params);
+  }
+
+  getGui() {
+    return this.eGui;
+  }
+
+  refresh(params) {
+    const iconMarkup = getHeaderIconMarkup(params.iconKey);
+    this.eIcon.innerHTML = iconMarkup;
+    this.eIcon.hidden = !iconMarkup;
+    this.eLabel.textContent = params.displayName;
+    this.eGui.title = params.longLabel ?? params.displayName;
+    this.eGui.dataset.iconKey = params.iconKey || "";
+    return true;
+  }
+}
 
 const mainTitle = document.querySelector("#main-title");
 const activeViewLabel = document.querySelector("#active-view-label");
@@ -407,6 +614,7 @@ const gridTheme = themeBalham.withParams({
 const gridOptions = {
   theme: gridTheme,
   columnDefs: buildColumnDefs(),
+  icons: GRID_ICON_OVERRIDES,
   rowData: [],
   loading: true,
   animateRows: false,
@@ -415,8 +623,10 @@ const gridOptions = {
   maintainColumnOrder: true,
   suppressMovableColumns: true,
   cacheQuickFilter: true,
+  enableBrowserTooltips: true,
   rowHeight: getRowHeight(),
   headerHeight: getHeaderHeight(),
+  groupHeaderHeight: getGroupHeaderHeight(),
   overlayLoadingTemplate:
     '<span class="ag-overlay-loading-center">Preparing Data Hub…</span>',
   overlayNoRowsTemplate:
@@ -426,9 +636,6 @@ const gridOptions = {
     resizable: true,
     filter: true,
     minWidth: 84,
-    headerComponentParams: {
-      template: PROVIDED_HEADER_TEMPLATE,
-    },
     cellClass: getCellClass,
     comparator: compareGridValues,
   },
@@ -596,31 +803,37 @@ function updateRowCount() {
 }
 
 function buildColumnDefs() {
-  const columns = COLUMN_SETS[state.activeCategory];
+  return VIEW_GROUPS[state.activeCategory].map((group) => ({
+    headerName: group.headerName,
+    groupId: `${state.activeCategory}-${toGroupId(group.headerName)}`,
+    marryChildren: true,
+    headerClass: "dh-header-group-cell",
+    children: group.columns.map((columnName) => buildLeafColumnDef(columnName)),
+  }));
+}
 
-  return columns.map((columnName, index) => {
-    const isLabelColumn = LABEL_COLUMNS.has(columnName);
-    const isNumericColumn = !isLabelColumn;
-    const columnWidth = getColumnWidth(columnName);
-    const minWidth = getColumnMinWidth(columnName);
+function buildLeafColumnDef(columnName) {
+  const meta = getHeaderMeta(columnName);
+  const isNumericColumn = meta.filter !== "agTextColumnFilter";
 
-    return {
-      headerName: columnName,
-      field: columnName,
-      width: columnWidth,
-      minWidth,
-      pinned: index < 3 ? "left" : null,
-      lockPinned: index < 3,
-      suppressMovable: true,
-      filter: isLabelColumn ? "agTextColumnFilter" : "agNumberColumnFilter",
-      type: isNumericColumn ? "numericColumn" : undefined,
-      headerClass: "dh-header-cell",
-      valueFormatter: formatGridValue,
-      cellRenderer: columnName === FPTS_COLUMN ? renderFptsCell : undefined,
-      cellClass: getCellClass,
-      comparator: compareGridValues,
-    };
-  });
+  return {
+    headerName: meta.shortLabel,
+    headerTooltip: meta.longLabel,
+    field: columnName,
+    width: getColumnWidth(columnName),
+    minWidth: getColumnMinWidth(columnName),
+    pinned: PINNED_COLUMNS.has(columnName) ? "left" : null,
+    lockPinned: PINNED_COLUMNS.has(columnName),
+    suppressMovable: true,
+    filter: meta.filter,
+    type: isNumericColumn ? "numericColumn" : undefined,
+    headerClass: "dh-header-cell",
+    headerComponentParams: buildHeaderComponentParams(columnName),
+    valueFormatter: formatGridValue,
+    cellRenderer: getCellRenderer(columnName),
+    cellClass: getCellClass,
+    comparator: compareGridValues,
+  };
 }
 
 function getVisibleRows() {
@@ -628,16 +841,45 @@ function getVisibleRows() {
   return state.rows.filter((row) => predicate(row, state));
 }
 
+function buildHeaderComponentParams(columnName) {
+  const meta = getHeaderMeta(columnName);
+
+  return {
+    template: PROVIDED_HEADER_TEMPLATE,
+    innerHeaderComponent: DataHubInnerHeader,
+    innerHeaderComponentParams: {
+      iconKey: meta.headerIcon,
+      longLabel: meta.longLabel,
+    },
+  };
+}
+
+function getCellRenderer(columnName) {
+  const renderer = getHeaderMeta(columnName).renderer;
+
+  if (renderer === "fptsChip") {
+    return renderFptsCell;
+  }
+
+  if (renderer === "posChip") {
+    return renderPosChip;
+  }
+
+  return undefined;
+}
+
+function getHeaderMeta(columnName) {
+  return HEADER_META[columnName] ?? createHeaderMetaEntry(columnName, {});
+}
+
 function getColumnMinWidth(columnName) {
-  const charWidth = state.isCompactViewport ? 6.3 : 7.2;
-  const sideSpace = state.isCompactViewport ? 26 : 34;
-  return Math.ceil(String(columnName).length * charWidth + sideSpace);
+  const meta = getHeaderMeta(columnName);
+  return state.isCompactViewport ? meta.minWidths.mobile : meta.minWidths.desktop;
 }
 
 function getColumnWidth(columnName) {
-  const widths = state.isCompactViewport ? MOBILE_COLUMN_WIDTHS : COLUMN_WIDTHS;
-  const fallback = state.isCompactViewport ? 58 : 94;
-  const baseWidth = widths[columnName] ?? fallback;
+  const meta = getHeaderMeta(columnName);
+  const baseWidth = state.isCompactViewport ? meta.widths.mobile : meta.widths.desktop;
   const shrinkBy = state.isCompactViewport
     ? 4
     : columnName === PLAYER_COLUMN
@@ -656,7 +898,11 @@ function getRowHeight() {
 }
 
 function getHeaderHeight() {
-  return state.isCompactViewport ? 36 : 44;
+  return state.isCompactViewport ? 34 : 40;
+}
+
+function getGroupHeaderHeight() {
+  return state.isCompactViewport ? 24 : 28;
 }
 
 let resizeFrame = 0;
@@ -672,15 +918,15 @@ function handleViewportResize() {
     state.isCompactViewport = nextCompact;
     gridApi.setGridOption("rowHeight", getRowHeight());
     gridApi.setGridOption("headerHeight", getHeaderHeight());
+    gridApi.setGridOption("groupHeaderHeight", getGroupHeaderHeight());
     refreshGrid();
   });
 }
 
 function normalizeRow(sourceRow) {
-  const allColumns = new Set(Object.values(COLUMN_SETS).flat());
   const normalized = {};
 
-  for (const columnName of allColumns) {
+  for (const columnName of ALL_COLUMNS) {
     const alias = Object.prototype.hasOwnProperty.call(SOURCE_ALIASES, columnName)
       ? SOURCE_ALIASES[columnName]
       : columnName;
@@ -774,6 +1020,10 @@ function getCellClass(params) {
     classes.push("center-cell");
   }
 
+  if (columnName === POS_COLUMN) {
+    classes.push("pos-cell");
+  }
+
   if (NON_FORMATTED_COLUMNS.has(columnName)) {
     classes.push("plain-cell");
   } else {
@@ -819,6 +1069,18 @@ function renderFptsCell(params) {
   return `<span class="dh-fpts-chip dh-fpts-chip--tier-${tier}">${safeValue}</span>`;
 }
 
+function renderPosChip(params) {
+  const displayValue = params.valueFormatted ?? formatDisplayValue(POS_COLUMN, params.value);
+
+  if (isMissingValue(params.value)) {
+    return displayValue;
+  }
+
+  const chipTone = getPositionChipTone(params.value);
+  const safeValue = escapeHtml(String(displayValue).toUpperCase());
+  return `<span class="dh-pos-chip dh-pos-chip--${chipTone}">${safeValue}</span>`;
+}
+
 function formatDisplayValue(columnName, value) {
   const formattedValue = formatCellValue(value);
 
@@ -845,7 +1107,7 @@ function abbreviatePlayerName(name) {
 
 function buildColumnFormatting(rows) {
   const formatting = Object.create(null);
-  const columns = COLUMN_SETS[state.activeCategory];
+  const columns = getActiveLeafColumns();
 
   columns.forEach((columnName) => {
     if (NON_FORMATTED_COLUMNS.has(columnName)) {
@@ -1005,4 +1267,87 @@ function showOverlay({ title, description, showActions = false }) {
 
 function hideOverlay() {
   overlay.classList.add("is-hidden");
+}
+
+function getActiveLeafColumns() {
+  return VIEW_GROUPS[state.activeCategory].flatMap((group) => group.columns);
+}
+
+function getPositionChipTone(value) {
+  const normalized = String(value).trim().toUpperCase();
+
+  if (normalized === "QB") {
+    return "qb";
+  }
+
+  if (normalized === "RB") {
+    return "rb";
+  }
+
+  if (normalized === "WR") {
+    return "wr";
+  }
+
+  if (normalized === "TE") {
+    return "te";
+  }
+
+  return "neutral";
+}
+
+function toGroupId(headerName) {
+  return String(headerName).toLowerCase().replaceAll(/[^a-z0-9]+/g, "-");
+}
+
+function getHeaderIconMarkup(iconKey) {
+  return HEADER_ICON_MARKUP[iconKey] ?? HEADER_ICON_MARKUP.stat;
+}
+
+function createGroup(headerName, columns) {
+  return { headerName, columns };
+}
+
+function createHeaderMeta(definitions) {
+  return Object.fromEntries(
+    Object.entries(definitions).map(([columnName, definition]) => [
+      columnName,
+      createHeaderMetaEntry(columnName, definition),
+    ]),
+  );
+}
+
+function createHeaderMetaEntry(columnName, definition) {
+  const shortLabel = definition.shortLabel ?? columnName;
+
+  return {
+    shortLabel,
+    longLabel: definition.longLabel ?? shortLabel,
+    headerIcon: definition.headerIcon ?? "stat",
+    filter:
+      definition.filter ??
+      (LABEL_COLUMNS.has(columnName) ? "agTextColumnFilter" : "agNumberColumnFilter"),
+    widths: {
+      desktop: definition.width ?? COLUMN_WIDTHS[columnName] ?? 94,
+      mobile: definition.mobileWidth ?? MOBILE_COLUMN_WIDTHS[columnName] ?? 58,
+    },
+    minWidths: {
+      desktop: definition.minWidth ?? computeHeaderMinWidth(shortLabel, false),
+      mobile: definition.mobileMinWidth ?? computeHeaderMinWidth(shortLabel, true),
+    },
+    renderer: definition.renderer ?? null,
+  };
+}
+
+function computeHeaderMinWidth(label, compact) {
+  const charWidth = compact ? 6.1 : 6.9;
+  const sideSpace = compact ? 30 : 42;
+  return Math.ceil(String(label).length * charWidth + sideSpace);
+}
+
+function createSvgIcon(paths) {
+  return `
+    <svg class="dh-grid-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      ${paths}
+    </svg>
+  `.trim();
 }
