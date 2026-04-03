@@ -559,282 +559,151 @@ body::after {
     rgba(10, 18, 30, 0.68);
 }
 
-/* Keep the base Balham theme current while pinning app-specific styling to our own theme hook. */
-.ag-theme-dh-hub {
-  --ag-font-family: var(--font-sans);
-  --ag-font-size: 12px;
-  --ag-data-font-size: 12px;
-  --ag-background-color: transparent;
-  --ag-header-background-color: transparent;
-  --ag-odd-row-background-color: transparent;
-  --ag-control-panel-background-color: transparent;
-  --ag-chrome-background-color: transparent;
-  --ag-panel-background-color: rgba(10, 18, 30, 0.78);
-  --ag-browser-color-scheme: dark;
-  --ag-foreground-color: rgba(236, 242, 252, 0.94);
-  --ag-text-color: rgba(236, 242, 252, 0.94);
-  --ag-data-color: rgba(236, 242, 252, 0.94);
-  --ag-header-foreground-color: rgba(202, 222, 247, 0.88);
-  --ag-header-text-color: rgba(202, 222, 247, 0.88);
-  --ag-secondary-foreground-color: rgba(165, 184, 209, 0.74);
-  --ag-subtle-text-color: rgba(165, 184, 209, 0.74);
-  --ag-border-color: transparent;
-  --ag-row-border-color: rgba(255, 255, 255, 0.06);
-  --ag-column-border: 0 none transparent;
-  --ag-cell-horizontal-border: solid transparent;
-  --ag-header-column-separator-color: rgba(255, 255, 255, 0.1);
-  --ag-header-column-border: 1px solid rgba(255, 255, 255, 0.08);
-  --ag-accent-color: var(--accent-cyan);
-  --ag-active-color: var(--accent-cyan);
-  --ag-balham-active-color: var(--accent-cyan);
-  --ag-range-selection-border-color: rgba(102, 215, 255, 0.46);
-  --ag-selected-row-background-color: rgba(102, 215, 255, 0.08);
-  --ag-row-hover-color: transparent;
-  --ag-header-cell-hover-background-color: rgba(255, 255, 255, 0.02);
-  --ag-input-focus-border-color: rgba(128, 220, 255, 0.6);
-  --ag-focus-shadow: 0 0 0 1px rgba(128, 220, 255, 0.5),
-    0 0 0 4px rgba(57, 135, 255, 0.18);
-  --ag-card-shadow: 0 22px 48px rgba(0, 0, 0, 0.44);
-  --ag-popup-shadow: 0 22px 48px rgba(0, 0, 0, 0.44);
-  --ag-menu-shadow: 0 22px 48px rgba(0, 0, 0, 0.44);
-  --ag-spacing: 6px;
-  --ag-border-radius: 16px;
-  --ag-header-height: 44px;
+/* ── Tabulator dark theme overrides ── */
+
+/* --- Nuke midnight-theme backgrounds everywhere --- */
+.dh-tabulator-hub.tabulator,
+.dh-tabulator-hub .tabulator-header,
+.dh-tabulator-hub .tabulator-headers,
+.dh-tabulator-hub .tabulator-tableholder,
+.dh-tabulator-hub .tabulator-table,
+.dh-tabulator-hub .tabulator-row,
+.dh-tabulator-hub .tabulator-row.tabulator-row-even,
+.dh-tabulator-hub .tabulator-row.tabulator-row-odd,
+.dh-tabulator-hub .tabulator-cell,
+.dh-tabulator-hub .tabulator-col,
+.dh-tabulator-hub .tabulator-header .tabulator-col {
+  background: transparent !important;
 }
 
-.ag-theme-dh-hub .ag-root-wrapper,
-.ag-theme-dh-hub .ag-root,
-.ag-theme-dh-hub .ag-header,
-.ag-theme-dh-hub .ag-body-viewport,
-.ag-theme-dh-hub .ag-center-cols-viewport,
-.ag-theme-dh-hub .ag-center-cols-container,
-.ag-theme-dh-hub .ag-pinned-left-cols-container,
-.ag-theme-dh-hub .ag-pinned-left-header,
-.ag-theme-dh-hub .ag-center-cols-clipper,
-.ag-theme-dh-hub .ag-floating-top,
-.ag-theme-dh-hub .ag-row,
-.ag-theme-dh-hub .ag-cell,
-.ag-theme-dh-hub .ag-header-cell {
-  background: transparent;
-}
-
-.ag-theme-dh-hub,
-.ag-theme-dh-hub .ag-root-wrapper,
-.ag-theme-dh-hub .ag-root,
-.ag-theme-dh-hub .ag-header,
-.ag-theme-dh-hub .ag-header-cell,
-.ag-theme-dh-hub .ag-header-group-cell,
-.ag-theme-dh-hub .ag-cell,
-.ag-theme-dh-hub .ag-cell-value {
-  font-family: var(--font-sans);
-}
-
-.ag-theme-dh-hub .ag-root-wrapper {
+.dh-tabulator-hub.tabulator {
   border: 0;
   border-radius: 0;
-  box-shadow: none;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: rgba(236, 242, 252, 0.94);
 }
 
-.ag-theme-dh-hub .ag-header {
-  position: relative;
-  background: transparent;
+/* --- Header --- */
+.dh-tabulator-hub .tabulator-header {
   border-bottom: none;
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-.ag-theme-dh-hub .ag-pinned-left-header,
-.ag-theme-dh-hub .ag-header-viewport {
-  background:
-    linear-gradient(180deg, rgba(10, 18, 30, 0.24), rgba(10, 18, 30, 0.14));
-}
-
-.ag-theme-dh-hub .ag-pinned-left-cols-container {
-  background:
-    linear-gradient(180deg, rgba(10, 18, 30, 0.08), rgba(10, 18, 30, 0.03));
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-.ag-theme-dh-hub .ag-pinned-left-cols-viewport,
-.ag-theme-dh-hub .ag-center-cols-viewport,
-.ag-theme-dh-hub .ag-center-cols-container,
-.ag-theme-dh-hub .ag-center-cols-clipper,
-.ag-theme-dh-hub .ag-body-viewport,
-.ag-theme-dh-hub .ag-header-container,
-.ag-theme-dh-hub .ag-header-row,
-.ag-theme-dh-hub .ag-header-cell,
-.ag-theme-dh-hub .ag-header-group-cell,
-.ag-theme-dh-hub .ag-pinned-left-header .ag-header-cell,
-.ag-theme-dh-hub .ag-pinned-left-header .ag-header-group-cell {
-  background: transparent;
-}
-
-.ag-theme-dh-hub .ag-header-cell,
-.ag-theme-dh-hub .ag-header-group-cell {
   font-weight: 600;
   letter-spacing: 0.02em;
-  padding-left: 6px;
-  padding-right: 6px;
+  color: rgba(202, 222, 247, 0.88);
+  min-height: 44px;
 }
 
-.ag-theme-dh-hub .ag-header-cell-comp-wrapper {
-  position: absolute;
-  inset: 0 4px;
+.dh-tabulator-hub .tabulator-header .tabulator-col {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0 6px;
+  height: 100%;
+}
+
+.dh-tabulator-hub .tabulator-header .tabulator-col:last-child {
+  border-right: none;
+}
+
+.dh-tabulator-hub .tabulator-header .tabulator-col .tabulator-col-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 0;
-  z-index: 1;
-}
-
-.ag-theme-dh-hub .dh-header-template {
-  position: static;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
+  padding: 0 4px;
   height: 100%;
-  min-width: 0;
 }
 
-.ag-theme-dh-hub .ag-header-cell-menu-button,
-.ag-theme-dh-hub .ag-header-cell-filter-button {
-  position: absolute;
-  top: 50%;
-  width: 12px;
-  height: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transform: translateY(-50%);
-  color: rgba(186, 205, 230, 0.68);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 140ms ease, color 140ms ease;
-}
-
-.ag-theme-dh-hub .ag-header-cell-menu-button {
-  left: 0;
-}
-
-.ag-theme-dh-hub .ag-header-cell-filter-button {
-  right: 0;
-}
-
-.ag-theme-dh-hub .ag-header-cell:hover .ag-header-cell-menu-button,
-.ag-theme-dh-hub .ag-header-cell:hover .ag-header-cell-filter-button,
-.ag-theme-dh-hub .ag-header-cell:focus-within .ag-header-cell-menu-button,
-.ag-theme-dh-hub .ag-header-cell:focus-within .ag-header-cell-filter-button {
-  opacity: 0.88;
-  pointer-events: auto;
-}
-
-.ag-theme-dh-hub .ag-header-cell-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  width: 100%;
-  min-width: 0;
-  height: 100%;
-  padding: 0 14px;
-}
-
-.ag-theme-dh-hub .ag-header-cell-text {
-  position: static;
-  display: block;
-  flex: 0 1 auto;
-  max-width: 100%;
-  min-width: 0;
-  padding: 0;
-  box-sizing: border-box;
+.dh-tabulator-hub .tabulator-header .tabulator-col .tabulator-col-title {
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 12px;
+  color: rgba(202, 222, 247, 0.88);
 }
 
-.ag-theme-dh-hub .ag-header-label-icon,
-.ag-theme-dh-hub .ag-sort-order {
-  flex: 0 0 auto;
-  margin-left: 0;
-  position: relative;
-  z-index: 1;
+.dh-tabulator-hub .tabulator-header .tabulator-col .tabulator-col-sorter {
+  color: rgba(186, 205, 230, 0.68);
 }
 
-.ag-theme-dh-hub .ag-filter-icon {
-  color: rgba(126, 214, 255, 0.86);
+.dh-tabulator-hub .tabulator-header .tabulator-col:hover {
+  background: rgba(255, 255, 255, 0.03) !important;
 }
 
-.ag-theme-dh-hub .ag-header-cell::after,
-.ag-theme-dh-hub .ag-header-group-cell::after {
-  opacity: 0.72;
-  z-index: 0;
+/* Frozen header columns get the pinned gradient */
+.dh-tabulator-hub .tabulator-header .tabulator-col.tabulator-frozen {
+  background:
+    linear-gradient(180deg, rgba(10, 18, 30, 0.24), rgba(10, 18, 30, 0.14)) !important;
 }
 
-.ag-theme-dh-hub .ag-header-cell:hover,
-.ag-theme-dh-hub .ag-pinned-left-header .ag-header-cell:hover,
-.ag-theme-dh-hub .ag-header-group-cell:hover {
-  background: rgba(255, 255, 255, 0.03);
+.dh-tabulator-hub .tabulator-header .tabulator-col-resize-handle {
+  width: 6px;
 }
 
-.ag-theme-dh-hub .ag-row {
-  border-color: rgba(255, 255, 255, 0.06);
+/* --- Rows --- */
+.dh-tabulator-hub .tabulator-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.ag-theme-dh-hub .ag-row-even,
-.ag-theme-dh-hub .ag-row-odd,
-.ag-theme-dh-hub .ag-row-hover {
+.dh-tabulator-hub .tabulator-row:hover {
   background: transparent !important;
 }
 
-.ag-theme-dh-hub .ag-row-focus,
-.ag-theme-dh-hub .ag-row-selected {
+.dh-tabulator-hub .tabulator-row.tabulator-selected {
   background: rgba(102, 215, 255, 0.04) !important;
 }
 
-.ag-theme-dh-hub .ag-cell {
-  display: flex;
-  align-items: center;
-  border: 0 !important;
-  overflow: hidden;
-  padding-left: 6px;
-  padding-right: 6px;
-}
-
-.ag-theme-dh-hub .ag-cell-value {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-height: 100%;
+/* --- Cells --- */
+.dh-tabulator-hub .tabulator-cell {
+  border-right: none;
+  padding: 0 6px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  font-family: var(--font-sans);
+  font-size: 12px;
   color: rgba(236, 242, 252, 0.92);
+  line-height: 40px;
+  vertical-align: middle;
 }
 
-.ag-theme-dh-hub .ag-cell.center-cell {
+/* Frozen body cells get the pinned gradient */
+.dh-tabulator-hub .tabulator-cell.tabulator-frozen {
+  background:
+    linear-gradient(180deg, rgba(10, 18, 30, 0.08), rgba(10, 18, 30, 0.03)) !important;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ── Cell alignment ── */
+.dh-tabulator-hub .tabulator-cell.center-cell {
   justify-content: center;
+  text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
-.ag-theme-dh-hub .ag-cell.center-cell .ag-cell-value {
-  justify-content: center;
-}
-
-.ag-theme-dh-hub .ag-cell.player-cell,
-.ag-theme-dh-hub .ag-cell.player-cell .ag-cell-value {
+.dh-tabulator-hub .tabulator-cell.player-cell {
   justify-content: flex-start;
+  text-align: left;
 }
 
-.ag-theme-dh-hub .ag-cell.fpts-cell {
+/* ── Formatted cell text ── */
+.dh-tabulator-hub .tabulator-cell.formatted-cell {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* ── NA cell ── */
+.dh-tabulator-hub .tabulator-cell.na-cell {
+  color: rgba(171, 186, 208, 0.48);
+}
+
+/* ── FPTS cell ── */
+.dh-tabulator-hub .tabulator-cell.fpts-cell {
   justify-content: stretch;
 }
 
-.ag-theme-dh-hub .ag-cell.fpts-cell > span {
+.dh-tabulator-hub .tabulator-cell.fpts-cell > span {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -842,17 +711,67 @@ body::after {
   min-width: 100%;
 }
 
-.ag-theme-dh-hub .ag-cell.formatted-cell .ag-cell-value {
-  font-weight: 600;
-  letter-spacing: 0.01em;
+/* ── Heat-map tier colors ── */
+.dh-tabulator-hub .tabulator-cell.heat-cell--heat.heat-cell--tier-0 {
+  color: rgba(212, 222, 240, 0.74);
   text-shadow: none;
 }
 
-.ag-theme-dh-hub .ag-cell.na-cell .ag-cell-value {
-  color: rgba(171, 186, 208, 0.48);
+.dh-tabulator-hub .tabulator-cell.heat-cell--heat.heat-cell--tier-1 {
+  color: rgba(194, 232, 255, 0.82);
+  text-shadow: 0 0 10px rgba(102, 215, 255, 0.04);
 }
 
-.ag-theme-dh-hub .dh-fpts-chip {
+.dh-tabulator-hub .tabulator-cell.heat-cell--heat.heat-cell--tier-2 {
+  color: rgba(171, 225, 255, 0.92);
+  text-shadow: 0 0 12px rgba(102, 215, 255, 0.07);
+}
+
+.dh-tabulator-hub .tabulator-cell.heat-cell--heat.heat-cell--tier-3 {
+  color: rgba(141, 225, 255, 0.98);
+  text-shadow:
+    0 0 14px rgba(102, 215, 255, 0.11),
+    0 0 22px rgba(162, 127, 255, 0.05);
+}
+
+.dh-tabulator-hub .tabulator-cell.heat-cell--heat.heat-cell--tier-4 {
+  color: rgba(122, 233, 255, 1);
+  text-shadow:
+    0 0 16px rgba(102, 215, 255, 0.15),
+    0 0 28px rgba(162, 127, 255, 0.07);
+}
+
+.dh-tabulator-hub .tabulator-cell.heat-cell--neutral.heat-cell--tier-0 {
+  color: rgba(214, 221, 234, 0.74);
+  text-shadow: none;
+}
+
+.dh-tabulator-hub .tabulator-cell.heat-cell--neutral.heat-cell--tier-1 {
+  color: rgba(223, 227, 238, 0.82);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.035);
+}
+
+.dh-tabulator-hub .tabulator-cell.heat-cell--neutral.heat-cell--tier-2 {
+  color: rgba(235, 228, 215, 0.9);
+  text-shadow: 0 0 10px rgba(255, 196, 132, 0.05);
+}
+
+.dh-tabulator-hub .tabulator-cell.heat-cell--neutral.heat-cell--tier-3 {
+  color: rgba(248, 222, 182, 0.96);
+  text-shadow:
+    0 0 12px rgba(255, 190, 120, 0.09),
+    0 0 18px rgba(255, 255, 255, 0.03);
+}
+
+.dh-tabulator-hub .tabulator-cell.heat-cell--neutral.heat-cell--tier-4 {
+  color: rgba(255, 214, 158, 1);
+  text-shadow:
+    0 0 14px rgba(255, 184, 102, 0.12),
+    0 0 22px rgba(255, 255, 255, 0.04);
+}
+
+/* ── FPTS chip tiers ── */
+.dh-tabulator-hub .dh-fpts-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -875,79 +794,21 @@ body::after {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.ag-theme-dh-hub .ag-cell.heat-cell--heat.heat-cell--tier-0 .ag-cell-value {
-  color: rgba(212, 222, 240, 0.74);
-  text-shadow: none;
-}
-
-.ag-theme-dh-hub .ag-cell.heat-cell--heat.heat-cell--tier-1 .ag-cell-value {
-  color: rgba(194, 232, 255, 0.82);
-  text-shadow: 0 0 10px rgba(102, 215, 255, 0.04);
-}
-
-.ag-theme-dh-hub .ag-cell.heat-cell--heat.heat-cell--tier-2 .ag-cell-value {
-  color: rgba(171, 225, 255, 0.92);
-  text-shadow: 0 0 12px rgba(102, 215, 255, 0.07);
-}
-
-.ag-theme-dh-hub .ag-cell.heat-cell--heat.heat-cell--tier-3 .ag-cell-value {
-  color: rgba(141, 225, 255, 0.98);
-  text-shadow:
-    0 0 14px rgba(102, 215, 255, 0.11),
-    0 0 22px rgba(162, 127, 255, 0.05);
-}
-
-.ag-theme-dh-hub .ag-cell.heat-cell--heat.heat-cell--tier-4 .ag-cell-value {
-  color: rgba(122, 233, 255, 1);
-  text-shadow:
-    0 0 16px rgba(102, 215, 255, 0.15),
-    0 0 28px rgba(162, 127, 255, 0.07);
-}
-
-.ag-theme-dh-hub .ag-cell.heat-cell--neutral.heat-cell--tier-0 .ag-cell-value {
-  color: rgba(214, 221, 234, 0.74);
-  text-shadow: none;
-}
-
-.ag-theme-dh-hub .ag-cell.heat-cell--neutral.heat-cell--tier-1 .ag-cell-value {
-  color: rgba(223, 227, 238, 0.82);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.035);
-}
-
-.ag-theme-dh-hub .ag-cell.heat-cell--neutral.heat-cell--tier-2 .ag-cell-value {
-  color: rgba(235, 228, 215, 0.9);
-  text-shadow: 0 0 10px rgba(255, 196, 132, 0.05);
-}
-
-.ag-theme-dh-hub .ag-cell.heat-cell--neutral.heat-cell--tier-3 .ag-cell-value {
-  color: rgba(248, 222, 182, 0.96);
-  text-shadow:
-    0 0 12px rgba(255, 190, 120, 0.09),
-    0 0 18px rgba(255, 255, 255, 0.03);
-}
-
-.ag-theme-dh-hub .ag-cell.heat-cell--neutral.heat-cell--tier-4 .ag-cell-value {
-  color: rgba(255, 214, 158, 1);
-  text-shadow:
-    0 0 14px rgba(255, 184, 102, 0.12),
-    0 0 22px rgba(255, 255, 255, 0.04);
-}
-
-.ag-theme-dh-hub .dh-fpts-chip--tier-0 {
+.dh-tabulator-hub .dh-fpts-chip--tier-0 {
   background:
     linear-gradient(180deg, rgba(102, 215, 255, 0.08), rgba(162, 127, 255, 0.04)),
     rgba(255, 255, 255, 0.02);
   border-color: rgba(130, 214, 255, 0.12);
 }
 
-.ag-theme-dh-hub .dh-fpts-chip--tier-1 {
+.dh-tabulator-hub .dh-fpts-chip--tier-1 {
   background:
     linear-gradient(180deg, rgba(102, 215, 255, 0.12), rgba(162, 127, 255, 0.06)),
     rgba(255, 255, 255, 0.02);
   border-color: rgba(130, 214, 255, 0.16);
 }
 
-.ag-theme-dh-hub .dh-fpts-chip--tier-2 {
+.dh-tabulator-hub .dh-fpts-chip--tier-2 {
   background:
     linear-gradient(180deg, rgba(102, 215, 255, 0.16), rgba(162, 127, 255, 0.08)),
     rgba(255, 255, 255, 0.02);
@@ -957,7 +818,7 @@ body::after {
     0 0 20px rgba(102, 215, 255, 0.08);
 }
 
-.ag-theme-dh-hub .dh-fpts-chip--tier-3 {
+.dh-tabulator-hub .dh-fpts-chip--tier-3 {
   background:
     linear-gradient(180deg, rgba(102, 215, 255, 0.22), rgba(162, 127, 255, 0.12)),
     rgba(255, 255, 255, 0.02);
@@ -967,7 +828,7 @@ body::after {
     0 0 24px rgba(102, 215, 255, 0.12);
 }
 
-.ag-theme-dh-hub .dh-fpts-chip--tier-4 {
+.dh-tabulator-hub .dh-fpts-chip--tier-4 {
   background:
     linear-gradient(180deg, rgba(102, 215, 255, 0.28), rgba(162, 127, 255, 0.16)),
     rgba(255, 255, 255, 0.02);
@@ -977,83 +838,63 @@ body::after {
     0 0 30px rgba(102, 215, 255, 0.16);
 }
 
-.ag-theme-dh-hub .ag-overlay-no-rows-center,
-.ag-theme-dh-hub .ag-overlay-loading-center {
-  padding: 16px 18px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
-    rgba(11, 20, 33, 0.72);
-  color: rgba(231, 239, 251, 0.92);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.3);
-}
-
-.ag-theme-dh-hub .ag-input-field-input,
-.ag-theme-dh-hub .ag-picker-field-wrapper,
-.ag-theme-dh-hub .ag-menu,
-.ag-theme-dh-hub .ag-popup {
-  background: rgba(10, 18, 30, 0.92);
-}
-
-.ag-theme-dh-hub .ag-picker-field-wrapper,
-.ag-theme-dh-hub .ag-menu {
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.ag-theme-dh-hub .ag-body-horizontal-scroll-viewport::-webkit-scrollbar,
-.ag-theme-dh-hub .ag-body-viewport::-webkit-scrollbar {
+/* ── Scrollbar ── */
+.dh-tabulator-hub .tabulator-tableholder::-webkit-scrollbar {
   height: 12px;
   width: 12px;
 }
 
-.ag-theme-dh-hub .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb,
-.ag-theme-dh-hub .ag-body-viewport::-webkit-scrollbar-thumb {
+.dh-tabulator-hub .tabulator-tableholder::-webkit-scrollbar-thumb {
   border-radius: 999px;
   border: 3px solid transparent;
   background: linear-gradient(180deg, rgba(131, 214, 255, 0.5), rgba(162, 127, 255, 0.5));
   background-clip: padding-box;
 }
 
-.ag-theme-dh-hub .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-track,
-.ag-theme-dh-hub .ag-body-viewport::-webkit-scrollbar-track {
+.dh-tabulator-hub .tabulator-tableholder::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.04);
 }
 
-@media (max-width: 719px) {
-  .ag-theme-dh-hub {
-    --ag-font-size: 11px;
-    --ag-data-font-size: 11px;
-    --ag-header-height: 36px;
-    --ag-spacing: 4px;
-    --ag-border-radius: 12px;
-  }
+/* ── Tabulator placeholder ── */
+.dh-tabulator-hub .tabulator-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 18px;
+  color: rgba(231, 239, 251, 0.92);
+  font-size: 0.88rem;
+}
 
-  .ag-theme-dh-hub .ag-cell,
-  .ag-theme-dh-hub .ag-header-cell {
+/* ── Mobile overrides ── */
+@media (max-width: 719px) {
+  .dh-tabulator-hub.tabulator {
     font-size: 11px;
   }
 
-  .ag-theme-dh-hub .ag-cell {
+  .dh-tabulator-hub .tabulator-header {
+    min-height: 36px;
+  }
+
+  .dh-tabulator-hub .tabulator-header .tabulator-col .tabulator-col-title {
+    font-size: 11px;
+  }
+
+  .dh-tabulator-hub .tabulator-cell {
+    font-size: 11px;
     padding-left: 6px;
     padding-right: 6px;
   }
 
-  .ag-theme-dh-hub .ag-header-cell {
+  .dh-tabulator-hub .tabulator-header .tabulator-col {
     padding-left: 4px;
     padding-right: 4px;
   }
 
-  .ag-theme-dh-hub .ag-header-cell-comp-wrapper {
-    inset: 0 3px;
+  .dh-tabulator-hub .tabulator-header .tabulator-col .tabulator-col-content {
+    padding: 0 3px;
   }
 
-  .ag-theme-dh-hub .ag-header-cell-label {
-    gap: 2px;
-    padding: 0 12px;
-  }
-
-  .ag-theme-dh-hub .dh-fpts-chip {
+  .dh-tabulator-hub .dh-fpts-chip {
     width: calc(100% - 6px);
     min-width: calc(100% - 6px);
     max-width: calc(100% - 6px);
@@ -1062,6 +903,19 @@ body::after {
     min-height: 20px;
     padding: 0 5px;
   }
+}
+
+/* ── Nuclear override: catch any remaining midnight-theme .tabulator selectors ── */
+.tabulator.dh-tabulator-hub .tabulator-table,
+.tabulator.dh-tabulator-hub .tabulator-row,
+.tabulator.dh-tabulator-hub .tabulator-row.tabulator-row-even,
+.tabulator.dh-tabulator-hub .tabulator-row.tabulator-row-odd,
+.tabulator.dh-tabulator-hub .tabulator-row:hover,
+.tabulator.dh-tabulator-hub .tabulator-header,
+.tabulator.dh-tabulator-hub .tabulator-headers,
+.tabulator.dh-tabulator-hub .tabulator-tableholder,
+.tabulator.dh-tabulator-hub .tabulator-col {
+  background-color: transparent !important;
 }
 
 @keyframes driftPulse {
