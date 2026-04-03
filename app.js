@@ -188,6 +188,7 @@ const CATEGORY_FILTERS = {
 };
 
 const MOBILE_BREAKPOINT = 719;
+const FROZEN_COL_COUNT = 3;
 
 const COLUMN_WIDTHS = {
   RK: 78,
@@ -195,7 +196,7 @@ const COLUMN_WIDTHS = {
   POS: 74,
   TM: 82,
   AGE: 78,
-  FPTS: 110,
+  FPTS: 88,
   PPG: 92,
   VALUE: 100,
   ADP: 92,
@@ -262,7 +263,7 @@ const MOBILE_COLUMN_WIDTHS = {
   POS: 48,
   TM: 52,
   AGE: 54,
-  FPTS: 70,
+  FPTS: 58,
   PPG: 62,
   VALUE: 62,
   ADP: 62,
@@ -357,19 +358,17 @@ const receivingButtons = Array.from(
   document.querySelectorAll("[data-receiving-filter]"),
 );
 
-let table = null;
+let frozenTable = null;
+let mainTable = null;
+let sortsSyncing = false;
 
 function createTable() {
-  if (table) {
-    table.destroy();
-  }
+  if (frozenTable) frozenTable.destroy();
+  if (mainTable) mainTable.destroy();
 
-  table = new Tabulator("#player-grid", {
+  const sharedConfig = {
     nestedFieldSeparator: false,
-    columns: buildColumnDefs(),
     data: [],
-    layout: "fitDataStretch",
-    height: "100%",
     reactiveData: false,
     headerSortClickElement: "header",
     columnDefaults: {
@@ -380,7 +379,57 @@ function createTable() {
     },
     rowHeight: getRowHeight(),
     headerHeight: getHeaderHeight(),
+  };
+
+  frozenTable = new Tabulator("#frozen-grid", {
+    ...sharedConfig,
+    columns: buildFrozenColDefs(),
+    layout: "fitData",
+    height: "100%",
+    placeholder: "",
+  });
+
+  mainTable = new Tabulator("#main-grid", {
+    ...sharedConfig,
+    columns: buildMainColDefs(),
+    layout: "fitDataStretch",
+    height: "100%",
     placeholder: "No players match the current view.",
+  });
+
+  mainTable.on("tableBuilt", () => {
+    attachScrollSync();
+    attachSortSync();
+  });
+}
+
+function attachScrollSync() {
+  const mainHolder = mainTable.element.querySelector(".tabulator-tableholder");
+  const frozenHolder = frozenTable.element.querySelector(".tabulator-tableholder");
+  if (!mainHolder || !frozenHolder) return;
+
+  let syncingScroll = false;
+  mainHolder.addEventListener("scroll", () => {
+    if (syncingScroll) return;
+    syncingScroll = true;
+    frozenHolder.scrollTop = mainHolder.scrollTop;
+    syncingScroll = false;
+  });
+}
+
+function attachSortSync() {
+  mainTable.on("dataSorting", (sorters) => {
+    if (sortsSyncing) return;
+    sortsSyncing = true;
+    frozenTable.setSort(sorters.map((s) => ({ column: s.field, dir: s.dir })));
+    sortsSyncing = false;
+  });
+
+  frozenTable.on("dataSorting", (sorters) => {
+    if (sortsSyncing) return;
+    sortsSyncing = true;
+    mainTable.setSort(sorters.map((s) => ({ column: s.field, dir: s.dir })));
+    sortsSyncing = false;
   });
 }
 
@@ -431,12 +480,14 @@ function attachEventListeners() {
 }
 
 function applySearch() {
-  if (!table) return;
+  if (!mainTable) return;
 
   if (!state.searchText.trim()) {
-    table.clearFilter();
+    frozenTable.clearFilter();
+    mainTable.clearFilter();
   } else {
-    table.setFilter(quickTextFilter, { searchText: state.searchText });
+    frozenTable.setFilter(quickTextFilter, { searchText: state.searchText });
+    mainTable.setFilter(quickTextFilter, { searchText: state.searchText });
   }
   updateRowCount();
 }
@@ -513,9 +564,11 @@ function refreshGrid() {
   const visibleRows = getVisibleRows();
   state.columnFormatting = buildColumnFormatting(visibleRows);
 
-  if (table) {
-    table.setColumns(buildColumnDefs());
-    table.setData(visibleRows);
+  if (frozenTable && mainTable) {
+    frozenTable.setColumns(buildFrozenColDefs());
+    mainTable.setColumns(buildMainColDefs());
+    frozenTable.setData(visibleRows);
+    mainTable.setData(visibleRows);
     applySearch();
   }
 
@@ -550,44 +603,38 @@ function syncUiState() {
 }
 
 function updateRowCount() {
-  if (!table) {
+  if (!mainTable) {
     rowCount.textContent = "0 rows";
     return;
   }
-  const displayedRows = table.getDataCount("active");
+  const displayedRows = mainTable.getDataCount("active");
   rowCount.textContent = `${displayedRows} row${displayedRows === 1 ? "" : "s"}`;
 }
 
-function buildColumnDefs() {
-  const columns = COLUMN_SETS[state.activeCategory];
+function buildSingleColDef(columnName) {
+  const isLabelColumn = LABEL_COLUMNS.has(columnName);
+  const colDef = {
+    title: columnName,
+    field: columnName,
+    width: getColumnWidth(columnName),
+    minWidth: getColumnMinWidth(columnName),
+    headerHozAlign: "center",
+    hozAlign: isLabelColumn && columnName === PLAYER_COLUMN ? "left" : "center",
+    cssClass: buildCellCssClass(columnName),
+    headerSort: true,
+    sorter: tabulatorSorter,
+    resizable: true,
+  };
+  colDef.formatter = columnName === FPTS_COLUMN ? fptsCellFormatter : standardCellFormatter;
+  return colDef;
+}
 
-  return columns.map((columnName, index) => {
-    const isLabelColumn = LABEL_COLUMNS.has(columnName);
-    const columnWidth = getColumnWidth(columnName);
-    const minWidth = getColumnMinWidth(columnName);
+function buildFrozenColDefs() {
+  return COLUMN_SETS[state.activeCategory].slice(0, FROZEN_COL_COUNT).map(buildSingleColDef);
+}
 
-    const colDef = {
-      title: columnName,
-      field: columnName,
-      width: columnWidth,
-      minWidth,
-      frozen: index < 3,
-      headerHozAlign: "center",
-      hozAlign: isLabelColumn && columnName === PLAYER_COLUMN ? "left" : "center",
-      cssClass: buildCellCssClass(columnName),
-      headerSort: true,
-      sorter: tabulatorSorter,
-      resizable: true,
-    };
-
-    if (columnName === FPTS_COLUMN) {
-      colDef.formatter = fptsCellFormatter;
-    } else {
-      colDef.formatter = standardCellFormatter;
-    }
-
-    return colDef;
-  });
+function buildMainColDefs() {
+  return COLUMN_SETS[state.activeCategory].slice(FROZEN_COL_COUNT).map(buildSingleColDef);
 }
 
 function buildCellCssClass(columnName) {

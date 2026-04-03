@@ -188,11 +188,18 @@
         </div>
 
         <div class="grid-stage">
-          <div
-            id="player-grid"
-            class="dh-tabulator-hub data-grid"
-            aria-label="Player stats table"
-          ></div>
+          <div class="split-grid-wrap">
+            <div
+              id="frozen-grid"
+              class="dh-tabulator-hub dh-frozen-hub"
+              aria-label="Frozen columns"
+            ></div>
+            <div
+              id="main-grid"
+              class="dh-tabulator-hub dh-main-hub data-grid"
+              aria-label="Player stats table"
+            ></div>
+          </div>
 
           <div id="grid-overlay" class="grid-stage__overlay">
             <div class="overlay-card">
