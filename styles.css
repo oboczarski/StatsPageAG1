@@ -595,10 +595,14 @@ body::after {
   min-height: 44px;
 }
 
+.dh-tabulator-hub .tabulator-headers {
+  height: 44px !important;
+}
+
 .dh-tabulator-hub .tabulator-header .tabulator-col {
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   padding: 0 6px;
-  height: 100%;
+  height: 100% !important;
 }
 
 .dh-tabulator-hub .tabulator-header .tabulator-col:last-child {
@@ -884,6 +888,10 @@ body::after {
     font-size: 11px;
     padding-left: 6px;
     padding-right: 6px;
+  }
+
+  .dh-tabulator-hub .tabulator-headers {
+    height: 36px !important;
   }
 
   .dh-tabulator-hub .tabulator-header .tabulator-col {
