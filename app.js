@@ -345,17 +345,18 @@ const state = {
 
 const PROVIDED_HEADER_TEMPLATE = `
   <div class="ag-cell-label-container dh-header-template" role="presentation">
+    <span data-ref="eMenu" class="ag-header-icon ag-header-cell-menu-button" aria-hidden="true"></span>
+    <span data-ref="eFilterButton" class="ag-header-icon ag-header-cell-filter-button" aria-hidden="true"></span>
     <div data-ref="eLabel" class="ag-header-cell-label" role="presentation">
       <span data-ref="eText" class="ag-header-cell-text"></span>
-      <span class="dh-header-icons" aria-hidden="true">
-        <span data-ref="eSortOrder" class="ag-header-icon ag-header-label-icon ag-sort-order"></span>
-        <span data-ref="eSortAsc" class="ag-header-icon ag-header-label-icon ag-sort-ascending-icon"></span>
-        <span data-ref="eSortDesc" class="ag-header-icon ag-header-label-icon ag-sort-descending-icon"></span>
-        <span data-ref="eSortAbsoluteAsc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-ascending-icon ag-hidden"></span>
-        <span data-ref="eSortAbsoluteDesc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-descending-icon ag-hidden"></span>
-        <span data-ref="eSortMixed" class="ag-header-icon ag-header-label-icon ag-sort-mixed-icon ag-hidden"></span>
-        <span data-ref="eSortNone" class="ag-header-icon ag-header-label-icon ag-sort-none-icon"></span>
-      </span>
+      <span data-ref="eFilter" class="ag-header-icon ag-header-label-icon ag-filter-icon" aria-hidden="true"></span>
+      <span data-ref="eSortOrder" class="ag-header-icon ag-header-label-icon ag-sort-order" aria-hidden="true"></span>
+      <span data-ref="eSortAsc" class="ag-header-icon ag-header-label-icon ag-sort-ascending-icon" aria-hidden="true"></span>
+      <span data-ref="eSortDesc" class="ag-header-icon ag-header-label-icon ag-sort-descending-icon" aria-hidden="true"></span>
+      <span data-ref="eSortAbsoluteAsc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-ascending-icon ag-hidden" aria-hidden="true"></span>
+      <span data-ref="eSortAbsoluteDesc" class="ag-header-icon ag-header-label-icon ag-sort-absolute-descending-icon ag-hidden" aria-hidden="true"></span>
+      <span data-ref="eSortMixed" class="ag-header-icon ag-header-label-icon ag-sort-mixed-icon ag-hidden" aria-hidden="true"></span>
+      <span data-ref="eSortNone" class="ag-header-icon ag-header-label-icon ag-sort-none-icon" aria-hidden="true"></span>
     </div>
   </div>`;
 
@@ -381,12 +382,12 @@ const receivingButtons = Array.from(
 );
 
 const gridTheme = themeBalham.withParams({
-  spacing: 7,
+  spacing: 6,
   fontFamily: "var(--font-sans)",
-  fontSize: 13,
-  dataFontSize: 13,
+  fontSize: 12,
+  dataFontSize: 12,
   headerFontWeight: 600,
-  borderRadius: 18,
+  borderRadius: 16,
   backgroundColor: "rgba(8, 15, 26, 0.01)",
   headerBackgroundColor: "transparent",
   chromeBackgroundColor: "rgba(10, 18, 30, 0.18)",
@@ -399,8 +400,8 @@ const gridTheme = themeBalham.withParams({
   cardShadow: "0 18px 42px rgba(0, 0, 0, 0.28)",
   popupShadow: "0 22px 48px rgba(0, 0, 0, 0.44)",
   menuShadow: "0 22px 48px rgba(0, 0, 0, 0.44)",
-  headerHeight: 50,
-  iconSize: 14,
+  headerHeight: 44,
+  iconSize: 12,
 });
 
 const gridOptions = {
@@ -416,7 +417,6 @@ const gridOptions = {
   cacheQuickFilter: true,
   rowHeight: getRowHeight(),
   headerHeight: getHeaderHeight(),
-  tooltipShowDelay: 120,
   overlayLoadingTemplate:
     '<span class="ag-overlay-loading-center">Preparing Data Hub…</span>',
   overlayNoRowsTemplate:
@@ -602,12 +602,13 @@ function buildColumnDefs() {
     const isLabelColumn = LABEL_COLUMNS.has(columnName);
     const isNumericColumn = !isLabelColumn;
     const columnWidth = getColumnWidth(columnName);
+    const minWidth = getColumnMinWidth(columnName);
 
     return {
       headerName: columnName,
       field: columnName,
       width: columnWidth,
-      minWidth: columnWidth,
+      minWidth,
       pinned: index < 3 ? "left" : null,
       lockPinned: index < 3,
       suppressMovable: true,
@@ -615,7 +616,6 @@ function buildColumnDefs() {
       type: isNumericColumn ? "numericColumn" : undefined,
       headerClass: "dh-header-cell",
       valueFormatter: formatGridValue,
-      tooltipValueGetter: getTooltipValue,
       cellRenderer: columnName === FPTS_COLUMN ? renderFptsCell : undefined,
       cellClass: getCellClass,
       comparator: compareGridValues,
@@ -628,9 +628,23 @@ function getVisibleRows() {
   return state.rows.filter((row) => predicate(row, state));
 }
 
+function getColumnMinWidth(columnName) {
+  const charWidth = state.isCompactViewport ? 6.3 : 7.2;
+  const sideSpace = state.isCompactViewport ? 26 : 34;
+  return Math.ceil(String(columnName).length * charWidth + sideSpace);
+}
+
 function getColumnWidth(columnName) {
   const widths = state.isCompactViewport ? MOBILE_COLUMN_WIDTHS : COLUMN_WIDTHS;
-  return widths[columnName] ?? (state.isCompactViewport ? 58 : 94);
+  const fallback = state.isCompactViewport ? 58 : 94;
+  const baseWidth = widths[columnName] ?? fallback;
+  const shrinkBy = state.isCompactViewport
+    ? 4
+    : columnName === PLAYER_COLUMN
+      ? 14
+      : 8;
+
+  return Math.max(baseWidth - shrinkBy, getColumnMinWidth(columnName));
 }
 
 function isCompactViewport() {
@@ -638,11 +652,11 @@ function isCompactViewport() {
 }
 
 function getRowHeight() {
-  return state.isCompactViewport ? 38 : 44;
+  return state.isCompactViewport ? 34 : 40;
 }
 
 function getHeaderHeight() {
-  return state.isCompactViewport ? 40 : 50;
+  return state.isCompactViewport ? 36 : 44;
 }
 
 let resizeFrame = 0;
@@ -791,10 +805,6 @@ function formatCellValue(value) {
 
 function formatGridValue(params) {
   return formatDisplayValue(params.colDef.field, params.value);
-}
-
-function getTooltipValue(params) {
-  return formatCellValue(params.value);
 }
 
 function renderFptsCell(params) {
