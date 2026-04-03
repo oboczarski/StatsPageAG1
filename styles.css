@@ -840,6 +840,42 @@ body::after {
   white-space: nowrap;
 }
 
+.ag-theme-dh-hub .dh-group-header {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.ag-theme-dh-hub .dh-group-header__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  color: rgba(168, 214, 255, 0.84);
+}
+
+.ag-theme-dh-hub .dh-group-header__icon[hidden] {
+  display: none;
+}
+
+.ag-theme-dh-hub .dh-group-header__icon .dh-grid-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.ag-theme-dh-hub .dh-group-header__label {
+  display: inline-block;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
 .ag-theme-dh-hub .ag-filter-icon {
   color: rgba(126, 214, 255, 0.86);
 }
@@ -988,34 +1024,34 @@ body::after {
 
 .ag-theme-dh-hub .dh-pos-chip--qb {
   background:
-    linear-gradient(180deg, rgba(102, 215, 255, 0.24), rgba(70, 125, 255, 0.12)),
+    linear-gradient(180deg, rgba(255, 29, 123, 0.28), rgba(145, 14, 73, 0.12)),
     rgba(255, 255, 255, 0.02);
-  border-color: rgba(122, 222, 255, 0.26);
-  color: rgba(220, 246, 255, 0.98);
+  border-color: rgba(255, 92, 165, 0.28);
+  color: rgba(255, 236, 244, 0.98);
 }
 
 .ag-theme-dh-hub .dh-pos-chip--rb {
   background:
-    linear-gradient(180deg, rgba(110, 236, 176, 0.22), rgba(37, 178, 123, 0.12)),
+    linear-gradient(180deg, rgba(14, 231, 172, 0.26), rgba(7, 119, 89, 0.12)),
     rgba(255, 255, 255, 0.02);
-  border-color: rgba(126, 240, 186, 0.24);
-  color: rgba(228, 255, 241, 0.98);
+  border-color: rgba(86, 243, 200, 0.26);
+  color: rgba(231, 255, 246, 0.98);
 }
 
 .ag-theme-dh-hub .dh-pos-chip--wr {
   background:
-    linear-gradient(180deg, rgba(255, 200, 112, 0.24), rgba(255, 141, 84, 0.12)),
+    linear-gradient(180deg, rgba(74, 134, 232, 0.28), rgba(36, 76, 150, 0.12)),
     rgba(255, 255, 255, 0.02);
-  border-color: rgba(255, 208, 132, 0.26);
-  color: rgba(255, 244, 222, 0.98);
+  border-color: rgba(112, 163, 240, 0.28);
+  color: rgba(235, 243, 255, 0.98);
 }
 
 .ag-theme-dh-hub .dh-pos-chip--te {
   background:
-    linear-gradient(180deg, rgba(200, 159, 255, 0.24), rgba(140, 112, 255, 0.12)),
+    linear-gradient(180deg, rgba(115, 0, 255, 0.28), rgba(61, 0, 140, 0.12)),
     rgba(255, 255, 255, 0.02);
-  border-color: rgba(212, 176, 255, 0.24);
-  color: rgba(244, 232, 255, 0.98);
+  border-color: rgba(158, 84, 255, 0.28);
+  color: rgba(245, 235, 255, 0.98);
 }
 
 .ag-theme-dh-hub .dh-pos-chip--neutral {
@@ -1213,7 +1249,13 @@ body::after {
     gap: 4px;
   }
 
+  .ag-theme-dh-hub .dh-group-header {
+    gap: 4px;
+  }
+
+  .ag-theme-dh-hub .dh-group-header__icon,
   .ag-theme-dh-hub .dh-inner-header__icon,
+  .ag-theme-dh-hub .dh-group-header__icon .dh-grid-icon,
   .ag-theme-dh-hub .dh-inner-header__icon .dh-grid-icon,
   .ag-theme-dh-hub .dh-grid-icon {
     width: 11px;
