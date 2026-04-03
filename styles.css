@@ -482,7 +482,7 @@ body::after {
 
 .data-grid {
   width: 100%;
-  height: clamp(500px, 62vh, 900px);
+  height: clamp(500px, 62vh, 900px) !important;
   background: transparent;
 }
 
@@ -582,6 +582,7 @@ body::after {
   font-family: var(--font-sans);
   font-size: 12px;
   color: rgba(236, 242, 252, 0.94);
+  transform: none !important;
 }
 
 /* --- Header --- */
