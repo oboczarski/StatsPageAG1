@@ -262,36 +262,38 @@ const COLUMN_ICONS = {
 // exact columns it spans (in-order, matching COLUMN_SETS). The frozen pane
 // always uses FROZEN_GROUP. The scrollable pane uses per-category groups.
 // ---------------------------------------------------------------------------
-const FROZEN_GROUP = [{ label: "GENERAL", columns: ["RK", "PLAYER", "POS"] }];
+// GENERAL icon: User (person)
+const FROZEN_GROUP = [{ label: "GENERAL", icon: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", columns: ["RK", "PLAYER", "POS"] }];
 
+// Group icons: Info, Star, BarChart2, ArrowRight, Zap, Inbox, Activity, TrendingUp, Shield, ScanLine
 const COLUMN_GROUPS = {
   overview: [
-    { label: "INFO",           columns: ["TM", "AGE"] },
-    { label: "FANTASY",        columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
-    { label: "OVERVIEW STATS", columns: ["G", "SNP%", "YDS(t)", "YPG(t)", "OPP", "IMP", "IMP/OPP", "CSTY%", "CL"] },
+    { label: "INFO",           icon: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 16v-4M12 8h.01",                                                                                                columns: ["TM", "AGE"] },
+    { label: "FANTASY",        icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",                                                              columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    { label: "OVERVIEW STATS", icon: "M18 20V10M12 20V4M6 20v-6",                                                                                                                                   columns: ["G", "SNP%", "YDS(t)", "YPG(t)", "OPP", "IMP", "IMP/OPP", "CSTY%", "CL"] },
   ],
   passing: [
-    { label: "INFO",    columns: ["TM", "AGE", "G"] },
-    { label: "FANTASY", columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
-    { label: "PASSING", columns: ["paYDS", "paTD", "CMP%", "paATT", "paRTG", "EPA/DB", "CPOE", "CMP", "YDS(t)", "paYPG", "pa1D", "IMP/G", "pIMP", "pIMP/A", "TTT", "PRS%", "SAC", "INT"] },
-    { label: "RUSHING", columns: ["ruYDS", "ruTD", "CAR", "YPC", "FUM"] },
-    { label: "CEILING & CONSISTENCY", columns: ["FPOE", "CSTY%", "CL"] },
+    { label: "INFO",                  icon: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 16v-4M12 8h.01",                                                                                           columns: ["TM", "AGE", "G"] },
+    { label: "FANTASY",               icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",                                                         columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    { label: "PASSING",               icon: "M5 12h14M12 5l7 7-7 7",                                                                                                                                 columns: ["paYDS", "paTD", "CMP%", "paATT", "paRTG", "EPA/DB", "CPOE", "CMP", "YDS(t)", "paYPG", "pa1D", "IMP/G", "pIMP", "pIMP/A", "TTT", "PRS%", "SAC", "INT"] },
+    { label: "RUSHING",               icon: "M13 10V3L4 14h7v7l9-11h-7z",                                                                                                                            columns: ["ruYDS", "ruTD", "CAR", "YPC", "FUM"] },
+    { label: "CEILING & CONSISTENCY", icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",                                                                                                          columns: ["FPOE", "CSTY%", "CL"] },
   ],
   rushing: [
-    { label: "INFO",                  columns: ["TM", "AGE", "G"] },
-    { label: "FANTASY",               columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
-    { label: "RUSHING EFFICIENCY",    columns: ["SNP%", "YPC", "ruYPG", "IMP/G"] },
-    { label: "RUSHING PRODUCTION",    columns: ["CAR", "ruYDS", "ruTD", "ru1D", "YDS(t)", "FUM"] },
-    { label: "RECEIVING",             columns: ["REC", "recYDS", "recTD", "rec1D", "YAC", "TGT"] },
-    { label: "ADVANCED RUSHING",      columns: ["ELU", "MTF/A", "YCO/A", "MTF", "YCO", "RYOE", "EXPLSV%"] },
-    { label: "CEILING & CONSISTENCY", columns: ["FPOE", "CSTY%", "CL"] },
+    { label: "INFO",                  icon: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 16v-4M12 8h.01",                                                                                           columns: ["TM", "AGE", "G"] },
+    { label: "FANTASY",               icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",                                                         columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    { label: "RUSHING EFFICIENCY",    icon: "M22 12h-4l-3 9L9 3l-3 9H2",                                                                                                                             columns: ["SNP%", "YPC", "ruYPG", "IMP/G"] },
+    { label: "RUSHING PRODUCTION",    icon: "M22 7 12 17 7 12 2 17",                                                                                                                                 columns: ["CAR", "ruYDS", "ruTD", "ru1D", "YDS(t)", "FUM"] },
+    { label: "RECEIVING",             icon: "M22 12h-6l-2 3h-4l-2-3H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z",                columns: ["REC", "recYDS", "recTD", "rec1D", "YAC", "TGT"] },
+    { label: "ADVANCED RUSHING",      icon: "M3 3h5M3 3v5M21 3h-5M21 3v5M3 21h5M3 21v-5M21 21h-5M21 21v-5",                                                                                          columns: ["ELU", "MTF/A", "YCO/A", "MTF", "YCO", "RYOE", "EXPLSV%"] },
+    { label: "CEILING & CONSISTENCY", icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",                                                                                                          columns: ["FPOE", "CSTY%", "CL"] },
   ],
   receiving: [
-    { label: "INFO",                  columns: ["TM", "AGE", "G"] },
-    { label: "FANTASY",               columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
-    { label: "RECEIVING",             columns: ["SNP%", "TGT", "REC", "TS%", "recYDS", "recTD", "YPRR", "rec1D", "1DRR", "recYPG", "AY%", "YAC", "YPR", "IMP/G", "RR", "YDS(t)", "RZ Tgt"] },
-    { label: "RUSHING",               columns: ["CAR", "ruYDS", "ruTD", "YPC", "FUM"] },
-    { label: "CEILING & CONSISTENCY", columns: ["FPOE", "CSTY%", "CL"] },
+    { label: "INFO",                  icon: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 16v-4M12 8h.01",                                                                                           columns: ["TM", "AGE", "G"] },
+    { label: "FANTASY",               icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",                                                         columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    { label: "RECEIVING",             icon: "M22 12h-6l-2 3h-4l-2-3H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z",                columns: ["SNP%", "TGT", "REC", "TS%", "recYDS", "recTD", "YPRR", "rec1D", "1DRR", "recYPG", "AY%", "YAC", "YPR", "IMP/G", "RR", "YDS(t)", "RZ Tgt"] },
+    { label: "RUSHING",               icon: "M13 10V3L4 14h7v7l9-11h-7z",                                                                                                                            columns: ["CAR", "ruYDS", "ruTD", "YPC", "FUM"] },
+    { label: "CEILING & CONSISTENCY", icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",                                                                                                          columns: ["FPOE", "CSTY%", "CL"] },
   ],
 };
 
@@ -325,8 +327,8 @@ const MOBILE_BREAKPOINT = 719;
 
 const COLUMN_WIDTHS = {
   RK: 78,
-  PLAYER: 196,
-  POS: 74,
+  PLAYER: 172,
+  POS: 86,
   TM: 82,
   AGE: 78,
   FPTS: 110,
@@ -855,13 +857,31 @@ function applyColumnStyle(cell, column) {
 function buildGroupHeaderRow(columns, groups) {
   const tr = document.createElement("tr");
 
-  // Build a quick lookup: columnName → groupLabel so we can verify alignment
-  // Then render one <th colspan=N> per group, in order
   groups.forEach((group) => {
     const th = document.createElement("th");
     th.className = "stats-table__group-header-cell";
     th.colSpan = group.columns.length;
-    th.textContent = group.label;
+
+    const inner = document.createElement("div");
+    inner.className = "stats-table__group-header-inner";
+
+    if (group.icon) {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("aria-hidden", "true");
+      svg.setAttribute("focusable", "false");
+      svg.classList.add("stats-table__group-header-icon");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", group.icon);
+      svg.append(path);
+      inner.append(svg);
+    }
+
+    const label = document.createElement("span");
+    label.textContent = group.label;
+    inner.append(label);
+
+    th.append(inner);
     tr.append(th);
   });
 
