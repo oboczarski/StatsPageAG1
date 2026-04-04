@@ -606,6 +606,7 @@ function refreshGrid() {
   state.columnFormatting = buildColumnFormatting(visibleRows);
   const sortedRows = getSharedSortedRows(visibleRows);
   const scrollTop = getSharedScrollTop();
+  const scrollLeft = getMainScrollLeft();
 
   if (frozenTable && mainTable) {
     frozenTable.setColumns(buildFrozenColDefs());
@@ -614,7 +615,7 @@ function refreshGrid() {
     mainTable.setData(sortedRows);
     queueHeaderIconHydration();
     applySearch();
-    queueScrollSync(scrollTop);
+    queueScrollSync(scrollTop, scrollLeft);
   }
 
   updateRowCount();
@@ -1235,7 +1236,11 @@ function getSharedScrollTop() {
   return mainHolder?.scrollTop ?? frozenHolder?.scrollTop ?? 0;
 }
 
-function queueScrollSync(scrollTop = 0) {
+function getMainScrollLeft() {
+  return getTableHolders().mainHolder?.scrollLeft ?? 0;
+}
+
+function queueScrollSync(scrollTop = 0, scrollLeft = 0) {
   cancelAnimationFrame(scrollSyncFrame);
   scrollSyncFrame = requestAnimationFrame(() => {
     const { mainHolder, frozenHolder } = getTableHolders();
@@ -1245,6 +1250,7 @@ function queueScrollSync(scrollTop = 0) {
 
     mainHolder.scrollTop = scrollTop;
     frozenHolder.scrollTop = scrollTop;
+    mainHolder.scrollLeft = scrollLeft;
   });
 }
 
