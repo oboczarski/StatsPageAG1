@@ -700,6 +700,8 @@ body::after {
   gap: 6px;
   overflow: visible;
   white-space: nowrap;
+  font-size: 13px;
+  letter-spacing: -0.02em;
 }
 
 .ag-theme-dh-hub .ag-header-group-text {
