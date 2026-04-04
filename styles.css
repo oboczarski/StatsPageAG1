@@ -1224,36 +1224,11 @@ radial-gradient(23px 14px at 50% 50%, rgba(0, 0, 0, 0.08) 0%, rgba(255, 55, 155,
   }
 }
 
-.ag-theme-dh-hub.is-touch-scroll .ag-header-viewport,
-.ag-theme-dh-hub.is-touch-scroll .ag-pinned-left-header,
-.ag-theme-dh-hub.is-touch-scroll .ag-header-container,
-.ag-theme-dh-hub.is-touch-scroll .ag-header-row {
-  contain: none;
-  backface-visibility: visible;
-  will-change: auto;
-}
-
-.ag-theme-dh-hub.is-touch-scroll .ag-header-cell,
-.ag-theme-dh-hub.is-touch-scroll .ag-header-group-cell,
-.ag-theme-dh-hub.is-touch-scroll .ag-header-group-cell-label,
-.ag-theme-dh-hub.is-touch-scroll .ag-header-group-text,
-.ag-theme-dh-hub.is-touch-scroll .ag-header-cell-comp-wrapper,
-.ag-theme-dh-hub.is-touch-scroll .dh-header-template,
-.ag-theme-dh-hub.is-touch-scroll .ag-header-cell-label,
-.ag-theme-dh-hub.is-touch-scroll .ag-header-cell-text,
-.ag-theme-dh-hub.is-touch-scroll .dh-inner-header,
-.ag-theme-dh-hub.is-touch-scroll .dh-inner-header__label {
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .ag-theme-dh-hub.is-touch-scroll .ag-body-horizontal-scroll-viewport,
 .ag-theme-dh-hub.is-touch-scroll .ag-body-viewport {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
+  scroll-behavior: auto;
 }
 
 @keyframes driftPulse {

@@ -651,6 +651,9 @@ const gridOptions = {
   animateRows: false,
   suppressCellFocus: false,
   suppressRowHoverHighlight: true,
+  // AG Grid support explicitly recommends this as a workaround for
+  // browser async-scroll header lag in Safari/Firefox-class environments.
+  suppressColumnVirtualisation: state.isTouchScrollViewport,
   maintainColumnOrder: false,
   suppressMovableColumns: true,
   cacheQuickFilter: true,
@@ -950,8 +953,8 @@ function getColumnWidth(columnName) {
   const meta = getHeaderMeta(columnName);
   if (state.isCompactViewport) {
     const compactWidth = PINNED_COLUMNS.has(columnName)
-      ? meta.widths.mobile - 4
-      : meta.widths.mobile + 4;
+      ? meta.widths.mobile
+      : meta.widths.mobile + 12;
 
     return Math.max(compactWidth, getColumnMinWidth(columnName));
   }
@@ -976,6 +979,10 @@ function getRowHeight() {
 }
 
 function getRowBuffer() {
+  if (state.isTouchScrollViewport) {
+    return 2;
+  }
+
   return state.isCompactViewport ? 4 : 10;
 }
 
