@@ -3,7 +3,7 @@ import {
   ModuleRegistry,
   createGrid,
   themeBalham,
-} from "ag-grid-community";
+} from "./node_modules/ag-grid-community/dist/package/main.esm.mjs";
 import {
   IconActivity,
   IconAlertTriangle,
