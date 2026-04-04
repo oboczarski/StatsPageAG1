@@ -1240,12 +1240,37 @@ radial-gradient(23px 14px at 50% 50%, rgba(0, 0, 0, 0.08) 0%, rgba(255, 55, 155,
   overflow: hidden;
 }
 
+.ag-theme-dh-hub.is-touch-scroll .ag-header-cell-comp-wrapper {
+  position: relative;
+  justify-content: initial;
+}
+
 .ag-theme-dh-hub.is-touch-scroll .ag-header-cell-label {
+  justify-content: flex-start;
   padding-inline: 8px;
 }
 
 .ag-theme-dh-hub.is-touch-scroll .dh-header-template {
   justify-content: center;
+}
+
+.ag-theme-dh-hub.is-touch-scroll .ag-header-cell-text {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: start;
+  text-overflow: ellipsis;
+}
+
+.ag-theme-dh-hub.is-touch-scroll .dh-inner-header {
+  justify-content: flex-start;
+  width: 100%;
+  overflow: hidden;
+}
+
+.ag-theme-dh-hub.is-touch-scroll .dh-inner-header__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @keyframes driftPulse {
