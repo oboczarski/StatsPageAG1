@@ -440,6 +440,7 @@ const state = {
   searchText: "",
   rows: [],
   isCompactViewport: isCompactViewport(),
+  isTouchScrollViewport: isTouchScrollViewport(),
   columnFormatting: Object.create(null),
 };
 
@@ -599,6 +600,7 @@ class DataHubInnerHeader {
 const mainTitle = document.querySelector("#main-title");
 const activeViewLabel = document.querySelector("#active-view-label");
 const rowCount = document.querySelector("#row-count");
+const gridElement = document.querySelector("#player-grid");
 const overlay = document.querySelector("#grid-overlay");
 const overlayTitle = document.querySelector("#overlay-title");
 const overlayDescription = document.querySelector("#overlay-description");
@@ -671,7 +673,9 @@ const gridOptions = {
   },
 };
 
-const gridApi = createGrid(document.querySelector("#player-grid"), gridOptions);
+syncViewportModeClasses();
+
+const gridApi = createGrid(gridElement, gridOptions);
 
 attachEventListeners();
 syncUiState();
@@ -842,7 +846,7 @@ function buildColumnDefs() {
       headerTooltip: groupMeta.longLabel,
       groupId: `${state.activeCategory}-${toGroupId(group.headerName)}`,
       marryChildren: true,
-      suppressStickyLabel: state.isCompactViewport,
+      suppressStickyLabel: state.isTouchScrollViewport,
       headerClass: "dh-header-group-cell",
       headerGroupComponentParams: buildHeaderGroupComponentParams(group.headerName),
       children: group.columns.map((columnName) => buildLeafColumnDef(columnName)),
@@ -944,18 +948,27 @@ function getColumnMinWidth(columnName) {
 
 function getColumnWidth(columnName) {
   const meta = getHeaderMeta(columnName);
-  const baseWidth = state.isCompactViewport ? meta.widths.mobile : meta.widths.desktop;
-  const shrinkBy = state.isCompactViewport
-    ? 4
-    : columnName === PLAYER_COLUMN
-      ? 14
-      : 8;
+  if (state.isCompactViewport) {
+    const compactWidth = PINNED_COLUMNS.has(columnName)
+      ? meta.widths.mobile - 4
+      : meta.widths.mobile + 4;
 
-  return Math.max(baseWidth - shrinkBy, getColumnMinWidth(columnName));
+    return Math.max(compactWidth, getColumnMinWidth(columnName));
+  }
+
+  const shrinkBy = columnName === PLAYER_COLUMN ? 14 : 8;
+  return Math.max(meta.widths.desktop - shrinkBy, getColumnMinWidth(columnName));
 }
 
 function isCompactViewport() {
   return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+}
+
+function isTouchScrollViewport() {
+  return (
+    window.matchMedia("(pointer: coarse)").matches ||
+    navigator.maxTouchPoints > 0
+  );
 }
 
 function getRowHeight() {
@@ -974,17 +987,28 @@ function getGroupHeaderHeight() {
   return state.isCompactViewport ? 24 : 28;
 }
 
+function syncViewportModeClasses() {
+  gridElement.classList.toggle("is-touch-scroll", state.isTouchScrollViewport);
+}
+
 let resizeFrame = 0;
 
 function handleViewportResize() {
   cancelAnimationFrame(resizeFrame);
   resizeFrame = requestAnimationFrame(() => {
     const nextCompact = isCompactViewport();
-    if (nextCompact === state.isCompactViewport) {
+    const nextTouchScroll = isTouchScrollViewport();
+
+    if (
+      nextCompact === state.isCompactViewport &&
+      nextTouchScroll === state.isTouchScrollViewport
+    ) {
       return;
     }
 
     state.isCompactViewport = nextCompact;
+    state.isTouchScrollViewport = nextTouchScroll;
+    syncViewportModeClasses();
     gridApi.setGridOption("rowBuffer", getRowBuffer());
     gridApi.setGridOption("rowHeight", getRowHeight());
     gridApi.setGridOption("headerHeight", getHeaderHeight());
