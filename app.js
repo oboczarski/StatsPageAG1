@@ -365,6 +365,7 @@ const overlayActions = document.querySelector("#overlay-actions");
 const filePickerButton = document.querySelector("#file-picker-button");
 const filePickerInput = document.querySelector("#file-picker-input");
 const playerSearch = document.querySelector("#player-search");
+const splitGridWrap = document.querySelector(".split-grid-wrap");
 const primaryTabButtons = Array.from(
   document.querySelectorAll("[data-primary-tab]"),
 );
@@ -397,6 +398,7 @@ function createTable() {
     data: [],
     reactiveData: false,
     columnHeaderVertAlign: "bottom",
+    renderVertical: state.isCompactViewport ? "basic" : "virtual",
     columnDefaults: {
       resizable: true,
       headerHozAlign: "center",
@@ -404,20 +406,21 @@ function createTable() {
     rowHeight: getRowHeight(),
     headerHeight: getHeaderHeight(),
   };
+  const tableHeightConfig = state.isCompactViewport ? {} : { height: "100%" };
 
   frozenTable = new Tabulator("#frozen-grid", {
     ...sharedConfig,
+    ...tableHeightConfig,
     columns: buildFrozenColDefs(),
     layout: "fitData",
-    height: "100%",
     placeholder: "",
   });
 
   mainTable = new Tabulator("#main-grid", {
     ...sharedConfig,
+    ...tableHeightConfig,
     columns: buildMainColDefs(),
     layout: "fitDataStretch",
-    height: "100%",
     placeholder: "No players match the current view.",
   });
 
@@ -433,6 +436,11 @@ function attachScrollSync() {
   if (!mainHolder || !frozenHolder) return;
 
   detachScrollSync?.();
+
+  if (state.isCompactViewport) {
+    detachScrollSync = null;
+    return;
+  }
 
   const releaseScrollLock = () => {
     cancelAnimationFrame(releaseScrollLockFrame);
@@ -1232,6 +1240,10 @@ function getTableHolders() {
 }
 
 function getSharedScrollTop() {
+  if (state.isCompactViewport) {
+    return splitGridWrap?.scrollTop ?? 0;
+  }
+
   const { mainHolder, frozenHolder } = getTableHolders();
   return mainHolder?.scrollTop ?? frozenHolder?.scrollTop ?? 0;
 }
@@ -1244,12 +1256,22 @@ function queueScrollSync(scrollTop = 0, scrollLeft = 0) {
   cancelAnimationFrame(scrollSyncFrame);
   scrollSyncFrame = requestAnimationFrame(() => {
     const { mainHolder, frozenHolder } = getTableHolders();
-    if (!mainHolder || !frozenHolder) {
+    if (!mainHolder) {
       return;
     }
 
-    mainHolder.scrollTop = scrollTop;
-    frozenHolder.scrollTop = scrollTop;
+    if (state.isCompactViewport) {
+      if (splitGridWrap) {
+        splitGridWrap.scrollTop = scrollTop;
+      }
+    } else {
+      if (!frozenHolder) {
+        return;
+      }
+      mainHolder.scrollTop = scrollTop;
+      frozenHolder.scrollTop = scrollTop;
+    }
+
     mainHolder.scrollLeft = scrollLeft;
   });
 }
