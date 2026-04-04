@@ -19,6 +19,7 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23060d16'/%3E%3Cpath d='M19 20.5h17.5c5.8 0 9.5 3.2 9.5 8.4 0 3.7-1.9 6.3-5.2 7.3 4.1.8 6.7 4 6.7 8.4 0 5.8-4 9.4-10.6 9.4H19V20.5Zm8.2 13.2h7c2.5 0 3.9-1.2 3.9-3.3 0-2.2-1.5-3.3-4.3-3.3h-6.7v6.6Zm0 13.9h7.8c2.9 0 4.5-1.3 4.5-3.7 0-2.4-1.7-3.7-4.8-3.7h-7.5v7.4Z' fill='%23dff5ff'/%3E%3C/svg%3E"
     />
+    <link rel="stylesheet" href="./tabulator.min.css" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -35,25 +36,27 @@
           </h1>
         </div>
 
-        <div class="top-tabs" role="tablist" aria-label="League format">
-          <button
-            type="button"
-            class="top-tab is-active"
-            data-primary-tab="1-QB"
-            role="tab"
-            aria-selected="true"
-          >
-            1-QB
-          </button>
-          <button
-            type="button"
-            class="top-tab"
-            data-primary-tab="SFLX"
-            role="tab"
-            aria-selected="false"
-          >
-            SFLX
-          </button>
+        <div class="hero-actions">
+          <div class="top-tabs" role="tablist" aria-label="League format">
+            <button
+              type="button"
+              class="top-tab is-active"
+              data-primary-tab="1-QB"
+              role="tab"
+              aria-selected="true"
+            >
+              1-QB
+            </button>
+            <button
+              type="button"
+              class="top-tab"
+              data-primary-tab="SFLX"
+              role="tab"
+              aria-selected="false"
+            >
+              SFLX
+            </button>
+          </div>
           <button type="button" class="top-pill top-pill--ghost" aria-disabled="true">
             PICK VALUES
           </button>
@@ -69,8 +72,10 @@
               data-category="overview"
               role="tab"
               aria-selected="true"
+              aria-label="OVERVIEW (ALL)"
             >
-              OVERVIEW (ALL)
+              <span class="category-chip__label">OVERVIEW</span>
+              <span class="category-chip__meta">(ALL)</span>
             </button>
             <button
               type="button"
@@ -78,8 +83,10 @@
               data-category="passing"
               role="tab"
               aria-selected="false"
+              aria-label="PASSING (QB)"
             >
-              PASSING (QB)
+              <span class="category-chip__label">PASSING</span>
+              <span class="category-chip__meta">(QB)</span>
             </button>
             <button
               type="button"
@@ -87,8 +94,10 @@
               data-category="rushing"
               role="tab"
               aria-selected="false"
+              aria-label="RUSHING (RB)"
             >
-              RUSHING (RB)
+              <span class="category-chip__label">RUSHING</span>
+              <span class="category-chip__meta">(RB)</span>
             </button>
             <button
               type="button"
@@ -96,8 +105,10 @@
               data-category="receiving"
               role="tab"
               aria-selected="false"
+              aria-label="RECEIVING (W/T)"
             >
-              RECEIVING (W/T)
+              <span class="category-chip__label">RECEIVING</span>
+              <span class="category-chip__meta">(W/T)</span>
             </button>
           </div>
 
@@ -127,10 +138,6 @@
         </div>
 
         <div class="utility-row">
-          <button type="button" class="mini-chip mini-chip--ghost" aria-disabled="true">
-            ROOKIES
-          </button>
-
           <button type="button" class="mini-chip mini-chip--icon" aria-disabled="true">
             <svg
               class="mini-chip__icon"
@@ -181,7 +188,18 @@
         </div>
 
         <div class="grid-stage">
-          <div id="player-grid" class="ag-theme-balham data-grid" aria-label="Player stats table"></div>
+          <div class="split-grid-wrap">
+            <div
+              id="frozen-grid"
+              class="dh-tabulator-hub dh-frozen-hub"
+              aria-label="Frozen columns"
+            ></div>
+            <div
+              id="main-grid"
+              class="dh-tabulator-hub dh-main-hub data-grid"
+              aria-label="Player stats table"
+            ></div>
+          </div>
 
           <div id="grid-overlay" class="grid-stage__overlay">
             <div class="overlay-card">
@@ -211,6 +229,7 @@
       </section>
     </main>
 
+    <script src="https://unpkg.com/lucide@0.474.0/dist/umd/lucide.min.js"></script>
     <script type="module" src="./app.js"></script>
   </body>
 </html>
