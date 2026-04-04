@@ -35,25 +35,27 @@
           </h1>
         </div>
 
-        <div class="top-tabs" role="tablist" aria-label="League format">
-          <button
-            type="button"
-            class="top-tab is-active"
-            data-primary-tab="1-QB"
-            role="tab"
-            aria-selected="true"
-          >
-            1-QB
-          </button>
-          <button
-            type="button"
-            class="top-tab"
-            data-primary-tab="SFLX"
-            role="tab"
-            aria-selected="false"
-          >
-            SFLX
-          </button>
+        <div class="hero-actions">
+          <div class="top-tabs" role="tablist" aria-label="League format">
+            <button
+              type="button"
+              class="top-tab is-active"
+              data-primary-tab="1-QB"
+              role="tab"
+              aria-selected="true"
+            >
+              1-QB
+            </button>
+            <button
+              type="button"
+              class="top-tab"
+              data-primary-tab="SFLX"
+              role="tab"
+              aria-selected="false"
+            >
+              SFLX
+            </button>
+          </div>
           <button type="button" class="top-pill top-pill--ghost" aria-disabled="true">
             PICK VALUES
           </button>
@@ -69,8 +71,10 @@
               data-category="overview"
               role="tab"
               aria-selected="true"
+              aria-label="OVERVIEW (ALL)"
             >
-              OVERVIEW (ALL)
+              <span class="category-chip__label">OVERVIEW</span>
+              <span class="category-chip__meta">(ALL)</span>
             </button>
             <button
               type="button"
@@ -78,8 +82,10 @@
               data-category="passing"
               role="tab"
               aria-selected="false"
+              aria-label="PASSING (QB)"
             >
-              PASSING (QB)
+              <span class="category-chip__label">PASSING</span>
+              <span class="category-chip__meta">(QB)</span>
             </button>
             <button
               type="button"
@@ -87,8 +93,10 @@
               data-category="rushing"
               role="tab"
               aria-selected="false"
+              aria-label="RUSHING (RB)"
             >
-              RUSHING (RB)
+              <span class="category-chip__label">RUSHING</span>
+              <span class="category-chip__meta">(RB)</span>
             </button>
             <button
               type="button"
@@ -96,8 +104,10 @@
               data-category="receiving"
               role="tab"
               aria-selected="false"
+              aria-label="RECEIVING (W/T)"
             >
-              RECEIVING (W/T)
+              <span class="category-chip__label">RECEIVING</span>
+              <span class="category-chip__meta">(W/T)</span>
             </button>
           </div>
 
@@ -127,10 +137,6 @@
         </div>
 
         <div class="utility-row">
-          <button type="button" class="mini-chip mini-chip--ghost" aria-disabled="true">
-            ROOKIES
-          </button>
-
           <button type="button" class="mini-chip mini-chip--icon" aria-disabled="true">
             <svg
               class="mini-chip__icon"
@@ -181,7 +187,11 @@
         </div>
 
         <div class="grid-stage">
-          <div id="player-grid" class="ag-theme-balham data-grid" aria-label="Player stats table"></div>
+          <div
+            id="player-grid"
+            class="ag-theme-balham ag-theme-dh-hub data-grid"
+            aria-label="Player stats table"
+          ></div>
 
           <div id="grid-overlay" class="grid-stage__overlay">
             <div class="overlay-card">
