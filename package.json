@@ -1,0 +1,17 @@
+{
+  "name": "statspageag2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --mode production",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tabler/icons": "^3.34.1",
+    "ag-grid-community": "35.2.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.12"
+  }
+}
