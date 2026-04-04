@@ -507,11 +507,18 @@ body::after {
   overflow-x: hidden !important;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  touch-action: pan-y;
 }
 
 .dh-frozen-hub .tabulator-tableholder::-webkit-scrollbar {
   width: 0;
   height: 0;
+}
+
+.dh-tabulator-hub .tabulator-tableholder {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
 }
 
 .grid-stage__overlay {
