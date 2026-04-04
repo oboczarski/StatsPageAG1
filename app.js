@@ -688,7 +688,10 @@ function standardCellFormatter(cell) {
 
 function fptsCellFormatter(cell) {
   const value = cell.getValue();
-  const displayValue = formatDisplayValue(FPTS_COLUMN, value);
+  const rawDisplay = formatDisplayValue(FPTS_COLUMN, value);
+  const displayValue = (!isMissingValue(value) && rawDisplay !== "NA")
+    ? parseFloat(rawDisplay).toFixed(1)
+    : rawDisplay;
   const element = cell.getElement();
 
   element.classList.remove(
