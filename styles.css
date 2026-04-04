@@ -1026,36 +1026,16 @@ body::after {
 
 /* ── Mobile overrides ── */
 @media (max-width: 719px) {
-  .split-grid-wrap {
-    align-items: flex-start;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-  }
-
-  .dh-tabulator-hub.tabulator,
-  .data-grid,
-  .dh-frozen-hub {
-    height: auto !important;
-    align-self: flex-start;
-  }
-
-  .dh-tabulator-hub .tabulator-tableholder {
-    height: auto !important;
-    max-height: none !important;
-  }
-
   .dh-frozen-hub .tabulator-tableholder {
     overflow-y: hidden !important;
     overflow-x: hidden !important;
   }
 
   .dh-main-hub .tabulator-tableholder {
-    overflow-y: hidden !important;
+    overflow-y: auto !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
+    overscroll-behavior: contain;
   }
 
   .dh-tabulator-hub.tabulator {

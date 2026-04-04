@@ -365,7 +365,6 @@ const overlayActions = document.querySelector("#overlay-actions");
 const filePickerButton = document.querySelector("#file-picker-button");
 const filePickerInput = document.querySelector("#file-picker-input");
 const playerSearch = document.querySelector("#player-search");
-const splitGridWrap = document.querySelector(".split-grid-wrap");
 const primaryTabButtons = Array.from(
   document.querySelectorAll("[data-primary-tab]"),
 );
@@ -381,6 +380,7 @@ let frozenTable = null;
 let mainTable = null;
 let headerIconsFrame = 0;
 let scrollSyncFrame = 0;
+let mobileScrollSyncFrame = 0;
 let releaseScrollLockFrame = 0;
 let releaseScrollLockTimeout = 0;
 let activeScrollSource = null;
@@ -398,7 +398,7 @@ function createTable() {
     data: [],
     reactiveData: false,
     columnHeaderVertAlign: "bottom",
-    renderVertical: state.isCompactViewport ? "basic" : "virtual",
+    renderVertical: "virtual",
     columnDefaults: {
       resizable: true,
       headerHozAlign: "center",
@@ -406,21 +406,20 @@ function createTable() {
     rowHeight: getRowHeight(),
     headerHeight: getHeaderHeight(),
   };
-  const tableHeightConfig = state.isCompactViewport ? {} : { height: "100%" };
 
   frozenTable = new Tabulator("#frozen-grid", {
     ...sharedConfig,
-    ...tableHeightConfig,
     columns: buildFrozenColDefs(),
     layout: "fitData",
+    height: "100%",
     placeholder: "",
   });
 
   mainTable = new Tabulator("#main-grid", {
     ...sharedConfig,
-    ...tableHeightConfig,
     columns: buildMainColDefs(),
     layout: "fitDataStretch",
+    height: "100%",
     placeholder: "No players match the current view.",
   });
 
@@ -438,7 +437,35 @@ function attachScrollSync() {
   detachScrollSync?.();
 
   if (state.isCompactViewport) {
-    detachScrollSync = null;
+    let pendingTop = mainHolder.scrollTop;
+
+    const syncFrozenFromMain = (top) => {
+      pendingTop = top;
+      if (mobileScrollSyncFrame) {
+        return;
+      }
+
+      mobileScrollSyncFrame = requestAnimationFrame(() => {
+        mobileScrollSyncFrame = 0;
+        if (frozenHolder.scrollTop !== pendingTop) {
+          frozenHolder.scrollTop = pendingTop;
+        }
+      });
+    };
+
+    const onMainVerticalScroll = (top) => {
+      syncFrozenFromMain(top);
+    };
+
+    mainTable.on("scrollVertical", onMainVerticalScroll);
+
+    detachScrollSync = () => {
+      mainTable.off("scrollVertical", onMainVerticalScroll);
+      cancelAnimationFrame(mobileScrollSyncFrame);
+      mobileScrollSyncFrame = 0;
+    };
+
+    syncFrozenFromMain(mainHolder.scrollTop);
     return;
   }
 
@@ -475,6 +502,8 @@ function attachScrollSync() {
     mainHolder.removeEventListener("scroll", onMainScroll);
     frozenHolder.removeEventListener("scroll", onFrozenScroll);
     clearTimeout(releaseScrollLockTimeout);
+    cancelAnimationFrame(mobileScrollSyncFrame);
+    mobileScrollSyncFrame = 0;
     cancelAnimationFrame(releaseScrollLockFrame);
   };
 
@@ -1240,10 +1269,6 @@ function getTableHolders() {
 }
 
 function getSharedScrollTop() {
-  if (state.isCompactViewport) {
-    return splitGridWrap?.scrollTop ?? 0;
-  }
-
   const { mainHolder, frozenHolder } = getTableHolders();
   return mainHolder?.scrollTop ?? frozenHolder?.scrollTop ?? 0;
 }
@@ -1256,22 +1281,12 @@ function queueScrollSync(scrollTop = 0, scrollLeft = 0) {
   cancelAnimationFrame(scrollSyncFrame);
   scrollSyncFrame = requestAnimationFrame(() => {
     const { mainHolder, frozenHolder } = getTableHolders();
-    if (!mainHolder) {
+    if (!mainHolder || !frozenHolder) {
       return;
     }
 
-    if (state.isCompactViewport) {
-      if (splitGridWrap) {
-        splitGridWrap.scrollTop = scrollTop;
-      }
-    } else {
-      if (!frozenHolder) {
-        return;
-      }
-      mainHolder.scrollTop = scrollTop;
-      frozenHolder.scrollTop = scrollTop;
-    }
-
+    mainHolder.scrollTop = scrollTop;
+    frozenHolder.scrollTop = scrollTop;
     mainHolder.scrollLeft = scrollLeft;
   });
 }
