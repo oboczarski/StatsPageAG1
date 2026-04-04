@@ -653,6 +653,7 @@ const gridOptions = {
   suppressMovableColumns: true,
   cacheQuickFilter: true,
   enableBrowserTooltips: true,
+  rowBuffer: getRowBuffer(),
   rowHeight: getRowHeight(),
   headerHeight: getHeaderHeight(),
   groupHeaderHeight: getGroupHeaderHeight(),
@@ -841,6 +842,7 @@ function buildColumnDefs() {
       headerTooltip: groupMeta.longLabel,
       groupId: `${state.activeCategory}-${toGroupId(group.headerName)}`,
       marryChildren: true,
+      suppressStickyLabel: state.isCompactViewport,
       headerClass: "dh-header-group-cell",
       headerGroupComponentParams: buildHeaderGroupComponentParams(group.headerName),
       children: group.columns.map((columnName) => buildLeafColumnDef(columnName)),
@@ -960,6 +962,10 @@ function getRowHeight() {
   return state.isCompactViewport ? 34 : 40;
 }
 
+function getRowBuffer() {
+  return state.isCompactViewport ? 4 : 10;
+}
+
 function getHeaderHeight() {
   return state.isCompactViewport ? 34 : 40;
 }
@@ -979,6 +985,7 @@ function handleViewportResize() {
     }
 
     state.isCompactViewport = nextCompact;
+    gridApi.setGridOption("rowBuffer", getRowBuffer());
     gridApi.setGridOption("rowHeight", getRowHeight());
     gridApi.setGridOption("headerHeight", getHeaderHeight());
     gridApi.setGridOption("groupHeaderHeight", getGroupHeaderHeight());
