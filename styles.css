@@ -713,14 +713,13 @@ body::after {
 
 /* Column header icon */
 .stats-table__head-icon {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   flex-shrink: 0;
-  opacity: 0.58;
-  stroke: currentColor;
-  stroke-width: 2;
+  opacity: 1;
+  stroke: rgb(98 135 183);
+  stroke-width: 3px;
   stroke-linecap: round;
-  stroke-linejoin: round;
   fill: none;
 }
 
