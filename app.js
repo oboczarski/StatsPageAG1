@@ -672,6 +672,13 @@ function renderTable() {
 
   gridContainer.replaceChildren(frame);
 
+  // Vertical scroll sync: right pane is the sole scroll container; left pane follows via JS
+  scrollPane.addEventListener("scroll", () => {
+    if (frozenPane.scrollTop !== scrollPane.scrollTop) {
+      frozenPane.scrollTop = scrollPane.scrollTop;
+    }
+  });
+
   // Sync row heights after paint (both panes are now in the DOM)
   requestAnimationFrame(() => {
     syncRowHeights(frozenTable, scrollTable);

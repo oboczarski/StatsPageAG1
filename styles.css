@@ -483,27 +483,22 @@ body::after {
 }
 
 .grid-scroll-wrapper {
-  /* Single unified scroll container for the semantic table */
-  overflow: auto;
-  max-height: clamp(500px, 62vh, 900px);
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
   border-radius: 24px;
 }
 
-.grid-scroll-wrapper::-webkit-scrollbar {
+.table-pane--scroll::-webkit-scrollbar {
   height: 12px;
   width: 12px;
 }
 
-.grid-scroll-wrapper::-webkit-scrollbar-thumb {
+.table-pane--scroll::-webkit-scrollbar-thumb {
   border-radius: 999px;
   border: 3px solid transparent;
   background: linear-gradient(180deg, rgba(131, 214, 255, 0.5), rgba(162, 127, 255, 0.5));
   background-clip: padding-box;
 }
 
-.grid-scroll-wrapper::-webkit-scrollbar-track {
+.table-pane--scroll::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.04);
 }
 
@@ -520,22 +515,22 @@ body::after {
   align-items: flex-start;
 }
 
-/* Frozen pane: sticks to the left edge of the scroll container */
+/* Frozen pane: always visible on the left; body scrollTop driven by JS scroll-sync */
 .table-pane--frozen {
-  position: sticky;
-  left: 0;
-  z-index: 3;
   flex-shrink: 0;
   overflow: hidden;
-  /* Opaque background so scrolling content is masked behind the pane */
-  background: rgba(8, 15, 27, 0.98);
+  max-height: clamp(500px, 62vh, 900px);
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.12), 2px 0 18px rgba(0, 0, 0, 0.44);
 }
 
-/* Scrollable pane: fills remaining width */
+/* Scrollable pane: sole scroll container — handles all horizontal and vertical scrolling */
 .table-pane--scroll {
   flex: 1;
   min-width: 0;
+  overflow: auto;
+  max-height: clamp(500px, 62vh, 900px);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .grid-stage__overlay {
@@ -1280,7 +1275,8 @@ body::after {
 }
 
 @media (max-width: 719px) {
-  .grid-scroll-wrapper {
+  .table-pane--frozen,
+  .table-pane--scroll {
     max-height: clamp(420px, 55vh, 700px);
   }
 
@@ -1483,7 +1479,8 @@ body::after {
     padding: 22px;
   }
 
-  .grid-scroll-wrapper {
+  .table-pane--frozen,
+  .table-pane--scroll {
     max-height: clamp(620px, 72vh, 940px);
   }
 }
