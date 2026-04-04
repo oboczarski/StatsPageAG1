@@ -1,12 +1,3 @@
-import {
-  AllCommunityModule,
-  ModuleRegistry,
-  createGrid,
-  themeBalham,
-} from "https://cdn.jsdelivr.net/npm/ag-grid-community@35.2.0/+esm";
-
-ModuleRegistry.registerModules([AllCommunityModule]);
-
 const PRIMARY_TITLES = {
   "1-QB": "1QB ADP, TRADE VALUES & 2025 STATS",
   SFLX: "SFLX ADP, TRADE VALUES & 2025 STATS",
@@ -171,6 +162,21 @@ const SOURCE_ALIASES = {
 };
 
 const LABEL_COLUMNS = new Set(["PLAYER", "POS", "TM"]);
+const NON_FORMATTED_COLUMNS = new Set(["PLAYER", "POS", "TM", "AGE", "G"]);
+const INVERTED_COLUMNS = new Set([
+  "RK",
+  "ADP",
+  "POS·ADP",
+  "INT",
+  "FUM",
+  "PRS%",
+  "CSTY%",
+]);
+const NEUTRAL_COLUMNS = new Set(["TTT", "CL"]);
+const PLAYER_COLUMN = "PLAYER";
+const FPTS_COLUMN = "FPTS";
+const STICKY_COLUMN_COUNT = 3;
+const ALL_COLUMNS = [...new Set(Object.values(COLUMN_SETS).flat())];
 
 const CATEGORY_FILTERS = {
   overview: (row) => Boolean(row.POS && row.POS !== "NA"),
@@ -181,9 +187,11 @@ const CATEGORY_FILTERS = {
     (row.POS === "TE" && state.receivingFilters.TE),
 };
 
+const MOBILE_BREAKPOINT = 719;
+
 const COLUMN_WIDTHS = {
   RK: 78,
-  PLAYER: 244,
+  PLAYER: 196,
   POS: 74,
   TM: 82,
   AGE: 78,
@@ -248,6 +256,73 @@ const COLUMN_WIDTHS = {
   "RZ Tgt": 98,
 };
 
+const MOBILE_COLUMN_WIDTHS = {
+  RK: 44,
+  PLAYER: 92,
+  POS: 48,
+  TM: 52,
+  AGE: 54,
+  FPTS: 70,
+  PPG: 62,
+  VALUE: 62,
+  ADP: 62,
+  "POS·ADP": 74,
+  G: 46,
+  "SNP%": 62,
+  "YDS(t)": 68,
+  "YPG(t)": 62,
+  OPP: 58,
+  IMP: 56,
+  "IMP/OPP": 68,
+  "CSTY%": 60,
+  CL: 52,
+  paYDS: 68,
+  paTD: 56,
+  "CMP%": 62,
+  paATT: 60,
+  paRTG: 60,
+  "EPA/DB": 62,
+  CPOE: 58,
+  CMP: 56,
+  paYPG: 62,
+  ruYDS: 62,
+  ruTD: 54,
+  pa1D: 54,
+  "IMP/G": 62,
+  pIMP: 56,
+  "pIMP/A": 66,
+  CAR: 52,
+  YPC: 52,
+  TTT: 52,
+  "PRS%": 58,
+  SAC: 50,
+  INT: 50,
+  FUM: 50,
+  FPOE: 60,
+  REC: 52,
+  recYDS: 64,
+  TGT: 52,
+  ELU: 52,
+  "MTF/A": 60,
+  "YCO/A": 60,
+  MTF: 52,
+  YCO: 52,
+  "EXPLSV%": 68,
+  ru1D: 52,
+  RYOE: 60,
+  recTD: 54,
+  rec1D: 54,
+  YAC: 56,
+  "TS%": 56,
+  YPRR: 56,
+  "1DRR": 56,
+  recYPG: 62,
+  "AY%": 54,
+  YPR: 52,
+  RR: 52,
+  "RZ Tgt": 64,
+};
+
 const state = {
   primaryTab: "1-QB",
   activeCategory: "overview",
@@ -257,6 +332,13 @@ const state = {
   },
   searchText: "",
   rows: [],
+  displayedRows: [],
+  sort: {
+    column: "RK",
+    direction: "asc",
+  },
+  isCompactViewport: isCompactViewport(),
+  columnFormatting: Object.create(null),
 };
 
 const mainTitle = document.querySelector("#main-title");
@@ -269,6 +351,7 @@ const overlayActions = document.querySelector("#overlay-actions");
 const filePickerButton = document.querySelector("#file-picker-button");
 const filePickerInput = document.querySelector("#file-picker-input");
 const playerSearch = document.querySelector("#player-search");
+const gridContainer = document.querySelector("#player-grid");
 const primaryTabButtons = Array.from(
   document.querySelectorAll("[data-primary-tab]"),
 );
@@ -279,67 +362,39 @@ const receivingSubfilters = document.querySelector("#receiving-subfilters");
 const receivingButtons = Array.from(
   document.querySelectorAll("[data-receiving-filter]"),
 );
-
-const gridTheme = themeBalham.withParams({
-  spacing: 7,
-  fontFamily: "var(--font-sans)",
-  fontSize: 13,
-  dataFontSize: 13,
-  headerFontWeight: 600,
-  borderRadius: 18,
-  backgroundColor: "rgba(8, 15, 26, 0.01)",
-  headerBackgroundColor: "rgba(10, 18, 30, 0.2)",
-  chromeBackgroundColor: "rgba(10, 18, 30, 0.18)",
-  foregroundColor: "rgba(236, 242, 252, 0.94)",
-  textColor: "rgba(236, 242, 252, 0.94)",
-  headerTextColor: "rgba(202, 222, 247, 0.88)",
-  borderColor: "rgba(255, 255, 255, 0.08)",
-  accentColor: "rgba(102, 215, 255, 0.92)",
-  browserColorScheme: "dark",
-  cardShadow: "0 18px 42px rgba(0, 0, 0, 0.28)",
-  popupShadow: "0 22px 48px rgba(0, 0, 0, 0.44)",
-  menuShadow: "0 22px 48px rgba(0, 0, 0, 0.44)",
-  headerHeight: 50,
-  iconSize: 14,
-});
-
-const gridOptions = {
-  theme: gridTheme,
-  columnDefs: buildColumnDefs(),
-  rowData: [],
-  loading: true,
-  animateRows: true,
-  suppressCellFocus: false,
-  maintainColumnOrder: true,
-  suppressMovableColumns: true,
-  cacheQuickFilter: true,
-  rowHeight: 44,
-  headerHeight: 50,
-  tooltipShowDelay: 120,
-  overlayLoadingTemplate:
-    '<span class="ag-overlay-loading-center">Preparing Data Hub…</span>',
-  overlayNoRowsTemplate:
-    '<span class="ag-overlay-no-rows-center">No players match the current view.</span>',
-  defaultColDef: {
-    sortable: true,
-    resizable: true,
-    filter: true,
-    minWidth: 84,
-    cellClass: getCellClass,
-    comparator: compareGridValues,
-  },
+const splitGridState = {
+  root: null,
+  frozenPane: null,
+  scrollPane: null,
+  frozenViewport: null,
+  scrollViewport: null,
+  frozenTable: null,
+  scrollTable: null,
 };
-
-const gridApi = createGrid(document.querySelector("#player-grid"), gridOptions);
+let resizeFrame = 0;
+let rowHeightSyncFrame = 0;
+let syncingViewport = null;
+let isApplyingRowHeights = false;
+let resizeObserver = null;
+let hoveredRowIndex = null;
 
 attachEventListeners();
 syncUiState();
+renderTable();
 showOverlay({
   title: "Preparing SZN.csv",
   description:
-    "Building the Data Hub grid and mapping the requested stat views.",
+    "Building the Data Hub table and mapping the requested stat views.",
 });
 loadInitialData();
+
+if (document.fonts?.ready) {
+  document.fonts.ready
+    .then(() => {
+      scheduleRowHeightSync();
+    })
+    .catch(() => {});
+}
 
 function attachEventListeners() {
   primaryTabButtons.forEach((button) => {
@@ -368,12 +423,13 @@ function attachEventListeners() {
 
   playerSearch.addEventListener("input", (event) => {
     state.searchText = event.target.value;
-    gridApi.setGridOption("quickFilterText", state.searchText);
-    updateRowCount();
+    refreshGrid();
   });
 
   filePickerButton.addEventListener("click", () => filePickerInput.click());
   filePickerInput.addEventListener("change", handlePickedFile);
+
+  window.addEventListener("resize", handleViewportResize, { passive: true });
 }
 
 async function loadInitialData() {
@@ -383,7 +439,6 @@ async function loadInitialData() {
     hideOverlay();
   } catch (error) {
     console.error(error);
-    gridApi.setGridOption("loading", false);
     showOverlay({
       title: "Local browser access blocked",
       description:
@@ -413,13 +468,11 @@ async function handlePickedFile(event) {
       description:
         "Parsing the selected local file and rebuilding the category views.",
     });
-    gridApi.setGridOption("loading", true);
     const csvText = await file.text();
     applyCsvText(csvText);
     hideOverlay();
   } catch (error) {
     console.error(error);
-    gridApi.setGridOption("loading", false);
     showOverlay({
       title: "Could not read the selected file",
       description:
@@ -437,22 +490,15 @@ function applyCsvText(csvText) {
     .filter((row) => (row.NM || "").trim() || (row.POS || "").trim())
     .map(normalizeRow);
 
-  gridApi.setGridOption("loading", false);
   refreshGrid();
 }
 
 function refreshGrid() {
   const visibleRows = getVisibleRows();
-  gridApi.setGridOption("columnDefs", buildColumnDefs());
-  gridApi.setGridOption("rowData", visibleRows);
-  gridApi.setGridOption("quickFilterText", state.searchText);
-
-  if (visibleRows.length === 0 && !gridApi.getGridOption("loading")) {
-    gridApi.showNoRowsOverlay();
-  } else if (!gridApi.getGridOption("loading")) {
-    gridApi.hideOverlay();
-  }
-
+  state.columnFormatting = buildColumnFormatting(visibleRows);
+  const searchedRows = visibleRows.filter(matchesSearch);
+  state.displayedRows = sortRows(searchedRows);
+  renderTable();
   updateRowCount();
 }
 
@@ -484,34 +530,310 @@ function syncUiState() {
 }
 
 function updateRowCount() {
-  const displayedRows = gridApi.getDisplayedRowCount();
+  const displayedRows = state.displayedRows.length;
   rowCount.textContent = `${displayedRows} row${displayedRows === 1 ? "" : "s"}`;
 }
 
-function buildColumnDefs() {
-  const columns = COLUMN_SETS[state.activeCategory];
-
-  return columns.map((columnName, index) => {
-    const isLabelColumn = LABEL_COLUMNS.has(columnName);
-    const isNumericColumn = !isLabelColumn;
-
-    return {
-      headerName: columnName,
-      field: columnName,
-      width: COLUMN_WIDTHS[columnName] ?? 94,
-      minWidth: COLUMN_WIDTHS[columnName] ?? 94,
-      pinned: index < 3 ? "left" : null,
-      lockPinned: index < 3,
-      suppressMovable: true,
-      filter: isLabelColumn ? "agTextColumnFilter" : "agNumberColumnFilter",
-      type: isNumericColumn ? "numericColumn" : undefined,
-      headerClass: isNumericColumn ? "numeric-column" : "label-column",
-      valueFormatter: ({ value }) => formatCellValue(value),
-      tooltipValueGetter: ({ value }) => formatCellValue(value),
-      cellClass: getCellClass,
-      comparator: compareGridValues,
-    };
+function renderTable() {
+  const {
+    frozenColumns,
+    scrollColumns,
+    frozenWidth,
+    scrollWidth,
+  } = buildColumnLayout(
+    COLUMN_SETS[state.activeCategory],
+  );
+  const splitGrid = ensureSplitGrid();
+  const frozenTable = createTable({
+    columns: frozenColumns,
+    pane: "frozen",
+    tableWidth: frozenWidth,
+    ariaLabel: "Frozen player stats columns",
+    emptyStateMessage: "\u00A0",
+    isEmptyStatePlaceholder: true,
   });
+  const scrollTable = createTable({
+    columns: scrollColumns,
+    pane: "scroll",
+    tableWidth: scrollWidth,
+    ariaLabel: "Player stats table",
+    emptyStateMessage: "No players match the current view.",
+  });
+
+  clearHoveredRow();
+  splitGrid.root.style.setProperty("--frozen-width", `${frozenWidth}px`);
+  splitGrid.frozenViewport.replaceChildren(frozenTable);
+  splitGrid.scrollViewport.replaceChildren(scrollTable);
+
+  splitGridState.frozenTable = frozenTable;
+  splitGridState.scrollTable = scrollTable;
+
+  observeSplitGrid();
+  scheduleRowHeightSync();
+}
+
+function buildColumnLayout(columnNames) {
+  let totalWidth = 0;
+
+  const columns = columnNames.map((name, index) => {
+    const width = getColumnWidth(name);
+    const column = {
+      name,
+      index,
+      width,
+      isFrozen: index < STICKY_COLUMN_COUNT,
+    };
+
+    totalWidth += width;
+
+    return column;
+  });
+
+  const frozenColumns = columns.filter((column) => column.isFrozen);
+  const scrollColumns = columns.filter((column) => !column.isFrozen);
+
+  return {
+    columns,
+    frozenColumns,
+    scrollColumns,
+    frozenWidth: getTotalColumnWidth(frozenColumns),
+    scrollWidth: getTotalColumnWidth(scrollColumns),
+    totalWidth,
+  };
+}
+
+function getTotalColumnWidth(columns) {
+  return columns.reduce((width, column) => width + column.width, 0);
+}
+
+function ensureSplitGrid() {
+  if (splitGridState.root) {
+    return splitGridState;
+  }
+
+  const root = document.createElement("div");
+  root.className = "split-grid";
+
+  const frozenPane = document.createElement("div");
+  frozenPane.className = "split-grid__pane split-grid__pane--frozen";
+
+  const frozenViewport = document.createElement("div");
+  frozenViewport.className = "split-grid__viewport split-grid__viewport--frozen";
+
+  const scrollPane = document.createElement("div");
+  scrollPane.className = "split-grid__pane split-grid__pane--scroll";
+
+  const scrollViewport = document.createElement("div");
+  scrollViewport.className = "split-grid__viewport split-grid__viewport--scroll";
+
+  frozenPane.append(frozenViewport);
+  scrollPane.append(scrollViewport);
+  root.append(frozenPane, scrollPane);
+
+  root.addEventListener("mouseover", handleGridMouseOver);
+  root.addEventListener("mouseout", handleGridMouseOut);
+  root.addEventListener("mouseleave", clearHoveredRow);
+
+  frozenViewport.addEventListener("scroll", () => {
+    syncViewportScroll(frozenViewport, scrollViewport);
+  });
+  scrollViewport.addEventListener("scroll", () => {
+    syncViewportScroll(scrollViewport, frozenViewport);
+  });
+
+  gridContainer.classList.add("data-grid--split");
+  gridContainer.replaceChildren(root);
+
+  Object.assign(splitGridState, {
+    root,
+    frozenPane,
+    scrollPane,
+    frozenViewport,
+    scrollViewport,
+  });
+
+  return splitGridState;
+}
+
+function createTable({
+  columns,
+  pane,
+  tableWidth,
+  ariaLabel,
+  emptyStateMessage,
+  isEmptyStatePlaceholder = false,
+}) {
+  const table = document.createElement("table");
+  table.className = `stats-table stats-table--${pane}`;
+  table.setAttribute("aria-label", ariaLabel);
+  table.style.setProperty("--table-width", `${tableWidth}px`);
+
+  table.append(createColGroup(columns));
+
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  headerRow.className = "stats-table__header-row";
+  columns.forEach((column) => {
+    headerRow.append(createHeaderCell(column));
+  });
+  thead.append(headerRow);
+  table.append(thead);
+
+  const tbody = document.createElement("tbody");
+  if (!state.displayedRows.length) {
+    tbody.append(
+      createEmptyStateRow(columns.length, emptyStateMessage, {
+        isPlaceholder: isEmptyStatePlaceholder,
+      }),
+    );
+  } else {
+    state.displayedRows.forEach((row, rowIndex) => {
+      tbody.append(createBodyRow(row, columns, rowIndex));
+    });
+  }
+  table.append(tbody);
+
+  return table;
+}
+
+function createColGroup(columns) {
+  const colgroup = document.createElement("colgroup");
+  columns.forEach((column) => {
+    const col = document.createElement("col");
+    col.style.width = `${column.width}px`;
+    col.style.minWidth = `${column.width}px`;
+    col.style.maxWidth = `${column.width}px`;
+    colgroup.append(col);
+  });
+  return colgroup;
+}
+
+function createHeaderCell(column) {
+  const th = document.createElement("th");
+  th.className = "stats-table__header-cell";
+  th.scope = "col";
+  applyColumnStyle(th, column);
+  th.setAttribute("aria-sort", getAriaSort(column.name));
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "stats-table__head-button";
+  button.setAttribute("aria-label", `Sort by ${column.name}`);
+  button.addEventListener("click", () => handleHeaderSort(column.name));
+
+  const label = document.createElement("span");
+  label.className = "stats-table__head-label";
+  label.textContent = column.name;
+
+  const indicator = document.createElement("span");
+  indicator.className = "stats-table__sort-indicator";
+  indicator.textContent = getSortIndicator(column.name);
+  indicator.setAttribute("aria-hidden", "true");
+
+  if (getActiveSortColumn() === column.name) {
+    indicator.classList.add("is-active");
+  }
+
+  button.append(label, indicator);
+  th.append(button);
+  return th;
+}
+
+function createBodyRow(row, columns, rowIndex) {
+  const tr = document.createElement("tr");
+  tr.className = "stats-table__body-row";
+  tr.dataset.rowIndex = String(rowIndex);
+  columns.forEach((column) => {
+    tr.append(createBodyCell(row, column));
+  });
+  return tr;
+}
+
+function createBodyCell(row, column) {
+  const value = row[column.name];
+  const td = document.createElement("td");
+  td.classList.add("stats-table__body-cell");
+  applyColumnStyle(td, column);
+
+  const cellClasses = getCellClass({
+    colDef: { field: column.name },
+    value,
+  })
+    .split(/\s+/)
+    .filter(Boolean);
+
+  td.classList.add(...cellClasses);
+  td.title = formatCellValue(value);
+
+  const content = document.createElement("div");
+  content.className = "stats-table__cell-content";
+
+  if (column.name === FPTS_COLUMN && !isMissingValue(value)) {
+    content.append(createFptsChip(value));
+  } else {
+    content.textContent = formatDisplayValue(column.name, value);
+  }
+
+  td.append(content);
+  return td;
+}
+
+function createFptsChip(value) {
+  const chip = document.createElement("span");
+  const tier = getFormattingTier(FPTS_COLUMN, value);
+  chip.className = `stats-table__fpts-chip stats-table__fpts-chip--tier-${tier}`;
+  chip.textContent = formatDisplayValue(FPTS_COLUMN, value);
+  return chip;
+}
+
+function createEmptyStateRow(columnCount, message, { isPlaceholder = false } = {}) {
+  const tr = document.createElement("tr");
+  tr.className = "stats-table__empty-row";
+
+  const td = document.createElement("td");
+  td.className = "stats-table__empty-cell";
+  td.colSpan = Math.max(columnCount, 1);
+  td.textContent = message;
+
+  if (isPlaceholder) {
+    td.classList.add("stats-table__empty-cell--placeholder");
+  }
+
+  tr.append(td);
+  return tr;
+}
+
+function applyColumnStyle(cell, column) {
+  cell.style.setProperty("--column-width", `${column.width}px`);
+}
+
+function getAriaSort(columnName) {
+  if (getActiveSortColumn() !== columnName) {
+    return "none";
+  }
+
+  return state.sort.direction === "asc" ? "ascending" : "descending";
+}
+
+function getSortIndicator(columnName) {
+  if (getActiveSortColumn() !== columnName) {
+    return "↕";
+  }
+
+  return state.sort.direction === "asc" ? "▲" : "▼";
+}
+
+function handleHeaderSort(columnName) {
+  if (state.sort.column === columnName) {
+    state.sort.direction = state.sort.direction === "asc" ? "desc" : "asc";
+  } else {
+    state.sort = {
+      column: columnName,
+      direction: "asc",
+    };
+  }
+
+  refreshGrid();
 }
 
 function getVisibleRows() {
@@ -519,11 +841,256 @@ function getVisibleRows() {
   return state.rows.filter((row) => predicate(row, state));
 }
 
+function matchesSearch(row) {
+  const query = state.searchText.trim().toLowerCase();
+  if (!query) {
+    return true;
+  }
+
+  return COLUMN_SETS[state.activeCategory].some((columnName) => {
+    const value = row[columnName];
+    return !isMissingValue(value) && String(value).toLowerCase().includes(query);
+  });
+}
+
+function sortRows(rows) {
+  const sortColumn = getActiveSortColumn();
+  const directionMultiplier = state.sort.direction === "desc" ? -1 : 1;
+
+  return [...rows].sort((left, right) => {
+    const primaryResult = compareGridValues(left[sortColumn], right[sortColumn]);
+    if (primaryResult !== 0) {
+      return primaryResult * directionMultiplier;
+    }
+
+    if (sortColumn !== "RK") {
+      const rankFallback = compareGridValues(left.RK, right.RK);
+      if (rankFallback !== 0) {
+        return rankFallback;
+      }
+    }
+
+    const playerFallback = compareGridValues(left.PLAYER, right.PLAYER);
+    if (playerFallback !== 0) {
+      return playerFallback;
+    }
+
+    return compareGridValues(left.POS, right.POS);
+  });
+}
+
+function getActiveSortColumn() {
+  const columns = COLUMN_SETS[state.activeCategory];
+  return columns.includes(state.sort.column) ? state.sort.column : "RK";
+}
+
+function getColumnWidth(columnName) {
+  const widths = state.isCompactViewport ? MOBILE_COLUMN_WIDTHS : COLUMN_WIDTHS;
+  return widths[columnName] ?? (state.isCompactViewport ? 58 : 94);
+}
+
+function isCompactViewport() {
+  return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+}
+
+function handleViewportResize() {
+  cancelAnimationFrame(resizeFrame);
+  resizeFrame = requestAnimationFrame(() => {
+    const nextCompact = isCompactViewport();
+    if (nextCompact === state.isCompactViewport) {
+      scheduleRowHeightSync();
+      return;
+    }
+
+    state.isCompactViewport = nextCompact;
+    refreshGrid();
+  });
+}
+
+function syncViewportScroll(source, target) {
+  if (!target || syncingViewport === source || source.scrollTop === target.scrollTop) {
+    return;
+  }
+
+  syncingViewport = target;
+  target.scrollTop = source.scrollTop;
+
+  requestAnimationFrame(() => {
+    if (syncingViewport === target) {
+      syncingViewport = null;
+    }
+  });
+}
+
+function observeSplitGrid() {
+  if (!window.ResizeObserver) {
+    return;
+  }
+
+  if (!resizeObserver) {
+    resizeObserver = new ResizeObserver(() => {
+      if (isApplyingRowHeights) {
+        return;
+      }
+
+      scheduleRowHeightSync();
+    });
+  }
+
+  resizeObserver.disconnect();
+
+  [
+    splitGridState.root,
+    splitGridState.frozenViewport,
+    splitGridState.scrollViewport,
+    splitGridState.frozenTable,
+    splitGridState.scrollTable,
+  ]
+    .filter(Boolean)
+    .forEach((element) => {
+      resizeObserver.observe(element);
+    });
+}
+
+function scheduleRowHeightSync() {
+  cancelAnimationFrame(rowHeightSyncFrame);
+  rowHeightSyncFrame = requestAnimationFrame(syncRowHeights);
+}
+
+function syncRowHeights() {
+  const { frozenTable, scrollTable } = splitGridState;
+  if (!frozenTable || !scrollTable) {
+    return;
+  }
+
+  isApplyingRowHeights = true;
+  clearRowHeights(frozenTable);
+  clearRowHeights(scrollTable);
+
+  const frozenHeaderRow = frozenTable.tHead?.rows[0];
+  const scrollHeaderRow = scrollTable.tHead?.rows[0];
+  syncPairedRowHeight(frozenHeaderRow, scrollHeaderRow);
+
+  const frozenRows = Array.from(frozenTable.tBodies[0]?.rows || []);
+  const scrollRows = Array.from(scrollTable.tBodies[0]?.rows || []);
+  const rowCount = Math.max(frozenRows.length, scrollRows.length);
+
+  for (let index = 0; index < rowCount; index += 1) {
+    syncPairedRowHeight(frozenRows[index], scrollRows[index]);
+  }
+
+  requestAnimationFrame(() => {
+    isApplyingRowHeights = false;
+  });
+}
+
+function clearRowHeights(table) {
+  table.querySelectorAll("tr").forEach((row) => {
+    row.style.height = "";
+  });
+}
+
+function syncPairedRowHeight(leftRow, rightRow) {
+  const height = Math.max(
+    measureRowHeight(leftRow),
+    measureRowHeight(rightRow),
+  );
+
+  if (!height) {
+    return;
+  }
+
+  [leftRow, rightRow].forEach((row) => {
+    if (row) {
+      row.style.height = `${height}px`;
+    }
+  });
+}
+
+function measureRowHeight(row) {
+  return row ? Math.ceil(row.getBoundingClientRect().height) : 0;
+}
+
+function handleGridMouseOver(event) {
+  const row = getRowFromEventTarget(event.target);
+  if (!row) {
+    return;
+  }
+
+  const relatedRow = getRowFromEventTarget(event.relatedTarget);
+  if (relatedRow?.dataset.rowIndex === row.dataset.rowIndex) {
+    return;
+  }
+
+  setHoveredRow(row.dataset.rowIndex);
+}
+
+function handleGridMouseOut(event) {
+  const row = getRowFromEventTarget(event.target);
+  if (!row) {
+    return;
+  }
+
+  const relatedRow = getRowFromEventTarget(event.relatedTarget);
+  if (relatedRow?.dataset.rowIndex === row.dataset.rowIndex) {
+    return;
+  }
+
+  clearHoveredRow();
+}
+
+function getRowFromEventTarget(target) {
+  if (!(target instanceof Element)) {
+    return null;
+  }
+
+  const row = target.closest("tbody tr[data-row-index]");
+  if (!row || !splitGridState.root?.contains(row)) {
+    return null;
+  }
+
+  return row;
+}
+
+function setHoveredRow(rowIndex) {
+  if (hoveredRowIndex === rowIndex) {
+    return;
+  }
+
+  clearHoveredRow();
+  hoveredRowIndex = rowIndex;
+  getLinkedRows(rowIndex).forEach((row) => {
+    row.classList.add("is-row-hover");
+  });
+}
+
+function clearHoveredRow() {
+  if (hoveredRowIndex == null) {
+    return;
+  }
+
+  getLinkedRows(hoveredRowIndex).forEach((row) => {
+    row.classList.remove("is-row-hover");
+  });
+  hoveredRowIndex = null;
+}
+
+function getLinkedRows(rowIndex) {
+  if (!splitGridState.root) {
+    return [];
+  }
+
+  return Array.from(
+    splitGridState.root.querySelectorAll(
+      `tbody tr[data-row-index="${rowIndex}"]`,
+    ),
+  );
+}
+
 function normalizeRow(sourceRow) {
-  const allColumns = new Set(Object.values(COLUMN_SETS).flat());
   const normalized = {};
 
-  for (const columnName of allColumns) {
+  for (const columnName of ALL_COLUMNS) {
     const alias = Object.prototype.hasOwnProperty.call(SOURCE_ALIASES, columnName)
       ? SOURCE_ALIASES[columnName]
       : columnName;
@@ -607,17 +1174,36 @@ function parseCsv(csvText) {
 }
 
 function getCellClass(params) {
-  const classes = [];
+  const classes = ["dh-grid-cell"];
   const columnName = params.colDef.field;
+  const missingValue = isMissingValue(params.value);
 
-  if (LABEL_COLUMNS.has(columnName)) {
-    classes.push("label-cell");
+  if (columnName === PLAYER_COLUMN) {
+    classes.push("player-cell");
   } else {
-    classes.push("numeric-cell");
+    classes.push("center-cell");
   }
 
-  if (isMissingValue(params.value)) {
+  if (NON_FORMATTED_COLUMNS.has(columnName)) {
+    classes.push("plain-cell");
+  } else {
+    classes.push("formatted-cell");
+  }
+
+  if (missingValue) {
     classes.push("na-cell");
+    return classes.join(" ");
+  }
+
+  if (columnName === FPTS_COLUMN) {
+    classes.push("fpts-cell", `fpts-cell--tier-${getFormattingTier(columnName, params.value)}`);
+    return classes.join(" ");
+  }
+
+  if (!NON_FORMATTED_COLUMNS.has(columnName)) {
+    const family = NEUTRAL_COLUMNS.has(columnName) ? "neutral" : "heat";
+    const tier = getFormattingTier(columnName, params.value);
+    classes.push("heat-cell", `heat-cell--${family}`, `heat-cell--tier-${tier}`);
   }
 
   return classes.join(" ");
@@ -625,6 +1211,111 @@ function getCellClass(params) {
 
 function formatCellValue(value) {
   return isMissingValue(value) ? "NA" : value;
+}
+
+function formatDisplayValue(columnName, value) {
+  const formattedValue = formatCellValue(value);
+
+  if (columnName !== PLAYER_COLUMN || !state.isCompactViewport) {
+    return formattedValue;
+  }
+
+  return abbreviatePlayerName(formattedValue);
+}
+
+function abbreviatePlayerName(name) {
+  if (isMissingValue(name)) {
+    return "NA";
+  }
+
+  const parts = String(name).trim().split(/\s+/);
+  if (parts.length < 2) {
+    return String(name);
+  }
+
+  const [first, ...rest] = parts;
+  return `${first.charAt(0)}. ${rest.join(" ")}`;
+}
+
+function buildColumnFormatting(rows) {
+  const formatting = Object.create(null);
+  const columns = COLUMN_SETS[state.activeCategory];
+
+  columns.forEach((columnName) => {
+    if (NON_FORMATTED_COLUMNS.has(columnName)) {
+      return;
+    }
+
+    const values = rows
+      .map((row) => toComparableNumber(row[columnName]))
+      .filter((numericValue) => numericValue != null);
+
+    if (!values.length) {
+      return;
+    }
+
+    formatting[columnName] = createColumnMetric(values);
+  });
+
+  return formatting;
+}
+
+function createColumnMetric(values) {
+  const sorted = [...values].sort((left, right) => left - right);
+
+  return {
+    sorted,
+    isFlat: sorted[0] === sorted[sorted.length - 1],
+  };
+}
+
+function getFormattingTier(columnName, value) {
+  const metric = state.columnFormatting[columnName];
+  const numericValue = toComparableNumber(value);
+
+  if (!metric || numericValue == null) {
+    return 0;
+  }
+
+  if (metric.isFlat) {
+    return 2;
+  }
+
+  const percentile = getPercentileRank(metric.sorted, numericValue);
+  const normalized = INVERTED_COLUMNS.has(columnName)
+    ? 1 - percentile
+    : percentile;
+
+  return clamp(Math.round(normalized * 4), 0, 4);
+}
+
+function getPercentileRank(sortedValues, value) {
+  if (sortedValues.length <= 1) {
+    return 0.5;
+  }
+
+  const upperIndex = upperBound(sortedValues, value) - 1;
+  return clamp(upperIndex / (sortedValues.length - 1), 0, 1);
+}
+
+function upperBound(values, target) {
+  let low = 0;
+  let high = values.length;
+
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (values[middle] <= target) {
+      low = middle + 1;
+    } else {
+      high = middle;
+    }
+  }
+
+  return low;
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
 }
 
 function compareGridValues(valueA, valueB) {
@@ -662,14 +1353,28 @@ function toComparableValue(value) {
   }
 
   const raw = String(value).trim();
-  const normalized = raw.replace(/,/g, "").replace(/%$/g, "");
-  const parsedNumber = Number(normalized);
+  const parsedNumber = toComparableNumber(raw);
 
-  if (!Number.isNaN(parsedNumber)) {
+  if (parsedNumber != null) {
     return parsedNumber;
   }
 
   return raw.toUpperCase();
+}
+
+function toComparableNumber(value) {
+  if (isMissingValue(value)) {
+    return null;
+  }
+
+  const normalized = String(value).trim().replace(/,/g, "").replace(/%$/g, "");
+  const parsedNumber = Number(normalized);
+
+  if (Number.isNaN(parsedNumber)) {
+    return null;
+  }
+
+  return parsedNumber;
 }
 
 function isMissingValue(value) {
