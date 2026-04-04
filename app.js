@@ -352,6 +352,7 @@ const state = {
   rows: [],
   isCompactViewport: isCompactViewport(),
   columnFormatting: Object.create(null),
+  sorters: [],
 };
 
 const mainTitle = document.querySelector("#main-title");
@@ -377,25 +378,28 @@ const receivingButtons = Array.from(
 
 let frozenTable = null;
 let mainTable = null;
-let sortsSyncing = false;
 let headerIconsFrame = 0;
+let scrollSyncFrame = 0;
+let releaseScrollLockFrame = 0;
+let releaseScrollLockTimeout = 0;
+let activeScrollSource = null;
+let detachScrollSync = null;
 
 function createTable() {
   if (frozenTable) frozenTable.destroy();
   if (mainTable) mainTable.destroy();
+  detachScrollSync?.();
+  detachScrollSync = null;
+  activeScrollSource = null;
 
   const sharedConfig = {
     nestedFieldSeparator: false,
     data: [],
     reactiveData: false,
-    headerSortClickElement: "header",
-    headerSortElement: buildHeaderSortIconHtml,
     columnHeaderVertAlign: "bottom",
     columnDefaults: {
-      headerSort: true,
       resizable: true,
       headerHozAlign: "center",
-      sorter: tabulatorSorter,
     },
     rowHeight: getRowHeight(),
     headerHeight: getHeaderHeight(),
@@ -419,7 +423,6 @@ function createTable() {
 
   mainTable.on("tableBuilt", () => {
     attachScrollSync();
-    attachSortSync();
     queueHeaderIconHydration();
   });
 }
@@ -429,40 +432,45 @@ function attachScrollSync() {
   const frozenHolder = frozenTable.element.querySelector(".tabulator-tableholder");
   if (!mainHolder || !frozenHolder) return;
 
-  let syncingScroll = false;
-  mainHolder.addEventListener("scroll", () => {
-    if (syncingScroll) return;
-    syncingScroll = true;
-    frozenHolder.scrollTop = mainHolder.scrollTop;
-    syncingScroll = false;
-  });
-}
+  detachScrollSync?.();
 
-function attachSortSync() {
-  mainTable.on("dataSorting", (sorters) => {
-    if (sortsSyncing) return;
-    sortsSyncing = true;
-    if (!sorters.length) {
-      frozenTable.clearSort();
-    } else {
-      frozenTable.setSort(sorters.map((s) => ({ column: s.field, dir: s.dir })));
+  const releaseScrollLock = () => {
+    cancelAnimationFrame(releaseScrollLockFrame);
+    clearTimeout(releaseScrollLockTimeout);
+    releaseScrollLockFrame = requestAnimationFrame(() => {
+      activeScrollSource = null;
+    });
+    releaseScrollLockTimeout = window.setTimeout(() => {
+      activeScrollSource = null;
+    }, 32);
+  };
+
+  const syncTableScroll = (source, target) => {
+    if (activeScrollSource && activeScrollSource !== source) {
+      return;
     }
-    sortsSyncing = false;
-  });
 
-  frozenTable.on("dataSorting", (sorters) => {
-    if (sortsSyncing) return;
-    sortsSyncing = true;
-    if (!sorters.length) {
-      mainTable.clearSort();
-    } else {
-      mainTable.setSort(sorters.map((s) => ({ column: s.field, dir: s.dir })));
+    activeScrollSource = source;
+    if (target.scrollTop !== source.scrollTop) {
+      target.scrollTop = source.scrollTop;
     }
-    sortsSyncing = false;
-  });
+    releaseScrollLock();
+  };
 
-  mainTable.on("dataSorted", queueHeaderIconHydration);
-  frozenTable.on("dataSorted", queueHeaderIconHydration);
+  const onMainScroll = () => syncTableScroll(mainHolder, frozenHolder);
+  const onFrozenScroll = () => syncTableScroll(frozenHolder, mainHolder);
+
+  mainHolder.addEventListener("scroll", onMainScroll, { passive: true });
+  frozenHolder.addEventListener("scroll", onFrozenScroll, { passive: true });
+
+  detachScrollSync = () => {
+    mainHolder.removeEventListener("scroll", onMainScroll);
+    frozenHolder.removeEventListener("scroll", onFrozenScroll);
+    clearTimeout(releaseScrollLockTimeout);
+    cancelAnimationFrame(releaseScrollLockFrame);
+  };
+
+  syncTableScroll(mainHolder, frozenHolder);
 }
 
 createTable();
@@ -526,8 +534,8 @@ function applySearch() {
 
 function quickTextFilter(data, filterParams) {
   const needle = filterParams.searchText.toLowerCase();
-  return Object.values(data).some((value) =>
-    String(value).toLowerCase().includes(needle),
+  return getCategoryColumns().some((columnName) =>
+    String(data[columnName] ?? "").toLowerCase().includes(needle),
   );
 }
 
@@ -587,22 +595,26 @@ function applyCsvText(csvText) {
   const parsedRows = parseCsv(csvText);
   state.rows = parsedRows
     .filter((row) => (row.NM || "").trim() || (row.POS || "").trim())
-    .map(normalizeRow);
+    .map((row, index) => normalizeRow(row, index));
 
   refreshGrid();
 }
 
 function refreshGrid() {
+  pruneSharedSorters();
   const visibleRows = getVisibleRows();
   state.columnFormatting = buildColumnFormatting(visibleRows);
+  const sortedRows = getSharedSortedRows(visibleRows);
+  const scrollTop = getSharedScrollTop();
 
   if (frozenTable && mainTable) {
     frozenTable.setColumns(buildFrozenColDefs());
     mainTable.setColumns(buildMainColDefs());
-    frozenTable.setData(visibleRows);
-    mainTable.setData(visibleRows);
+    frozenTable.setData(sortedRows);
+    mainTable.setData(sortedRows);
     queueHeaderIconHydration();
     applySearch();
+    queueScrollSync(scrollTop);
   }
 
   updateRowCount();
@@ -655,10 +667,8 @@ function buildSingleColDef(columnName) {
     headerHozAlign: "center",
     hozAlign: isLabelColumn && columnName === PLAYER_COLUMN ? "left" : "center",
     cssClass: buildCellCssClass(columnName),
-    headerSort: true,
-    headerSortStartingDir: "desc",
-    headerSortTristate: true,
-    sorter: tabulatorSorter,
+    headerSort: false,
+    headerClick: handleSharedHeaderClick,
     resizable: true,
   };
   colDef.formatter = columnName === FPTS_COLUMN ? fptsCellFormatter : standardCellFormatter;
@@ -757,6 +767,14 @@ function getVisibleRows() {
   return state.rows.filter((row) => predicate(row, state));
 }
 
+function getSharedSortedRows(rows) {
+  if (!state.sorters.length) {
+    return [...rows].sort((left, right) => left.__rowIndex - right.__rowIndex);
+  }
+
+  return [...rows].sort((left, right) => compareRowsBySharedSorters(left, right));
+}
+
 function getColumnMinWidth(columnName) {
   const charWidth = state.isCompactViewport ? 6.3 : 7.2;
   const sideSpace = state.isCompactViewport ? 40 : 48;
@@ -804,7 +822,7 @@ function handleViewportResize() {
   });
 }
 
-function normalizeRow(sourceRow) {
+function normalizeRow(sourceRow, rowIndex) {
   const normalized = {};
 
   for (const columnName of ALL_COLUMNS) {
@@ -821,6 +839,7 @@ function normalizeRow(sourceRow) {
     normalized[columnName] = sanitizeValue(rawValue);
   }
 
+  normalized.__rowIndex = rowIndex;
   return normalized;
 }
 
@@ -1122,26 +1141,25 @@ function buildHeaderTitleHtml(columnName) {
   const meta = HEADER_META[columnName] ?? {};
   const label = meta.label ?? columnName;
   const icon = meta.icon ?? "bar-chart-3";
+  const sortDir = getColumnSortDirection(columnName);
+  const sortIconName = sortDir === "asc" ? "arrow-up" : sortDir === "desc" ? "arrow-down" : null;
+  const sortIconHtml = sortIconName
+    ? `
+      <span class="dh-sort-icon" aria-hidden="true">
+        <i data-lucide="${sortIconName}"></i>
+      </span>
+    `.trim()
+    : "";
 
   return `
     <span class="dh-grid-header">
-      <span class="dh-grid-header__icon" aria-hidden="true">
-        <i data-lucide="${escapeHtml(icon)}"></i>
+      <span class="dh-grid-header__main">
+        <span class="dh-grid-header__icon" aria-hidden="true">
+          <i data-lucide="${escapeHtml(icon)}"></i>
+        </span>
+        <span class="dh-grid-header__label">${escapeHtml(label)}</span>
       </span>
-      <span class="dh-grid-header__label">${escapeHtml(label)}</span>
-    </span>
-  `.trim();
-}
-
-function buildHeaderSortIconHtml(_column, dir) {
-  if (dir !== "asc" && dir !== "desc") {
-    return "";
-  }
-
-  const iconName = dir === "asc" ? "arrow-up" : "arrow-down";
-  return `
-    <span class="dh-sort-icon" aria-hidden="true">
-      <i data-lucide="${iconName}"></i>
+      ${sortIconHtml}
     </span>
   `.trim();
 }
@@ -1151,6 +1169,82 @@ function queueHeaderIconHydration() {
   headerIconsFrame = requestAnimationFrame(() => {
     hydrateTableIcons(frozenTable);
     hydrateTableIcons(mainTable);
+  });
+}
+
+function getColumnSortDirection(columnName) {
+  return state.sorters.find((sorter) => sorter.field === columnName)?.dir ?? null;
+}
+
+function handleSharedHeaderClick(event, column) {
+  if (!column?.getField) {
+    return;
+  }
+
+  if (event.target?.closest(".tabulator-col-resize-handle")) {
+    return;
+  }
+
+  const field = column.getField();
+  if (!field) {
+    return;
+  }
+
+  updateSharedSorters(field, event.shiftKey);
+}
+
+function updateSharedSorters(field, isAdditive) {
+  const currentDir = getColumnSortDirection(field);
+  const nextDir = currentDir === "desc" ? "asc" : currentDir === "asc" ? null : "desc";
+  const retainedSorters = isAdditive
+    ? state.sorters.filter((sorter) => sorter.field !== field)
+    : [];
+
+  state.sorters = nextDir
+    ? [...retainedSorters, { field, dir: nextDir }]
+    : retainedSorters;
+
+  refreshGrid();
+}
+
+function pruneSharedSorters() {
+  const visibleColumns = new Set(getCategoryColumns());
+  state.sorters = state.sorters.filter((sorter) => visibleColumns.has(sorter.field));
+}
+
+function compareRowsBySharedSorters(leftRow, rightRow) {
+  for (const sorter of state.sorters) {
+    const comparison = compareGridValues(leftRow[sorter.field], rightRow[sorter.field]);
+    if (comparison !== 0) {
+      return sorter.dir === "desc" ? comparison * -1 : comparison;
+    }
+  }
+
+  return leftRow.__rowIndex - rightRow.__rowIndex;
+}
+
+function getTableHolders() {
+  return {
+    frozenHolder: frozenTable?.element?.querySelector(".tabulator-tableholder") ?? null,
+    mainHolder: mainTable?.element?.querySelector(".tabulator-tableholder") ?? null,
+  };
+}
+
+function getSharedScrollTop() {
+  const { mainHolder, frozenHolder } = getTableHolders();
+  return mainHolder?.scrollTop ?? frozenHolder?.scrollTop ?? 0;
+}
+
+function queueScrollSync(scrollTop = 0) {
+  cancelAnimationFrame(scrollSyncFrame);
+  scrollSyncFrame = requestAnimationFrame(() => {
+    const { mainHolder, frozenHolder } = getTableHolders();
+    if (!mainHolder || !frozenHolder) {
+      return;
+    }
+
+    mainHolder.scrollTop = scrollTop;
+    frozenHolder.scrollTop = scrollTop;
   });
 }
 

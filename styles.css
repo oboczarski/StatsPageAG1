@@ -503,8 +503,15 @@ body::after {
 }
 
 .dh-frozen-hub .tabulator-tableholder {
-  overflow-y: hidden !important;
+  overflow-y: auto !important;
   overflow-x: hidden !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.dh-frozen-hub .tabulator-tableholder::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .grid-stage__overlay {
@@ -730,16 +737,29 @@ body::after {
 .dh-grid-header {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 8px;
   min-width: 0;
+  width: 100%;
   max-width: 100%;
 }
 
+.dh-grid-header__main,
 .dh-grid-header__icon,
 .dh-sort-icon {
   display: inline-flex;
   align-items: center;
+}
+
+.dh-grid-header__main {
+  min-width: 0;
+  flex: 1 1 auto;
+  justify-content: center;
+  gap: 6px;
+}
+
+.dh-grid-header__icon,
+.dh-sort-icon {
   justify-content: center;
   flex: 0 0 auto;
 }
@@ -1047,6 +1067,10 @@ body::after {
   }
 
   .dh-grid-header {
+    gap: 6px;
+  }
+
+  .dh-grid-header__main {
     gap: 5px;
   }
 
