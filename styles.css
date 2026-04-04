@@ -509,9 +509,33 @@ body::after {
 
 .data-grid {
   width: 100%;
-  /* height must be auto in autoHeight domLayout — the wrapper controls height */
   height: auto;
   background: transparent;
+}
+
+/* ── Two-pane table layout ─────────────────────────────────────────────── */
+
+.table-frame {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Frozen pane: sticks to the left edge of the scroll container */
+.table-pane--frozen {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  flex-shrink: 0;
+  overflow: hidden;
+  /* Opaque background so scrolling content is masked behind the pane */
+  background: rgba(8, 15, 27, 0.98);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.12), 2px 0 18px rgba(0, 0, 0, 0.44);
+}
+
+/* Scrollable pane: fills remaining width */
+.table-pane--scroll {
+  flex: 1;
+  min-width: 0;
 }
 
 .grid-stage__overlay {
@@ -943,6 +967,8 @@ body::after {
 }
 
 .stats-table {
+  /* Frozen pane: exactly fills its own column widths.
+     Scroll pane: stretches to fill remaining space or its natural width. */
   width: max(100%, var(--table-width, 0px));
   min-width: max(100%, var(--table-width, 0px));
   border-collapse: separate;
@@ -951,6 +977,12 @@ body::after {
   color: rgba(236, 242, 252, 0.94);
   background: transparent;
   font-size: 13px;
+}
+
+/* Frozen pane table: exact width, no stretching */
+.table-pane--frozen .stats-table {
+  width: var(--table-width);
+  min-width: var(--table-width);
 }
 
 .stats-table__header-cell,
@@ -963,13 +995,41 @@ body::after {
   vertical-align: middle;
 }
 
-.stats-table thead th {
+/* ── Group header row ──────────────────────────────────────────────────── */
+.stats-table__group-header-cell {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 12;
+  height: 26px;
+  padding: 0 6px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(175, 200, 235, 0.58);
+  background:
+    linear-gradient(180deg, rgba(10, 18, 30, 0.28), rgba(10, 18, 30, 0.18)),
+    rgba(8, 15, 27, 0.92);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Last group in row: no right border */
+.stats-table__group-header-cell:last-child {
+  border-right: 0;
+}
+
+/* ── Column header row ─────────────────────────────────────────────────── */
+.stats-table thead th.stats-table__header-cell {
+  position: sticky;
+  top: 26px; /* sits below the 26px group header row */
+  z-index: 11;
   background:
     linear-gradient(180deg, rgba(10, 18, 30, 0.24), rgba(10, 18, 30, 0.14)),
-    rgba(8, 15, 27, 0.86);
+    rgba(8, 15, 27, 0.90);
   border-bottom: 0;
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
   backdrop-filter: none;
@@ -985,53 +1045,9 @@ body::after {
   border-bottom: 0;
 }
 
-.stats-table tbody tr:hover > td:not(.stats-table__cell--sticky) {
-  background: transparent;
-}
-
-.stats-table__cell--sticky {
-  position: sticky;
-  left: var(--sticky-left);
-}
-
-.stats-table__body-cell.stats-table__cell--sticky {
-  background:
-    linear-gradient(180deg, rgba(10, 18, 30, 0.08), rgba(10, 18, 30, 0.03)),
-    rgba(8, 15, 27, 0.72);
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.1);
-}
-
-.stats-table__header-cell.stats-table__cell--sticky {
-  background:
-    linear-gradient(180deg, rgba(10, 18, 30, 0.24), rgba(10, 18, 30, 0.14)),
-    rgba(8, 15, 27, 0.86);
-  box-shadow:
-    inset -1px 0 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.stats-table__cell--sticky-0 {
-  z-index: 6;
-}
-
-.stats-table__cell--sticky-1 {
-  z-index: 5;
-}
-
-.stats-table__cell--sticky-2 {
-  z-index: 4;
-}
-
-.stats-table__header-cell.stats-table__cell--sticky-0 {
-  z-index: 17;
-}
-
-.stats-table__header-cell.stats-table__cell--sticky-1 {
-  z-index: 16;
-}
-
-.stats-table__header-cell.stats-table__cell--sticky-2 {
-  z-index: 15;
+/* Hover sync across both panes (JS class-driven; CSS :hover alone can't span tables) */
+.stats-table tbody tr.is-hovered td {
+  background: rgba(102, 215, 255, 0.045);
 }
 
 .stats-table__head-button {
@@ -1039,6 +1055,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 5px;
   width: 100%;
   min-height: 50px;
   padding: 0 18px 0 10px;
@@ -1060,9 +1077,22 @@ body::after {
   box-shadow: inset 0 0 0 1px rgba(128, 220, 255, 0.5);
 }
 
+/* Column header icon */
+.stats-table__head-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  opacity: 0.58;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
 .stats-table__head-label {
+  flex: 1;
   display: block;
-  width: 100%;
   padding: 0 2px;
   overflow: hidden;
   white-space: nowrap;
@@ -1258,13 +1288,27 @@ body::after {
     font-size: 11px;
   }
 
+  .stats-table__group-header-cell {
+    height: 22px;
+    font-size: 0.52rem;
+  }
+
+  .stats-table thead th.stats-table__header-cell {
+    top: 22px; /* mobile group row height */
+  }
+
   .stats-table__head-button {
     min-height: 40px;
-    padding: 0 16px 0 8px;
+    padding: 0 14px 0 8px;
+  }
+
+  .stats-table__head-icon {
+    width: 10px;
+    height: 10px;
   }
 
   .stats-table__sort-indicator {
-    right: 6px;
+    right: 4px;
     font-size: 9px;
   }
 
@@ -1274,38 +1318,6 @@ body::after {
   }
 
   .stats-table__fpts-chip {
-    min-height: 22px;
-    padding: 0 6px;
-  }
-
-  .ag-theme-balham {
-    --ag-font-size: 11px;
-    --ag-data-font-size: 11px;
-    --ag-header-height: 40px;
-    --ag-spacing: 5px;
-    --ag-border-radius: 14px;
-  }
-
-  .ag-theme-balham .ag-cell,
-  .ag-theme-balham .ag-header-cell {
-    font-size: 11px;
-  }
-
-  .ag-theme-balham .ag-cell {
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
-  .ag-theme-balham .ag-header-cell {
-    padding-left: 6px;
-    padding-right: 6px;
-  }
-
-  .ag-theme-balham .ag-header-cell-text {
-    width: calc(100% - 12px);
-  }
-
-  .ag-theme-balham .dh-fpts-chip {
     min-height: 22px;
     padding: 0 6px;
   }

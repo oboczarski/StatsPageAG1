@@ -11,6 +11,10 @@ const CATEGORY_LABELS = {
 };
 
 const COLUMN_SETS = {
+  // GENERAL (frozen): RK, PLAYER, POS
+  // INFO: TM, AGE
+  // FANTASY: FPTS, PPG, VALUE, ADP, POS·ADP
+  // OVERVIEW STATS: G, SNP%, YDS(t), YPG(t), OPP, IMP, IMP/OPP, CSTY%, CL
   overview: [
     "RK",
     "PLAYER",
@@ -32,6 +36,12 @@ const COLUMN_SETS = {
     "CSTY%",
     "CL",
   ],
+  // GENERAL (frozen): RK, PLAYER, POS
+  // INFO: TM, AGE, G
+  // FANTASY: FPTS, PPG, VALUE, ADP, POS·ADP
+  // PASSING: paYDS, paTD, CMP%, paATT, paRTG, EPA/DB, CPOE, CMP, YDS(t), paYPG, pa1D, IMP/G, pIMP, pIMP/A, TTT, PRS%, SAC, INT
+  // RUSHING: ruYDS, ruTD, CAR, YPC, FUM
+  // CEILING & CONSISTENCY: FPOE, CSTY%, CL
   passing: [
     "RK",
     "PLAYER",
@@ -54,23 +64,31 @@ const COLUMN_SETS = {
     "CMP",
     "YDS(t)",
     "paYPG",
-    "ruYDS",
-    "ruTD",
     "pa1D",
     "IMP/G",
     "pIMP",
     "pIMP/A",
-    "CAR",
-    "YPC",
     "TTT",
     "PRS%",
     "SAC",
     "INT",
+    "ruYDS",
+    "ruTD",
+    "CAR",
+    "YPC",
     "FUM",
     "FPOE",
     "CSTY%",
     "CL",
   ],
+  // GENERAL (frozen): RK, PLAYER, POS
+  // INFO: TM, AGE, G
+  // FANTASY: FPTS, PPG, VALUE, ADP, POS·ADP
+  // RUSHING EFFICIENCY: SNP%, YPC, ruYPG, IMP/G
+  // RUSHING PRODUCTION: CAR, ruYDS, ruTD, ru1D, YDS(t), FUM
+  // RECEIVING: REC, recYDS, recTD, rec1D, YAC, TGT
+  // ADVANCED RUSHING: ELU, MTF/A, YCO/A, MTF, YCO, RYOE, EXPLSV%
+  // CEILING & CONSISTENCY: FPOE, CSTY%, CL
   rushing: [
     "RK",
     "PLAYER",
@@ -84,32 +102,38 @@ const COLUMN_SETS = {
     "ADP",
     "POS·ADP",
     "SNP%",
+    "YPC",
+    "ruYPG",
+    "IMP/G",
     "CAR",
     "ruYDS",
-    "YPC",
     "ruTD",
+    "ru1D",
+    "YDS(t)",
+    "FUM",
     "REC",
     "recYDS",
+    "recTD",
+    "rec1D",
+    "YAC",
     "TGT",
-    "YDS(t)",
-    "ruYPG",
     "ELU",
     "MTF/A",
     "YCO/A",
     "MTF",
     "YCO",
-    "EXPLSV%",
-    "ru1D",
     "RYOE",
-    "recTD",
-    "rec1D",
-    "YAC",
-    "IMP/G",
-    "FUM",
+    "EXPLSV%",
     "FPOE",
     "CSTY%",
     "CL",
   ],
+  // GENERAL (frozen): RK, PLAYER, POS
+  // INFO: TM, AGE, G
+  // FANTASY: FPTS, PPG, VALUE, ADP, POS·ADP
+  // RECEIVING: SNP%, TGT, REC, TS%, recYDS, recTD, YPRR, rec1D, 1DRR, recYPG, AY%, YAC, YPR, IMP/G, RR, YDS(t), RZ Tgt
+  // RUSHING: CAR, ruYDS, ruTD, YPC, FUM
+  // CEILING & CONSISTENCY: FPOE, CSTY%, CL
   receiving: [
     "RK",
     "PLAYER",
@@ -137,7 +161,6 @@ const COLUMN_SETS = {
     "YPR",
     "IMP/G",
     "RR",
-    "FPOE",
     "YDS(t)",
     "RZ Tgt",
     "CAR",
@@ -145,6 +168,7 @@ const COLUMN_SETS = {
     "ruTD",
     "YPC",
     "FUM",
+    "FPOE",
     "CSTY%",
     "CL",
   ],
@@ -159,6 +183,116 @@ const SOURCE_ALIASES = {
   ADP: null,
   "POS·ADP": null,
   PPG: null,
+};
+
+// ---------------------------------------------------------------------------
+// Lucide icon paths (24×24 viewBox, stroke-based). Only columns used in this
+// app are listed here — no full icon library is loaded or bundled.
+// ---------------------------------------------------------------------------
+const COLUMN_ICONS = {
+  RK:        "M4 6h16M4 12h8M4 18h4", // Hash-like lines
+  PLAYER:    "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", // User
+  POS:       "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01", // Tag
+  TM:        "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10", // Home/Building
+  AGE:       "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z", // Calendar
+  G:         "M22 12h-4l-3 9L9 3l-3 9H2", // Activity/Games played
+  FPTS:      "M13 2L3 14h9l-1 8 10-12h-9l1-8z", // Zap
+  PPG:       "M22 7 12 17 7 12 2 17", // TrendingUp
+  VALUE:     "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6", // DollarSign
+  ADP:       "M18 20V10M12 20V4M6 20v-6", // BarChart2
+  "POS·ADP": "M3 6h18M7 12h10M11 18h2", // ListFilter (3 lines decreasing)
+  SNP:       "M22 12h-4l-3 9L9 3l-3 9H2", // Activity
+  "SNP%":    "M22 12h-4l-3 9L9 3l-3 9H2", // Activity
+  "YDS(t)":  "M22 3H2l8 9.46V19l4 2v-8.54L22 3z", // Filter/Ruler-like
+  "YPG(t)":  "M18 20V10M12 20V4M6 20v-6", // BarChart
+  OPP:       "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", // Shield/Opposition
+  IMP:       "M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83", // Sun/Impact
+  "IMP/OPP": "M12 2v20M2 12h20", // Percent-like cross
+  "CSTY%":   "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4", // ShieldCheck
+  CL:        "M8.21 13.89L7 23l5-3 5 3-1.21-9.12M12 2a5 5 0 0 1 5 5v1H7V7a5 5 0 0 1 5-5z", // Award-like
+  paYDS:     "M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z", // Send
+  paTD:      "M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3", // CheckCircle
+  "CMP%":    "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM12 8v4M12 16h.01", // Target-like
+  paATT:     "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", // MessageSquare (attempts)
+  paRTG:     "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", // Star
+  "EPA/DB":  "M13 2L3 14h9l-1 8 10-12h-9l1-8z", // Zap
+  CPOE:      "M22 7 12 17 7 12 2 17", // TrendingUp
+  CMP:       "M20 6 9 17l-5-5", // Check
+  paYPG:     "M22 7 12 17 7 12 2 17", // TrendingUp
+  ruYDS:     "M5 12h14M12 5l7 7-7 7", // ArrowRight
+  ruTD:      "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z", // Flag
+  pa1D:      "M9 18l6-6-6-6", // ChevronRight
+  "IMP/G":   "M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83", // Gauge/Sun
+  pIMP:      "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM8 12l3 3 5-5", // Target+check
+  "pIMP/A":  "M19 5H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zM12 10v4M12 14h.01", // Percent frame
+  CAR:       "M5 12h14M12 5l7 7-7 7", // ArrowRight (carries)
+  YPC:       "M6 3l6 18M18 3l-6 18M3 12h18", // Divide
+  TTT:       "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2", // Clock
+  "PRS%":    "M19 11H5m14 0a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2m14 0V9a2 2 0 0 1-2-2M5 11V9a2 2 0 0 1 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10", // Lock
+  SAC:       "M5 12h14", // Minus
+  INT:       "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01", // AlertTriangle
+  FUM:       "M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z", // AlertCircle
+  FPOE:      "M22 7 12 17 7 12 2 17", // TrendingUp
+  REC:       "M22 12h-6l-2 3h-4l-2-3H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z", // Inbox
+  TGT:       "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM12 18c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z", // Target circles
+  ELU:       "M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2 2 0 1 1 19 12H2", // Wind
+  "MTF/A":   "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75", // Users
+  "YCO/A":   "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0zM12 7v6M12 13h.01", // MapPin
+  MTF:       "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75", // Users
+  YCO:       "M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3zM13 13l6 6", // Map/Compass
+  "EXPLSV%": "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z", // Flame
+  ru1D:      "M9 18l6-6-6-6", // ChevronRight
+  RYOE:      "M22 7 12 17 7 12 2 17", // TrendingUp
+  recTD:     "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z", // Flag
+  rec1D:     "M9 18l6-6-6-6", // ChevronRight
+  YAC:       "M5 12h14M12 19l7-7-7-7", // ArrowRight (after catch)
+  "TS%":     "M19 5H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zM16 10h-6M12 8v4", // Target share
+  YPRR:      "M22 7 12 17 7 12 2 17", // TrendingUp
+  "1DRR":    "M18 20V10M12 20V4M6 20v-6", // BarChart
+  recYPG:    "M22 7 12 17 7 12 2 17", // TrendingUp
+  "AY%":     "M12 2v20M2 12h20", // Percent cross
+  YPR:       "M6 3l6 18M18 3l-6 18M3 12h18", // Divide
+  RR:        "M17 2l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3", // Repeat
+  "RZ Tgt":  "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM12 18c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z", // Target
+  ruYPG:     "M22 7 12 17 7 12 2 17", // TrendingUp
+};
+
+// ---------------------------------------------------------------------------
+// Column group definitions per view. Each group has a label and lists the
+// exact columns it spans (in-order, matching COLUMN_SETS). The frozen pane
+// always uses FROZEN_GROUP. The scrollable pane uses per-category groups.
+// ---------------------------------------------------------------------------
+const FROZEN_GROUP = [{ label: "GENERAL", columns: ["RK", "PLAYER", "POS"] }];
+
+const COLUMN_GROUPS = {
+  overview: [
+    { label: "INFO",           columns: ["TM", "AGE"] },
+    { label: "FANTASY",        columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    { label: "OVERVIEW STATS", columns: ["G", "SNP%", "YDS(t)", "YPG(t)", "OPP", "IMP", "IMP/OPP", "CSTY%", "CL"] },
+  ],
+  passing: [
+    { label: "INFO",    columns: ["TM", "AGE", "G"] },
+    { label: "FANTASY", columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    { label: "PASSING", columns: ["paYDS", "paTD", "CMP%", "paATT", "paRTG", "EPA/DB", "CPOE", "CMP", "YDS(t)", "paYPG", "pa1D", "IMP/G", "pIMP", "pIMP/A", "TTT", "PRS%", "SAC", "INT"] },
+    { label: "RUSHING", columns: ["ruYDS", "ruTD", "CAR", "YPC", "FUM"] },
+    { label: "CEILING & CONSISTENCY", columns: ["FPOE", "CSTY%", "CL"] },
+  ],
+  rushing: [
+    { label: "INFO",                  columns: ["TM", "AGE", "G"] },
+    { label: "FANTASY",               columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    { label: "RUSHING EFFICIENCY",    columns: ["SNP%", "YPC", "ruYPG", "IMP/G"] },
+    { label: "RUSHING PRODUCTION",    columns: ["CAR", "ruYDS", "ruTD", "ru1D", "YDS(t)", "FUM"] },
+    { label: "RECEIVING",             columns: ["REC", "recYDS", "recTD", "rec1D", "YAC", "TGT"] },
+    { label: "ADVANCED RUSHING",      columns: ["ELU", "MTF/A", "YCO/A", "MTF", "YCO", "RYOE", "EXPLSV%"] },
+    { label: "CEILING & CONSISTENCY", columns: ["FPOE", "CSTY%", "CL"] },
+  ],
+  receiving: [
+    { label: "INFO",                  columns: ["TM", "AGE", "G"] },
+    { label: "FANTASY",               columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    { label: "RECEIVING",             columns: ["SNP%", "TGT", "REC", "TS%", "recYDS", "recTD", "YPRR", "rec1D", "1DRR", "recYPG", "AY%", "YAC", "YPR", "IMP/G", "RR", "YDS(t)", "RZ Tgt"] },
+    { label: "RUSHING",               columns: ["CAR", "ruYDS", "ruTD", "YPC", "FUM"] },
+    { label: "CEILING & CONSISTENCY", columns: ["FPOE", "CSTY%", "CL"] },
+  ],
 };
 
 const LABEL_COLUMNS = new Set(["PLAYER", "POS", "TM"]);
@@ -512,14 +646,48 @@ function updateRowCount() {
 }
 
 function renderTable() {
-  const { columns, totalWidth } = buildColumnLayout(
-    COLUMN_SETS[state.activeCategory],
-  );
+  const allColumns = COLUMN_SETS[state.activeCategory];
+  const frozenNames = allColumns.slice(0, STICKY_COLUMN_COUNT);
+  const scrollNames = allColumns.slice(STICKY_COLUMN_COUNT);
+
+  const { columns: frozenCols, totalWidth: frozenWidth } = buildColumnLayout(frozenNames);
+  const { columns: scrollCols, totalWidth: scrollWidth } = buildColumnLayout(scrollNames);
+
+  // ── Frozen pane ──────────────────────────────────────────────────────────
+  const frozenTable = buildTable(frozenCols, frozenWidth, FROZEN_GROUP, "frozen");
+  const frozenPane = document.createElement("div");
+  frozenPane.className = "table-pane table-pane--frozen";
+  frozenPane.append(frozenTable);
+
+  // ── Scroll pane ──────────────────────────────────────────────────────────
+  const scrollTable = buildTable(scrollCols, scrollWidth, COLUMN_GROUPS[state.activeCategory], "scroll");
+  const scrollPane = document.createElement("div");
+  scrollPane.className = "table-pane table-pane--scroll";
+  scrollPane.append(scrollTable);
+
+  // ── Assemble frame ────────────────────────────────────────────────────────
+  const frame = document.createElement("div");
+  frame.className = "table-frame";
+  frame.append(frozenPane, scrollPane);
+
+  gridContainer.replaceChildren(frame);
+
+  // Sync row heights after paint (both panes are now in the DOM)
+  requestAnimationFrame(() => {
+    syncRowHeights(frozenTable, scrollTable);
+    observeRowResize(frozenTable, scrollTable);
+  });
+}
+
+// Build one complete <table> (colgroup + thead with group row + column row + tbody)
+function buildTable(columns, totalWidth, groups, paneType) {
   const table = document.createElement("table");
   table.className = "stats-table";
-  table.setAttribute("aria-label", "Player stats table");
+  table.dataset.pane = paneType;
+  table.setAttribute("aria-label", paneType === "frozen" ? "Player identity columns" : "Player stats columns");
   table.style.setProperty("--table-width", `${totalWidth}px`);
 
+  // colgroup
   const colgroup = document.createElement("colgroup");
   columns.forEach((column) => {
     const col = document.createElement("col");
@@ -530,53 +698,41 @@ function renderTable() {
   });
   table.append(colgroup);
 
+  // thead: group row + column row
   const thead = document.createElement("thead");
-  const headerRow = document.createElement("tr");
-  columns.forEach((column) => {
-    headerRow.append(createHeaderCell(column));
-  });
-  thead.append(headerRow);
+  thead.append(buildGroupHeaderRow(columns, groups));
+  const columnRow = document.createElement("tr");
+  columns.forEach((column) => columnRow.append(createHeaderCell(column)));
+  thead.append(columnRow);
   table.append(thead);
 
+  // tbody
   const tbody = document.createElement("tbody");
-  if (!state.displayedRows.length) {
+  if (paneType === "scroll" && !state.displayedRows.length) {
     tbody.append(createEmptyStateRow(columns.length));
   } else {
-    state.displayedRows.forEach((row) => {
-      tbody.append(createBodyRow(row, columns));
+    state.displayedRows.forEach((row, rowIndex) => {
+      const tr = document.createElement("tr");
+      tr.dataset.rowIndex = rowIndex;
+      columns.forEach((column) => tr.append(createBodyCell(row, column)));
+      tbody.append(tr);
     });
   }
   table.append(tbody);
 
-  gridContainer.replaceChildren(table);
+  return table;
 }
 
 function buildColumnLayout(columnNames) {
   let totalWidth = 0;
-  let stickyLeft = 0;
 
   const columns = columnNames.map((name, index) => {
     const width = getColumnWidth(name);
-    const column = {
-      name,
-      index,
-      width,
-      isSticky: index < STICKY_COLUMN_COUNT,
-      stickyLeft,
-    };
-
     totalWidth += width;
-    if (column.isSticky) {
-      stickyLeft += width;
-    }
-
-    return column;
+    return { name, index, width };
   });
 
-  return {
-    columns,
-    totalWidth,
-  };
+  return { columns, totalWidth };
 }
 
 function createHeaderCell(column) {
@@ -584,7 +740,6 @@ function createHeaderCell(column) {
   th.className = "stats-table__header-cell";
   th.scope = "col";
   applyColumnStyle(th, column);
-  applyStickyCellState(th, column);
   th.setAttribute("aria-sort", getAriaSort(column.name));
 
   const button = document.createElement("button");
@@ -592,6 +747,20 @@ function createHeaderCell(column) {
   button.className = "stats-table__head-button";
   button.setAttribute("aria-label", `Sort by ${column.name}`);
   button.addEventListener("click", () => handleHeaderSort(column.name));
+
+  // Icon (Lucide inline SVG — only rendered when a path is defined)
+  const iconPath = COLUMN_ICONS[column.name];
+  if (iconPath) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+    svg.classList.add("stats-table__head-icon");
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", iconPath);
+    svg.append(path);
+    button.append(svg);
+  }
 
   const label = document.createElement("span");
   label.className = "stats-table__head-label";
@@ -611,20 +780,11 @@ function createHeaderCell(column) {
   return th;
 }
 
-function createBodyRow(row, columns) {
-  const tr = document.createElement("tr");
-  columns.forEach((column) => {
-    tr.append(createBodyCell(row, column));
-  });
-  return tr;
-}
-
 function createBodyCell(row, column) {
   const value = row[column.name];
   const td = document.createElement("td");
   td.classList.add("stats-table__body-cell");
   applyColumnStyle(td, column);
-  applyStickyCellState(td, column);
 
   const cellClasses = getCellClass({
     colDef: { field: column.name },
@@ -674,16 +834,92 @@ function applyColumnStyle(cell, column) {
   cell.style.setProperty("--column-width", `${column.width}px`);
 }
 
-function applyStickyCellState(cell, column) {
-  if (!column.isSticky) {
-    return;
+// ---------------------------------------------------------------------------
+// Group header row builder
+// ---------------------------------------------------------------------------
+function buildGroupHeaderRow(columns, groups) {
+  const tr = document.createElement("tr");
+
+  // Build a quick lookup: columnName → groupLabel so we can verify alignment
+  // Then render one <th colspan=N> per group, in order
+  groups.forEach((group) => {
+    const th = document.createElement("th");
+    th.className = "stats-table__group-header-cell";
+    th.colSpan = group.columns.length;
+    th.textContent = group.label;
+    tr.append(th);
+  });
+
+  return tr;
+}
+
+// ---------------------------------------------------------------------------
+// Row height synchronization — keeps frozen + scroll pane rows identical
+// ---------------------------------------------------------------------------
+let _rowResizeObserver = null;
+
+function syncRowHeights(frozenTable, scrollTable) {
+  // Sync thead rows (group row + column row)
+  const frozenHeadRows = frozenTable.tHead ? Array.from(frozenTable.tHead.rows) : [];
+  const scrollHeadRows = scrollTable.tHead ? Array.from(scrollTable.tHead.rows) : [];
+  const headLen = Math.min(frozenHeadRows.length, scrollHeadRows.length);
+  for (let i = 0; i < headLen; i++) {
+    const h = Math.max(frozenHeadRows[i].offsetHeight, scrollHeadRows[i].offsetHeight);
+    frozenHeadRows[i].style.height = `${h}px`;
+    scrollHeadRows[i].style.height = `${h}px`;
   }
 
-  cell.classList.add(
-    "stats-table__cell--sticky",
-    `stats-table__cell--sticky-${column.index}`,
-  );
-  cell.style.setProperty("--sticky-left", `${column.stickyLeft}px`);
+  // Sync tbody rows
+  const frozenRows = frozenTable.tBodies[0] ? Array.from(frozenTable.tBodies[0].rows) : [];
+  const scrollRows = scrollTable.tBodies[0] ? Array.from(scrollTable.tBodies[0].rows) : [];
+  const len = Math.max(frozenRows.length, scrollRows.length);
+  for (let i = 0; i < len; i++) {
+    const fr = frozenRows[i];
+    const sr = scrollRows[i];
+    if (!fr || !sr) { continue; }
+    // Reset to natural height first so we don't lock in a stale value
+    fr.style.height = "";
+    sr.style.height = "";
+    const h = Math.max(fr.offsetHeight, sr.offsetHeight);
+    fr.style.height = `${h}px`;
+    sr.style.height = `${h}px`;
+  }
+
+  // Wire hover sync once per pair of rows
+  attachHoverSync(frozenRows, scrollRows);
+}
+
+function attachHoverSync(frozenRows, scrollRows) {
+  const len = Math.min(frozenRows.length, scrollRows.length);
+  for (let i = 0; i < len; i++) {
+    const fr = frozenRows[i];
+    const sr = scrollRows[i];
+    [fr, sr].forEach((el) => {
+      el.addEventListener("mouseenter", () => {
+        fr.classList.add("is-hovered");
+        sr.classList.add("is-hovered");
+      });
+      el.addEventListener("mouseleave", () => {
+        fr.classList.remove("is-hovered");
+        sr.classList.remove("is-hovered");
+      });
+    });
+  }
+}
+
+function observeRowResize(frozenTable, scrollTable) {
+  if (typeof ResizeObserver === "undefined") { return; }
+  if (_rowResizeObserver) {
+    _rowResizeObserver.disconnect();
+  }
+  let frame = 0;
+  _rowResizeObserver = new ResizeObserver(() => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => syncRowHeights(frozenTable, scrollTable));
+  });
+  if (scrollTable.tBodies[0]) {
+    _rowResizeObserver.observe(scrollTable.tBodies[0]);
+  }
 }
 
 function getAriaSort(columnName) {
