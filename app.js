@@ -439,8 +439,10 @@ const state = {
 const gridRuntime = {
   shell: null,
   bodyViewport: null,
-  bodyScroller: null,
-  headerTrack: null,
+  scrollPane: null,
+  horizontalController: null,
+  frozenTable: null,
+  scrollTable: null,
   resizeObserver: null,
   rowPairs: new Map(),
   measurementFrame: 0,
@@ -682,81 +684,81 @@ function renderGridShell(layout) {
   shell.className = "split-grid";
   shell.style.setProperty("--frozen-width", `${layout.frozenWidth}px`);
   shell.style.setProperty("--scrollable-width", `${layout.scrollableWidth}px`);
+  shell.style.setProperty("--scroll-offset", `${state.scroll.left}px`);
 
-  shell.append(renderHeader(layout));
-  shell.append(renderBody(layout));
+  shell.append(renderViewport(layout));
+  shell.append(renderHorizontalController());
 
   return shell;
 }
 
-function renderHeader(layout) {
-  const header = document.createElement("div");
-  header.className = "split-grid__header";
-
-  const frozenPane = document.createElement("div");
-  frozenPane.className = "split-grid__pane split-grid__pane--frozen split-grid__pane--header";
-  frozenPane.append(
-    createHeaderTable(layout.frozenColumns, layout.frozenGroups, "frozen"),
-  );
-
-  const scrollPane = document.createElement("div");
-  scrollPane.className = "split-grid__pane split-grid__pane--scroll split-grid__pane--header";
-
-  const headerTrack = document.createElement("div");
-  headerTrack.className = "split-grid__header-track";
-  headerTrack.dataset.headerTrack = "true";
-  headerTrack.append(
-    createHeaderTable(layout.scrollableColumns, layout.scrollableGroups, "scroll"),
-  );
-
-  scrollPane.append(headerTrack);
-  header.append(frozenPane, scrollPane);
-  return header;
-}
-
-function renderBody(layout) {
+function renderViewport(layout) {
   const bodyViewport = document.createElement("div");
   bodyViewport.className = "split-grid__body-viewport";
   bodyViewport.dataset.bodyViewport = "true";
 
-  if (!state.displayedRows.length) {
-    bodyViewport.append(createEmptyStatePanel());
-    return bodyViewport;
-  }
-
-  const bodyLayout = document.createElement("div");
-  bodyLayout.className = "split-grid__body-layout";
-
   const frozenPane = document.createElement("div");
-  frozenPane.className = "split-grid__pane split-grid__pane--frozen split-grid__pane--body";
-  frozenPane.append(
-    createBodyTable(layout.frozenColumns, layout.frozenWidth, "frozen"),
-  );
+  frozenPane.className = "split-grid__pane split-grid__pane--frozen";
+  frozenPane.append(createTable(layout.frozenColumns, layout.frozenGroups, "frozen"));
 
   const scrollPane = document.createElement("div");
-  scrollPane.className = "split-grid__pane split-grid__pane--scroll split-grid__pane--body";
-
-  const bodyScroller = document.createElement("div");
-  bodyScroller.className = "split-grid__body-scroller";
-  bodyScroller.dataset.bodyScroller = "true";
-  bodyScroller.append(
-    createBodyTable(layout.scrollableColumns, layout.scrollableWidth, "scroll"),
+  scrollPane.className = "split-grid__pane split-grid__pane--scroll";
+  scrollPane.dataset.scrollPane = "true";
+  scrollPane.append(
+    createTable(layout.scrollableColumns, layout.scrollableGroups, "scroll"),
   );
 
-  scrollPane.append(bodyScroller);
-  bodyLayout.append(frozenPane, scrollPane);
-  bodyViewport.append(bodyLayout);
+  const tables = document.createElement("div");
+  tables.className = "split-grid__tables";
+  tables.append(frozenPane, scrollPane);
+
+  bodyViewport.append(tables);
+
+  if (!state.displayedRows.length) {
+    bodyViewport.append(createEmptyStatePanel());
+  }
 
   return bodyViewport;
 }
 
-function createHeaderTable(columns, groups, pane) {
-  const table = document.createElement("table");
-  table.className = "stats-table stats-table--header";
-  table.dataset.headerTable = pane;
-  table.style.setProperty("--table-width", `${getColumnsWidth(columns)}px`);
-  appendColGroup(table, columns);
+function renderHorizontalController() {
+  const horizontalRow = document.createElement("div");
+  horizontalRow.className = "split-grid__horizontal-row";
 
+  const spacer = document.createElement("div");
+  spacer.className = "split-grid__horizontal-spacer";
+  spacer.setAttribute("aria-hidden", "true");
+
+  const controller = document.createElement("div");
+  controller.className = "split-grid__horizontal-controller";
+  controller.dataset.horizontalController = "true";
+  controller.setAttribute("aria-hidden", "true");
+
+  const size = document.createElement("div");
+  size.className = "split-grid__horizontal-size";
+  controller.append(size);
+
+  horizontalRow.append(spacer, controller);
+  return horizontalRow;
+}
+
+function createTable(columns, groups, pane) {
+  const table = document.createElement("table");
+  table.className = "stats-table";
+  table.dataset.table = pane;
+  table.style.setProperty("--table-width", `${getColumnsWidth(columns)}px`);
+
+  if (pane === "scroll") {
+    table.classList.add("stats-table--scroll");
+  }
+
+  appendColGroup(table, columns);
+  table.append(createTableHead(groups, columns));
+  table.append(createTableBody(columns));
+  return table;
+}
+
+function createTableHead(groups, columns) {
   const headerRows = buildHeaderRows(groups, columns);
   const thead = document.createElement("thead");
 
@@ -776,8 +778,7 @@ function createHeaderTable(columns, groups, pane) {
     thead.append(tr);
   });
 
-  table.append(thead);
-  return table;
+  return thead;
 }
 
 function createGroupHeaderCell(cell, cellIndex, rowCellCount) {
@@ -845,21 +846,14 @@ function createLeafHeaderCell(column, cellIndex, rowCellCount) {
   return th;
 }
 
-function createBodyTable(columns, width, pane) {
-  const table = document.createElement("table");
-  table.className = "stats-table stats-table--body";
-  table.dataset.bodyTable = pane;
-  table.style.setProperty("--table-width", `${width}px`);
-  appendColGroup(table, columns);
-
+function createTableBody(columns) {
   const tbody = document.createElement("tbody");
 
   state.displayedRows.forEach((row) => {
     tbody.append(createBodyRow(row, columns));
   });
 
-  table.append(tbody);
-  return table;
+  return tbody;
 }
 
 function createBodyRow(row, columns) {
@@ -952,8 +946,12 @@ function appendColGroup(table, columns) {
 function initializeGridRuntime(shell) {
   gridRuntime.shell = shell;
   gridRuntime.bodyViewport = shell.querySelector("[data-body-viewport]");
-  gridRuntime.bodyScroller = shell.querySelector("[data-body-scroller]");
-  gridRuntime.headerTrack = shell.querySelector("[data-header-track]");
+  gridRuntime.scrollPane = shell.querySelector("[data-scroll-pane]");
+  gridRuntime.horizontalController = shell.querySelector(
+    "[data-horizontal-controller]",
+  );
+  gridRuntime.frozenTable = shell.querySelector('[data-table="frozen"]');
+  gridRuntime.scrollTable = shell.querySelector('[data-table="scroll"]');
   gridRuntime.rowPairs = buildRowPairRegistry(shell);
 
   if (gridRuntime.bodyViewport) {
@@ -967,15 +965,25 @@ function initializeGridRuntime(shell) {
     state.scroll.top = gridRuntime.bodyViewport.scrollTop;
   }
 
-  if (gridRuntime.bodyScroller) {
-    gridRuntime.bodyScroller.addEventListener("scroll", handleHorizontalScroll, {
-      passive: true,
-    });
-    gridRuntime.bodyScroller.scrollLeft = state.scroll.left;
-    state.scroll.left = gridRuntime.bodyScroller.scrollLeft;
+  if (gridRuntime.horizontalController) {
+    gridRuntime.horizontalController.addEventListener(
+      "scroll",
+      handleHorizontalScroll,
+      {
+        passive: true,
+      },
+    );
+    gridRuntime.horizontalController.scrollLeft = state.scroll.left;
+    state.scroll.left = gridRuntime.horizontalController.scrollLeft;
   }
 
-  syncHeaderScroll();
+  if (gridRuntime.scrollPane) {
+    gridRuntime.scrollPane.addEventListener("wheel", handleHorizontalWheel, {
+      passive: false,
+    });
+  }
+
+  syncHorizontalOffset();
   restoreHoveredRowState();
   observeGridMeasurements(shell);
 }
@@ -991,8 +999,10 @@ function cleanupGridRuntime() {
 
   gridRuntime.shell = null;
   gridRuntime.bodyViewport = null;
-  gridRuntime.bodyScroller = null;
-  gridRuntime.headerTrack = null;
+  gridRuntime.scrollPane = null;
+  gridRuntime.horizontalController = null;
+  gridRuntime.frozenTable = null;
+  gridRuntime.scrollTable = null;
   gridRuntime.rowPairs = new Map();
 }
 
@@ -1008,7 +1018,9 @@ function observeGridMeasurements(shell) {
   observer.observe(shell);
 
   shell
-    .querySelectorAll("[data-header-table], [data-body-table], [data-body-viewport]")
+    .querySelectorAll(
+      "[data-table], [data-body-viewport], [data-scroll-pane], [data-horizontal-controller]",
+    )
     .forEach((element) => {
       observer.observe(element);
     });
@@ -1032,49 +1044,59 @@ function syncGridMeasurements() {
     return;
   }
 
-  syncScrollbarOffset();
   syncHeaderRowHeights();
   syncBodyRowHeights();
-  syncHeaderScroll();
-}
-
-function syncScrollbarOffset() {
-  if (!gridRuntime.shell || !gridRuntime.bodyViewport) {
-    return;
-  }
-
-  const scrollbarWidth =
-    gridRuntime.bodyViewport.offsetWidth - gridRuntime.bodyViewport.clientWidth;
-  gridRuntime.shell.style.setProperty(
-    "--body-scrollbar-width",
-    `${Math.max(scrollbarWidth, 0)}px`,
-  );
+  syncStickyHeaderOffsets();
+  syncHorizontalOffset();
 }
 
 function syncHeaderRowHeights() {
-  const frozenRows = getElementArray(
-    gridRuntime.shell,
-    '[data-header-table="frozen"] thead tr',
-  );
-  const scrollRows = getElementArray(
-    gridRuntime.shell,
-    '[data-header-table="scroll"] thead tr',
-  );
+  const frozenRows = getElementArray(gridRuntime.frozenTable, "thead tr");
+  const scrollRows = getElementArray(gridRuntime.scrollTable, "thead tr");
 
   syncElementHeights(frozenRows, scrollRows);
 }
 
 function syncBodyRowHeights() {
-  const frozenRows = getElementArray(
-    gridRuntime.shell,
-    '[data-body-table="frozen"] tbody tr',
-  );
-  const scrollRows = getElementArray(
-    gridRuntime.shell,
-    '[data-body-table="scroll"] tbody tr',
-  );
+  const frozenRows = getElementArray(gridRuntime.frozenTable, "tbody tr");
+  const scrollRows = getElementArray(gridRuntime.scrollTable, "tbody tr");
 
   syncElementHeights(frozenRows, scrollRows);
+}
+
+function syncStickyHeaderOffsets() {
+  if (!gridRuntime.shell) {
+    return;
+  }
+
+  const frozenRows = getElementArray(gridRuntime.frozenTable, "thead tr");
+  const scrollRows = getElementArray(gridRuntime.scrollTable, "thead tr");
+  const maxLength = Math.max(frozenRows.length, scrollRows.length);
+  let offset = 0;
+
+  for (let index = 0; index < maxLength; index += 1) {
+    const leftRow = frozenRows[index] ?? null;
+    const rightRow = scrollRows[index] ?? null;
+    const referenceRow = leftRow ?? rightRow;
+    const height = referenceRow
+      ? Math.ceil(referenceRow.getBoundingClientRect().height)
+      : 0;
+
+    [leftRow, rightRow].forEach((row) => {
+      if (!row) {
+        return;
+      }
+
+      row.querySelectorAll("th").forEach((cell) => {
+        cell.style.top = `${offset}px`;
+        cell.style.zIndex = String(30 - index);
+      });
+    });
+
+    offset += height;
+  }
+
+  gridRuntime.shell.style.setProperty("--header-stack-height", `${offset}px`);
 }
 
 function syncElementHeights(leftElements, rightElements) {
@@ -1111,23 +1133,57 @@ function handleVerticalScroll(event) {
 
 function handleHorizontalScroll(event) {
   state.scroll.left = event.currentTarget.scrollLeft;
-  scheduleHeaderScroll();
+  scheduleHorizontalOffset();
 }
 
-function scheduleHeaderScroll() {
-  cancelAnimationFrame(gridRuntime.scrollFrame);
-  gridRuntime.scrollFrame = requestAnimationFrame(() => {
-    syncHeaderScroll();
-  });
-}
-
-function syncHeaderScroll() {
-  if (!gridRuntime.headerTrack) {
+function handleHorizontalWheel(event) {
+  if (!gridRuntime.horizontalController) {
     return;
   }
 
-  const offset = gridRuntime.bodyScroller ? gridRuntime.bodyScroller.scrollLeft : 0;
-  gridRuntime.headerTrack.style.transform = `translate3d(${-offset}px, 0, 0)`;
+  const horizontalDelta =
+    Math.abs(event.deltaX) > 0 ? event.deltaX : event.shiftKey ? event.deltaY : 0;
+
+  if (!horizontalDelta) {
+    return;
+  }
+
+  event.preventDefault();
+  gridRuntime.horizontalController.scrollLeft += horizontalDelta;
+}
+
+function scheduleHorizontalOffset() {
+  cancelAnimationFrame(gridRuntime.scrollFrame);
+  gridRuntime.scrollFrame = requestAnimationFrame(() => {
+    syncHorizontalOffset();
+  });
+}
+
+function syncHorizontalOffset() {
+  if (!gridRuntime.shell) {
+    return;
+  }
+
+  if (gridRuntime.horizontalController) {
+    const maxOffset = Math.max(
+      gridRuntime.horizontalController.scrollWidth -
+        gridRuntime.horizontalController.clientWidth,
+      0,
+    );
+    const clampedOffset = Math.min(state.scroll.left, maxOffset);
+
+    if (clampedOffset !== state.scroll.left) {
+      state.scroll.left = clampedOffset;
+    }
+
+    if (gridRuntime.horizontalController.scrollLeft !== clampedOffset) {
+      gridRuntime.horizontalController.scrollLeft = clampedOffset;
+    }
+  } else {
+    state.scroll.left = 0;
+  }
+
+  gridRuntime.shell.style.setProperty("--scroll-offset", `${state.scroll.left}px`);
 }
 
 function handlePointerOver(event) {
@@ -1303,12 +1359,15 @@ function createColumnDef(columnId) {
 
 function createColumnLayoutEntry(columnId, index) {
   const definition = COLUMN_DEFS[columnId];
+  const baseWidth = state.isCompactViewport
+    ? definition.widthMobile
+    : definition.widthDesktop;
+  const widthBoost = definition.frozen ? 0 : state.isCompactViewport ? 10 : 16;
+
   return {
     ...definition,
     index,
-    width: state.isCompactViewport
-      ? definition.widthMobile
-      : definition.widthDesktop,
+    width: baseWidth + widthBoost,
   };
 }
 
