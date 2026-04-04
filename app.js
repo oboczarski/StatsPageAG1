@@ -393,6 +393,35 @@ const HEADER_META = /** @type {Record<string, HeaderMeta>} */ (
   })
 );
 
+const GROUP_HEADER_META = Object.freeze({
+  GENERAL: { longLabel: "General Player Info", headerIcon: "player" },
+  INFO: { longLabel: "Team, Age, and Games Played", headerIcon: "team" },
+  FANTASY: {
+    longLabel: "Fantasy Production and Market Value",
+    headerIcon: "fantasy",
+  },
+  "OVERVIEW STATS": { longLabel: "Overview Stats", headerIcon: "stat" },
+  PASSING: { longLabel: "Passing Stats", headerIcon: "passing" },
+  RUSHING: { longLabel: "Rushing Stats", headerIcon: "rushing" },
+  "RUSHING EFFICIENCY": {
+    longLabel: "Rushing Efficiency",
+    headerIcon: "efficiency",
+  },
+  "RUSHING PRODUCTION": {
+    longLabel: "Rushing Production",
+    headerIcon: "rushing",
+  },
+  RECEIVING: { longLabel: "Receiving Stats", headerIcon: "receiving" },
+  "ADVANCED RUSHING": {
+    longLabel: "Advanced Rushing",
+    headerIcon: "advanced",
+  },
+  "CEILING & CONSISTENCY": {
+    longLabel: "Ceiling and Consistency",
+    headerIcon: "ceiling",
+  },
+});
+
 const ALL_COLUMNS = Array.from(
   new Set(
     Object.values(VIEW_GROUPS).flatMap((groups) =>
@@ -620,7 +649,7 @@ const gridOptions = {
   animateRows: false,
   suppressCellFocus: false,
   suppressRowHoverHighlight: true,
-  maintainColumnOrder: true,
+  maintainColumnOrder: false,
   suppressMovableColumns: true,
   cacheQuickFilter: true,
   enableBrowserTooltips: true,
@@ -758,6 +787,7 @@ function refreshGrid() {
   const visibleRows = getVisibleRows();
   state.columnFormatting = buildColumnFormatting(visibleRows);
   gridApi.setGridOption("columnDefs", buildColumnDefs());
+  applyActiveColumnOrder();
   gridApi.setGridOption("rowData", visibleRows);
   gridApi.setGridOption("quickFilterText", state.searchText);
 
@@ -803,13 +833,19 @@ function updateRowCount() {
 }
 
 function buildColumnDefs() {
-  return VIEW_GROUPS[state.activeCategory].map((group) => ({
-    headerName: group.headerName,
-    groupId: `${state.activeCategory}-${toGroupId(group.headerName)}`,
-    marryChildren: true,
-    headerClass: "dh-header-group-cell",
-    children: group.columns.map((columnName) => buildLeafColumnDef(columnName)),
-  }));
+  return VIEW_GROUPS[state.activeCategory].map((group) => {
+    const groupMeta = getGroupHeaderMeta(group.headerName);
+
+    return {
+      headerName: group.headerName,
+      headerTooltip: groupMeta.longLabel,
+      groupId: `${state.activeCategory}-${toGroupId(group.headerName)}`,
+      marryChildren: true,
+      headerClass: "dh-header-group-cell",
+      headerGroupComponentParams: buildHeaderGroupComponentParams(group.headerName),
+      children: group.columns.map((columnName) => buildLeafColumnDef(columnName)),
+    };
+  });
 }
 
 function buildLeafColumnDef(columnName) {
@@ -817,6 +853,7 @@ function buildLeafColumnDef(columnName) {
   const isNumericColumn = meta.filter !== "agTextColumnFilter";
 
   return {
+    colId: columnName,
     headerName: meta.shortLabel,
     headerTooltip: meta.longLabel,
     field: columnName,
@@ -841,6 +878,13 @@ function getVisibleRows() {
   return state.rows.filter((row) => predicate(row, state));
 }
 
+function applyActiveColumnOrder() {
+  gridApi.applyColumnState({
+    state: getActiveLeafColumns().map((columnName) => ({ colId: columnName })),
+    applyOrder: true,
+  });
+}
+
 function buildHeaderComponentParams(columnName) {
   const meta = getHeaderMeta(columnName);
 
@@ -848,6 +892,18 @@ function buildHeaderComponentParams(columnName) {
     template: PROVIDED_HEADER_TEMPLATE,
     innerHeaderComponent: DataHubInnerHeader,
     innerHeaderComponentParams: {
+      iconKey: meta.headerIcon,
+      longLabel: meta.longLabel,
+    },
+  };
+}
+
+function buildHeaderGroupComponentParams(groupName) {
+  const meta = getGroupHeaderMeta(groupName);
+
+  return {
+    innerHeaderGroupComponent: DataHubInnerHeader,
+    innerHeaderGroupComponentParams: {
       iconKey: meta.headerIcon,
       longLabel: meta.longLabel,
     },
@@ -870,6 +926,13 @@ function getCellRenderer(columnName) {
 
 function getHeaderMeta(columnName) {
   return HEADER_META[columnName] ?? createHeaderMetaEntry(columnName, {});
+}
+
+function getGroupHeaderMeta(headerName) {
+  return GROUP_HEADER_META[headerName] ?? {
+    longLabel: headerName,
+    headerIcon: "stat",
+  };
 }
 
 function getColumnMinWidth(columnName) {
