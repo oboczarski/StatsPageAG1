@@ -569,7 +569,7 @@ body::after {
   --ag-header-text-color: rgba(202, 222, 247, 0.88);
   --ag-secondary-foreground-color: rgba(165, 184, 209, 0.74);
   --ag-subtle-text-color: rgba(165, 184, 209, 0.74);
-  --ag-border-color: transparent;
+  --ag-border-color: rgba(255, 255, 255, 0.1);
   --ag-row-border-color: rgba(255, 255, 255, 0.06);
   --ag-column-border: 0 none transparent;
   --ag-cell-horizontal-border: solid transparent;
@@ -639,11 +639,6 @@ body::after {
 .ag-theme-dh-hub .ag-header-viewport {
   background:
     linear-gradient(180deg, rgba(10, 18, 30, 0.24), rgba(10, 18, 30, 0.14));
-}
-
-.ag-theme-dh-hub .ag-pinned-left-header,
-.ag-theme-dh-hub .ag-pinned-left-cols-viewport {
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .ag-theme-dh-hub .ag-pinned-left-cols-container {
@@ -872,7 +867,6 @@ body::after {
 .ag-theme-dh-hub .ag-cell {
   display: flex;
   align-items: center;
-  border: 0 !important;
   overflow: hidden;
   padding-left: 6px;
   padding-right: 6px;
