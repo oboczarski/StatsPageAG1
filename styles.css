@@ -988,37 +988,37 @@ body::after {
 
 .ag-theme-dh-hub .dh-pos-chip--qb {
   background:
-    radial-gradient(circle at 22% 24%, rgba(255, 255, 255, 0.18), transparent 30%),
-    linear-gradient(135deg, rgba(255, 29, 123, 0.48), rgba(255, 29, 123, 0.2) 58%, rgba(54, 10, 31, 0.12)),
-    rgba(255, 255, 255, 0.02);
-  border-color: rgba(255, 29, 123, 0.34);
+    radial-gradient(circle at 22% 24%, rgba(255, 255, 255, 0.12), transparent 30%),
+    linear-gradient(135deg, rgba(255, 29, 123, 0.34), rgba(255, 29, 123, 0.14) 58%, rgba(54, 10, 31, 0.08)),
+    rgba(255, 255, 255, 0.015);
+  border-color: rgba(255, 29, 123, 0.24);
   color: rgba(255, 236, 244, 0.98);
 }
 
 .ag-theme-dh-hub .dh-pos-chip--rb {
   background:
-    radial-gradient(circle at 22% 24%, rgba(255, 255, 255, 0.18), transparent 30%),
-    linear-gradient(135deg, rgba(14, 231, 172, 0.44), rgba(14, 231, 172, 0.18) 58%, rgba(7, 52, 40, 0.12)),
-    rgba(255, 255, 255, 0.02);
-  border-color: rgba(14, 231, 172, 0.3);
+    radial-gradient(circle at 22% 24%, rgba(255, 255, 255, 0.12), transparent 30%),
+    linear-gradient(135deg, rgba(14, 231, 172, 0.3), rgba(14, 231, 172, 0.13) 58%, rgba(7, 52, 40, 0.08)),
+    rgba(255, 255, 255, 0.015);
+  border-color: rgba(14, 231, 172, 0.22);
   color: rgba(228, 255, 241, 0.98);
 }
 
 .ag-theme-dh-hub .dh-pos-chip--wr {
   background:
-    radial-gradient(circle at 22% 24%, rgba(255, 255, 255, 0.18), transparent 30%),
-    linear-gradient(135deg, rgba(74, 134, 232, 0.46), rgba(74, 134, 232, 0.18) 58%, rgba(18, 34, 67, 0.12)),
-    rgba(255, 255, 255, 0.02);
-  border-color: rgba(74, 134, 232, 0.32);
+    radial-gradient(circle at 22% 24%, rgba(255, 255, 255, 0.12), transparent 30%),
+    linear-gradient(135deg, rgba(74, 134, 232, 0.32), rgba(74, 134, 232, 0.14) 58%, rgba(18, 34, 67, 0.08)),
+    rgba(255, 255, 255, 0.015);
+  border-color: rgba(74, 134, 232, 0.24);
   color: rgba(232, 242, 255, 0.98);
 }
 
 .ag-theme-dh-hub .dh-pos-chip--te {
   background:
-    radial-gradient(circle at 22% 24%, rgba(255, 255, 255, 0.18), transparent 30%),
-    linear-gradient(135deg, rgba(115, 0, 255, 0.46), rgba(115, 0, 255, 0.18) 58%, rgba(28, 6, 68, 0.12)),
-    rgba(255, 255, 255, 0.02);
-  border-color: rgba(115, 0, 255, 0.32);
+    radial-gradient(circle at 22% 24%, rgba(255, 255, 255, 0.12), transparent 30%),
+    linear-gradient(135deg, rgba(115, 0, 255, 0.32), rgba(115, 0, 255, 0.14) 58%, rgba(28, 6, 68, 0.08)),
+    rgba(255, 255, 255, 0.015);
+  border-color: rgba(115, 0, 255, 0.24);
   color: rgba(244, 232, 255, 0.98);
 }
 
