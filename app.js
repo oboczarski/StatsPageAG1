@@ -12,144 +12,155 @@ const CATEGORY_LABELS = {
   receiving: "RECEIVING (W/T)",
 };
 
-const COLUMN_SETS = {
+const CATEGORY_GROUPS = {
   overview: [
-    "RK",
-    "PLAYER",
-    "POS",
-    "TM",
-    "AGE",
-    "FPTS",
-    "PPG",
-    "VALUE",
-    "ADP",
-    "POS·ADP",
-    "G",
-    "SNP%",
-    "YDS(t)",
-    "YPG(t)",
-    "OPP",
-    "IMP",
-    "IMP/OPP",
-    "CSTY%",
-    "CL",
+    { title: "GENERAL", columns: ["RK", "PLAYER", "POS"] },
+    { title: "INFO", columns: ["TM", "AGE"] },
+    { title: "FANTASY", columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    {
+      title: "OVERVIEW STATS",
+      columns: ["G", "SNP%", "YDS(t)", "YPG(t)", "OPP", "IMP", "IMP/OPP", "CSTY%", "CL"],
+    },
   ],
   passing: [
-    "RK",
-    "PLAYER",
-    "POS",
-    "TM",
-    "AGE",
-    "G",
-    "FPTS",
-    "PPG",
-    "VALUE",
-    "ADP",
-    "POS·ADP",
-    "paYDS",
-    "paTD",
-    "CMP%",
-    "paATT",
-    "paRTG",
-    "EPA/DB",
-    "CPOE",
-    "CMP",
-    "YDS(t)",
-    "paYPG",
-    "ruYDS",
-    "ruTD",
-    "pa1D",
-    "IMP/G",
-    "pIMP",
-    "pIMP/A",
-    "CAR",
-    "YPC",
-    "TTT",
-    "PRS%",
-    "SAC",
-    "INT",
-    "FUM",
-    "FPOE",
-    "CSTY%",
-    "CL",
+    { title: "GENERAL", columns: ["RK", "PLAYER", "POS"] },
+    { title: "INFO", columns: ["TM", "AGE", "G"] },
+    { title: "FANTASY", columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    {
+      title: "PASSING",
+      columns: [
+        "paYDS",
+        "paTD",
+        "CMP%",
+        "paATT",
+        "paRTG",
+        "EPA/DB",
+        "CPOE",
+        "CMP",
+        "YDS(t)",
+        "paYPG",
+        "pa1D",
+        "IMP/G",
+        "pIMP",
+        "pIMP/A",
+        "TTT",
+        "PRS%",
+        "SAC",
+        "INT",
+      ],
+    },
+    { title: "RUSHING", columns: ["ruYDS", "ruTD", "CAR", "YPC", "FUM"] },
+    { title: "CEILING & CONSISTENCY", columns: ["FPOE", "CSTY%", "CL"] },
   ],
   rushing: [
-    "RK",
-    "PLAYER",
-    "POS",
-    "TM",
-    "AGE",
-    "G",
-    "FPTS",
-    "PPG",
-    "VALUE",
-    "ADP",
-    "POS·ADP",
-    "SNP%",
-    "CAR",
-    "ruYDS",
-    "YPC",
-    "ruTD",
-    "REC",
-    "recYDS",
-    "TGT",
-    "YDS(t)",
-    "ruYPG",
-    "ELU",
-    "MTF/A",
-    "YCO/A",
-    "MTF",
-    "YCO",
-    "EXPLSV%",
-    "ru1D",
-    "RYOE",
-    "recTD",
-    "rec1D",
-    "YAC",
-    "IMP/G",
-    "FUM",
-    "FPOE",
-    "CSTY%",
-    "CL",
+    { title: "GENERAL", columns: ["RK", "PLAYER", "POS"] },
+    { title: "INFO", columns: ["TM", "AGE", "G"] },
+    { title: "FANTASY", columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    { title: "RUSHING EFFICIENCY", columns: ["SNP%", "YPC", "ruYPG", "IMP/G"] },
+    { title: "RUSHING PRODUCTION", columns: ["CAR", "ruYDS", "ruTD", "ru1D", "YDS(t)", "FUM"] },
+    { title: "RECEIVING", columns: ["REC", "recYDS", "recTD", "rec1D", "YAC", "TGT"] },
+    {
+      title: "ADVANCED RUSHING",
+      columns: ["ELU", "MTF/A", "YCO/A", "MTF", "YCO", "RYOE", "EXPLSV%"],
+    },
+    { title: "CEILING & CONSISTENCY", columns: ["FPOE", "CSTY%", "CL"] },
   ],
   receiving: [
-    "RK",
-    "PLAYER",
-    "POS",
-    "TM",
-    "AGE",
-    "G",
-    "FPTS",
-    "PPG",
-    "VALUE",
-    "ADP",
-    "POS·ADP",
-    "SNP%",
-    "TGT",
-    "REC",
-    "TS%",
-    "recYDS",
-    "recTD",
-    "YPRR",
-    "rec1D",
-    "1DRR",
-    "recYPG",
-    "AY%",
-    "YAC",
-    "YPR",
-    "IMP/G",
-    "RR",
-    "FPOE",
-    "YDS(t)",
-    "RZ Tgt",
-    "CAR",
-    "ruYDS",
-    "ruTD",
-    "YPC",
-    "FUM",
-    "CSTY%",
-    "CL",
+    { title: "GENERAL", columns: ["RK", "PLAYER", "POS"] },
+    { title: "INFO", columns: ["TM", "AGE", "G"] },
+    { title: "FANTASY", columns: ["FPTS", "PPG", "VALUE", "ADP", "POS·ADP"] },
+    {
+      title: "RECEIVING",
+      columns: [
+        "SNP%",
+        "TGT",
+        "REC",
+        "TS%",
+        "recYDS",
+        "recTD",
+        "YPRR",
+        "rec1D",
+        "1DRR",
+        "recYPG",
+        "AY%",
+        "YAC",
+        "YPR",
+        "IMP/G",
+        "RR",
+        "YDS(t)",
+        "RZ Tgt",
+      ],
+    },
+    { title: "RUSHING", columns: ["CAR", "ruYDS", "ruTD", "YPC", "FUM"] },
+    { title: "CEILING & CONSISTENCY", columns: ["FPOE", "CSTY%", "CL"] },
   ],
+};
+
+const HEADER_META = {
+  RK: { icon: "hash" },
+  PLAYER: { icon: "user" },
+  POS: { icon: "shield" },
+  TM: { icon: "flag" },
+  AGE: { icon: "calendar" },
+  FPTS: { icon: "star" },
+  PPG: { icon: "star" },
+  VALUE: { icon: "award" },
+  ADP: { icon: "list-ordered" },
+  "POS·ADP": { icon: "list-ordered" },
+  G: { icon: "activity" },
+  "SNP%": { icon: "gauge" },
+  "YDS(t)": { icon: "bar-chart-3" },
+  "YPG(t)": { icon: "bar-chart-3" },
+  OPP: { icon: "target" },
+  IMP: { icon: "target" },
+  "IMP/OPP": { icon: "gauge" },
+  "CSTY%": { icon: "award" },
+  CL: { icon: "award" },
+  paYDS: { icon: "bar-chart-3" },
+  paTD: { icon: "target" },
+  "CMP%": { icon: "gauge" },
+  paATT: { icon: "target" },
+  paRTG: { icon: "gauge" },
+  "EPA/DB": { icon: "gauge" },
+  CPOE: { icon: "gauge" },
+  CMP: { icon: "target" },
+  paYPG: { icon: "bar-chart-3" },
+  ruYDS: { icon: "bar-chart-3" },
+  ruTD: { icon: "target" },
+  pa1D: { icon: "target" },
+  "IMP/G": { icon: "gauge" },
+  pIMP: { icon: "target" },
+  "pIMP/A": { icon: "gauge" },
+  CAR: { icon: "target" },
+  YPC: { icon: "gauge" },
+  TTT: { icon: "timer" },
+  "PRS%": { icon: "alert-triangle" },
+  SAC: { icon: "alert-triangle" },
+  INT: { icon: "alert-triangle" },
+  FUM: { icon: "alert-triangle" },
+  FPOE: { icon: "award" },
+  REC: { icon: "target" },
+  recYDS: { icon: "bar-chart-3" },
+  TGT: { icon: "target" },
+  ELU: { icon: "gauge" },
+  "MTF/A": { icon: "gauge" },
+  "YCO/A": { icon: "gauge" },
+  MTF: { icon: "target" },
+  YCO: { icon: "bar-chart-3" },
+  "EXPLSV%": { icon: "gauge" },
+  ru1D: { icon: "target" },
+  RYOE: { icon: "gauge" },
+  recTD: { icon: "target" },
+  rec1D: { icon: "target" },
+  YAC: { icon: "bar-chart-3" },
+  "TS%": { icon: "gauge" },
+  YPRR: { icon: "gauge" },
+  "1DRR": { icon: "gauge" },
+  recYPG: { icon: "bar-chart-3" },
+  "AY%": { icon: "gauge" },
+  YPR: { icon: "gauge" },
+  RR: { icon: "target" },
+  "RZ Tgt": { icon: "target" },
 };
 
 const SOURCE_ALIASES = {
@@ -177,6 +188,13 @@ const INVERTED_COLUMNS = new Set([
 const NEUTRAL_COLUMNS = new Set(["TTT", "CL"]);
 const PLAYER_COLUMN = "PLAYER";
 const FPTS_COLUMN = "FPTS";
+const ALL_COLUMNS = [
+  ...new Set(
+    Object.values(CATEGORY_GROUPS).flatMap((groups) =>
+      groups.flatMap((group) => group.columns),
+    ),
+  ),
+];
 
 const CATEGORY_FILTERS = {
   overview: (row) => Boolean(row.POS && row.POS !== "NA"),
@@ -188,7 +206,6 @@ const CATEGORY_FILTERS = {
 };
 
 const MOBILE_BREAKPOINT = 719;
-const FROZEN_COL_COUNT = 3;
 
 const COLUMN_WIDTHS = {
   RK: 78,
@@ -361,6 +378,7 @@ const receivingButtons = Array.from(
 let frozenTable = null;
 let mainTable = null;
 let sortsSyncing = false;
+let headerIconsFrame = 0;
 
 function createTable() {
   if (frozenTable) frozenTable.destroy();
@@ -371,6 +389,8 @@ function createTable() {
     data: [],
     reactiveData: false,
     headerSortClickElement: "header",
+    headerSortElement: buildHeaderSortIconHtml,
+    columnHeaderVertAlign: "bottom",
     columnDefaults: {
       headerSort: true,
       resizable: true,
@@ -400,6 +420,7 @@ function createTable() {
   mainTable.on("tableBuilt", () => {
     attachScrollSync();
     attachSortSync();
+    queueHeaderIconHydration();
   });
 }
 
@@ -421,16 +442,27 @@ function attachSortSync() {
   mainTable.on("dataSorting", (sorters) => {
     if (sortsSyncing) return;
     sortsSyncing = true;
-    frozenTable.setSort(sorters.map((s) => ({ column: s.field, dir: s.dir })));
+    if (!sorters.length) {
+      frozenTable.clearSort();
+    } else {
+      frozenTable.setSort(sorters.map((s) => ({ column: s.field, dir: s.dir })));
+    }
     sortsSyncing = false;
   });
 
   frozenTable.on("dataSorting", (sorters) => {
     if (sortsSyncing) return;
     sortsSyncing = true;
-    mainTable.setSort(sorters.map((s) => ({ column: s.field, dir: s.dir })));
+    if (!sorters.length) {
+      mainTable.clearSort();
+    } else {
+      mainTable.setSort(sorters.map((s) => ({ column: s.field, dir: s.dir })));
+    }
     sortsSyncing = false;
   });
+
+  mainTable.on("dataSorted", queueHeaderIconHydration);
+  frozenTable.on("dataSorted", queueHeaderIconHydration);
 }
 
 createTable();
@@ -569,6 +601,7 @@ function refreshGrid() {
     mainTable.setColumns(buildMainColDefs());
     frozenTable.setData(visibleRows);
     mainTable.setData(visibleRows);
+    queueHeaderIconHydration();
     applySearch();
   }
 
@@ -614,7 +647,8 @@ function updateRowCount() {
 function buildSingleColDef(columnName) {
   const isLabelColumn = LABEL_COLUMNS.has(columnName);
   const colDef = {
-    title: columnName,
+    title: buildHeaderTitleHtml(columnName),
+    titleFormatter: "html",
     field: columnName,
     width: getColumnWidth(columnName),
     minWidth: getColumnMinWidth(columnName),
@@ -622,6 +656,8 @@ function buildSingleColDef(columnName) {
     hozAlign: isLabelColumn && columnName === PLAYER_COLUMN ? "left" : "center",
     cssClass: buildCellCssClass(columnName),
     headerSort: true,
+    headerSortStartingDir: "desc",
+    headerSortTristate: true,
     sorter: tabulatorSorter,
     resizable: true,
   };
@@ -630,11 +666,12 @@ function buildSingleColDef(columnName) {
 }
 
 function buildFrozenColDefs() {
-  return COLUMN_SETS[state.activeCategory].slice(0, FROZEN_COL_COUNT).map(buildSingleColDef);
+  const [generalGroup] = getCategoryGroups();
+  return generalGroup ? [buildGroupColDef(generalGroup)] : [];
 }
 
 function buildMainColDefs() {
-  return COLUMN_SETS[state.activeCategory].slice(FROZEN_COL_COUNT).map(buildSingleColDef);
+  return getCategoryGroups().slice(1).map(buildGroupColDef);
 }
 
 function buildCellCssClass(columnName) {
@@ -722,7 +759,7 @@ function getVisibleRows() {
 
 function getColumnMinWidth(columnName) {
   const charWidth = state.isCompactViewport ? 6.3 : 7.2;
-  const sideSpace = state.isCompactViewport ? 26 : 34;
+  const sideSpace = state.isCompactViewport ? 40 : 48;
   return Math.ceil(String(columnName).length * charWidth + sideSpace);
 }
 
@@ -748,7 +785,7 @@ function getRowHeight() {
 }
 
 function getHeaderHeight() {
-  return state.isCompactViewport ? 36 : 44;
+  return state.isCompactViewport ? 60 : 72;
 }
 
 let resizeFrame = 0;
@@ -768,10 +805,9 @@ function handleViewportResize() {
 }
 
 function normalizeRow(sourceRow) {
-  const allColumns = new Set(Object.values(COLUMN_SETS).flat());
   const normalized = {};
 
-  for (const columnName of allColumns) {
+  for (const columnName of ALL_COLUMNS) {
     const alias = Object.prototype.hasOwnProperty.call(SOURCE_ALIASES, columnName)
       ? SOURCE_ALIASES[columnName]
       : columnName;
@@ -914,7 +950,7 @@ function abbreviatePlayerName(name) {
 
 function buildColumnFormatting(rows) {
   const formatting = Object.create(null);
-  const columns = COLUMN_SETS[state.activeCategory];
+  const columns = getCategoryColumns();
 
   columns.forEach((columnName) => {
     if (NON_FORMATTED_COLUMNS.has(columnName)) {
@@ -1063,6 +1099,69 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function getCategoryGroups(category = state.activeCategory) {
+  return CATEGORY_GROUPS[category] ?? [];
+}
+
+function getCategoryColumns(category = state.activeCategory) {
+  return getCategoryGroups(category).flatMap((group) => group.columns);
+}
+
+function buildGroupColDef(group) {
+  return {
+    title: group.title,
+    columns: group.columns.map(buildSingleColDef),
+    headerSort: false,
+    resizable: false,
+  };
+}
+
+function buildHeaderTitleHtml(columnName) {
+  const meta = HEADER_META[columnName] ?? {};
+  const label = meta.label ?? columnName;
+  const icon = meta.icon ?? "bar-chart-3";
+
+  return `
+    <span class="dh-grid-header">
+      <span class="dh-grid-header__icon" aria-hidden="true">
+        <i data-lucide="${escapeHtml(icon)}"></i>
+      </span>
+      <span class="dh-grid-header__label">${escapeHtml(label)}</span>
+    </span>
+  `.trim();
+}
+
+function buildHeaderSortIconHtml(_column, dir) {
+  if (dir !== "asc" && dir !== "desc") {
+    return "";
+  }
+
+  const iconName = dir === "asc" ? "arrow-up" : "arrow-down";
+  return `
+    <span class="dh-sort-icon" aria-hidden="true">
+      <i data-lucide="${iconName}"></i>
+    </span>
+  `.trim();
+}
+
+function queueHeaderIconHydration() {
+  cancelAnimationFrame(headerIconsFrame);
+  headerIconsFrame = requestAnimationFrame(() => {
+    hydrateTableIcons(frozenTable);
+    hydrateTableIcons(mainTable);
+  });
+}
+
+function hydrateTableIcons(table) {
+  if (!table?.element || !window.lucide?.createIcons) {
+    return;
+  }
+
+  window.lucide.createIcons({
+    root: table.element,
+  });
 }
 
 function showOverlay({ title, description, showActions = false }) {
