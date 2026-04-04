@@ -995,21 +995,20 @@ body::after {
   position: sticky;
   top: 0;
   z-index: 12;
-  height: 26px;
+  height: 30px;
   padding: 0 6px;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 0.58rem;
-  font-weight: 700;
+  font-size: 0.88rem;
+  font-weight: 800;
   letter-spacing: 0.1em;
   color: rgba(175, 200, 235, 0.58);
-  background:
-    linear-gradient(180deg, rgba(10, 18, 30, 0.28), rgba(10, 18, 30, 0.18)),
-    rgba(8, 15, 27, 0.92);
+  background: linear-gradient(180deg, rgb(51 63 81), rgba(10, 18, 30, 0.18)), rgb(46 51 70);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  letter-spacing: -0.02em;
 }
 
 /* Last group in row: no right border */
@@ -1022,9 +1021,7 @@ body::after {
   position: sticky;
   top: 26px; /* sits below the 26px group header row */
   z-index: 11;
-  background:
-    linear-gradient(180deg, rgba(10, 18, 30, 0.24), rgba(10, 18, 30, 0.14)),
-    rgba(8, 15, 27, 0.90);
+  background: linear-gradient(180deg, rgb(53 61 80 / 99%), rgb(38 44 60 / 99%));
   border-bottom: 0;
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
   backdrop-filter: none;
@@ -1093,6 +1090,7 @@ body::after {
   white-space: nowrap;
   text-overflow: ellipsis;
   text-align: center;
+  letter-spacing: -0.02em;
 }
 
 .stats-table__sort-indicator {
