@@ -1231,6 +1231,23 @@ radial-gradient(23px 14px at 50% 50%, rgba(0, 0, 0, 0.08) 0%, rgba(255, 55, 155,
   scroll-behavior: auto;
 }
 
+.ag-theme-dh-hub.is-touch-scroll .ag-header-cell,
+.ag-theme-dh-hub.is-touch-scroll .ag-header-group-cell,
+.ag-theme-dh-hub.is-touch-scroll .ag-header-cell-comp-wrapper,
+.ag-theme-dh-hub.is-touch-scroll .dh-header-template,
+.ag-theme-dh-hub.is-touch-scroll .ag-header-cell-label,
+.ag-theme-dh-hub.is-touch-scroll .ag-header-group-cell-label {
+  overflow: hidden;
+}
+
+.ag-theme-dh-hub.is-touch-scroll .ag-header-cell-label {
+  padding-inline: 8px;
+}
+
+.ag-theme-dh-hub.is-touch-scroll .dh-header-template {
+  justify-content: center;
+}
+
 @keyframes driftPulse {
   0%,
   100% {

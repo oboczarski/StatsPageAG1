@@ -461,6 +461,18 @@ const PROVIDED_HEADER_TEMPLATE = `
     </div>
   </div>`;
 
+const TOUCH_HEADER_TEMPLATE = `
+  <div class="ag-cell-label-container dh-header-template" role="presentation">
+    <div data-ref="eLabel" class="ag-header-cell-label" role="presentation">
+      <span data-ref="eText" class="ag-header-cell-text"></span>
+      <span data-ref="eFilter" class="ag-header-icon ag-header-label-icon ag-filter-icon" aria-hidden="true"></span>
+      <span data-ref="eSortOrder" class="ag-header-icon ag-header-label-icon ag-sort-order" aria-hidden="true"></span>
+      <span data-ref="eSortAsc" class="ag-header-icon ag-header-label-icon ag-sort-ascending-icon" aria-hidden="true"></span>
+      <span data-ref="eSortDesc" class="ag-header-icon ag-header-label-icon ag-sort-descending-icon" aria-hidden="true"></span>
+      <span data-ref="eSortMixed" class="ag-header-icon ag-header-label-icon ag-sort-mixed-icon ag-hidden" aria-hidden="true"></span>
+    </div>
+  </div>`;
+
 const HEADER_ICON_MARKUP = Object.freeze({
   rank: createSvgIcon(
     '<path d="M8 4h8v4a4 4 0 0 1-8 0Z"/><path d="M8 4H5a3 3 0 0 0 3 4"/><path d="M16 4h3a3 3 0 0 1-3 4"/><path d="M9 14h6"/><path d="M10 18h4"/>',
@@ -871,6 +883,8 @@ function buildLeafColumnDef(columnName) {
     pinned: PINNED_COLUMNS.has(columnName) ? "left" : null,
     lockPinned: PINNED_COLUMNS.has(columnName),
     suppressMovable: true,
+    suppressHeaderMenuButton: state.isTouchScrollViewport,
+    suppressHeaderFilterButton: state.isTouchScrollViewport,
     filter: meta.filter,
     type: isNumericColumn ? "numericColumn" : undefined,
     headerClass: "dh-header-cell",
@@ -898,7 +912,9 @@ function buildHeaderComponentParams(columnName) {
   const meta = getHeaderMeta(columnName);
 
   return {
-    template: PROVIDED_HEADER_TEMPLATE,
+    template: state.isTouchScrollViewport
+      ? TOUCH_HEADER_TEMPLATE
+      : PROVIDED_HEADER_TEMPLATE,
     innerHeaderComponent: DataHubInnerHeader,
     innerHeaderComponentParams: {
       iconKey: meta.headerIcon,
@@ -1016,6 +1032,10 @@ function handleViewportResize() {
     state.isCompactViewport = nextCompact;
     state.isTouchScrollViewport = nextTouchScroll;
     syncViewportModeClasses();
+    gridApi.setGridOption(
+      "suppressColumnVirtualisation",
+      state.isTouchScrollViewport,
+    );
     gridApi.setGridOption("rowBuffer", getRowBuffer());
     gridApi.setGridOption("rowHeight", getRowHeight());
     gridApi.setGridOption("headerHeight", getHeaderHeight());
