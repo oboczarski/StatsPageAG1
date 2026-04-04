@@ -1086,9 +1086,8 @@ body::after {
   flex: 1;
   display: block;
   padding: 0 2px;
-  overflow: hidden;
+  overflow: overlay;
   white-space: nowrap;
-  text-overflow: ellipsis;
   text-align: center;
   letter-spacing: -0.02em;
 }
