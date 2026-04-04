@@ -14,9 +14,8 @@
   --accent-magenta: #ff62c3;
   --accent-warm: #ffb066;
   --success-glow: rgba(113, 225, 199, 0.34);
-  --shadow-soft: 0 30px 90px rgba(0, 0, 0, 0.38);
-  --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.03), 0 14px 50px rgba(0, 0, 0, 0.34);
+  --shadow-soft: 10px 30px 20px rgba(0, 0, 0, 0.28);
+  --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.28), 20px 26px 20px rgba(0, 0, 0, 0.2);
 }
 
 *,
@@ -131,8 +130,9 @@ body::after {
     linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
     linear-gradient(180deg, rgba(8, 16, 28, 0.6), rgba(6, 12, 20, 0.4));
   box-shadow: var(--shadow-soft), var(--shadow-glass);
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(4px) saturate(140%);
+  -webkit-backdrop-filter: blur(4px) saturate(140%);
+  will-change: backdrop-filter, transform;
 }
 
 .glass-panel::before {
@@ -140,10 +140,8 @@ body::after {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 32%),
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.14), transparent 34%);
-  opacity: 0.9;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 32%),
+    radial-gradient(circle at top left, rgba(215, 225, 255, 0.14), transparent 34%);
 }
 
 .hero-shell,
@@ -178,15 +176,17 @@ body::after {
   font-size: 0.63rem;
   font-weight: 700;
   letter-spacing: 0.18em;
-  color: rgba(190, 215, 244, 0.72);
+  color: rgb(161 169 191);
 }
 
 .page-title {
   margin: 4px 0 0;
   max-width: none;
-  font-size: clamp(1.38rem, 7vw, 3.5rem);
+  font-size: clamp(1.38rem, 8.3vw, 3.5rem);
   line-height: 0.94;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+  word-spacing: 0.18em;
   text-wrap: balance;
 }
 
@@ -213,9 +213,7 @@ body::after {
     background 180ms ease,
     color 180ms ease,
     box-shadow 180ms ease;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 10px 24px rgba(0, 0, 0, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 7px 10px rgba(0, 0, 0, 0.24);
 }
 
 .top-tab:hover,
@@ -264,9 +262,8 @@ body::after {
   background:
     linear-gradient(180deg, rgba(133, 215, 255, 0.24), rgba(162, 127, 255, 0.16)),
     rgba(11, 22, 39, 0.74);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 14px 36px rgba(44, 109, 214, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 10px 16px rgba(44, 109, 214, 0.18);
 }
 
 .top-pill--ghost,
@@ -473,7 +470,7 @@ body::after {
   position: relative;
   min-height: 60vh;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  border-radius: 17px;
   /* clip instead of hidden: visually clips rounded corners without becoming a
      scroll container, which would silently break position:sticky on the header */
   overflow: clip;
@@ -977,15 +974,15 @@ body::after {
 
 /* Frozen pane table: exact width, no stretching */
 .table-pane--frozen .stats-table {
-  width: 200px;
-  min-width: 200px;
+  width: var(--table-width);
+  min-width: var(--table-width);
 }
 
 .stats-table__header-cell,
 .stats-table__body-cell {
-  width: 70px;
-  min-width: 70px;
-  max-width: 70px;
+  width: var(--column-width);
+  min-width: var(--column-width);
+  max-width: var(--column-width);
   padding: 0;
   border: 0;
   vertical-align: middle;
@@ -1056,7 +1053,7 @@ body::after {
   background: transparent;
   color: rgba(202, 222, 247, 0.88);
   font: inherit;
-  font-weight: 600;
+  font-weight: 800;
   letter-spacing: 0.03em;
   cursor: pointer;
 }
@@ -1295,7 +1292,7 @@ body::after {
 
   .stats-table__head-button {
     min-height: 40px;
-    padding: 0 14px 0 8px;
+    padding: 0 13px 0 7px;
     gap: 0px;
   }
 
@@ -1356,6 +1353,7 @@ body::after {
     max-width: 14ch;
     font-size: clamp(1.7rem, 4vw, 3.5rem);
     line-height: 0.96;
+    font-weight: 800;
   }
 
   .top-tabs,
@@ -1385,8 +1383,9 @@ body::after {
   }
 
   .top-pill {
-    min-height: 34px;
-    padding: 0 12px;
+    min-height: 40px;
+    min-width: 70px;
+    padding: 0 4px;
     font-size: 0.74rem;
   }
 
