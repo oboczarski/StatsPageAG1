@@ -119,7 +119,7 @@ body::after {
   z-index: 1;
   width: min(100%, 1680px);
   margin: 0 auto;
-  padding: 18px 14px 28px;
+  padding: 11px 6px 28px;
 }
 
 .glass-panel {
@@ -421,7 +421,7 @@ body::after {
 
 .grid-shell {
   margin-top: 14px;
-  padding: 10px;
+  padding: 10px 6px;
 }
 
 .grid-shell__meta {
@@ -429,8 +429,8 @@ body::after {
   flex-wrap: wrap;
   align-items: end;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 9px;
+  margin: 0px 5px 12px 8px;
 }
 
 .meta-value {
@@ -977,15 +977,15 @@ body::after {
 
 /* Frozen pane table: exact width, no stretching */
 .table-pane--frozen .stats-table {
-  width: var(--table-width);
-  min-width: var(--table-width);
+  width: 200px;
+  min-width: 200px;
 }
 
 .stats-table__header-cell,
 .stats-table__body-cell {
-  width: var(--column-width);
-  min-width: var(--column-width);
-  max-width: var(--column-width);
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
   padding: 0;
   border: 0;
   vertical-align: middle;
@@ -1280,11 +1280,13 @@ body::after {
 
   .stats-table {
     font-size: 11px;
+    width: 215px !important;
+    min-width: 215px !important;
   }
 
   .stats-table__group-header-cell {
-    height: 22px;
-    font-size: 0.52rem;
+    height: 26px;
+    font-size: 0.72rem;
   }
 
   .stats-table thead th.stats-table__header-cell {
@@ -1294,6 +1296,7 @@ body::after {
   .stats-table__head-button {
     min-height: 40px;
     padding: 0 14px 0 8px;
+    gap: 0px;
   }
 
   .stats-table__head-icon {
