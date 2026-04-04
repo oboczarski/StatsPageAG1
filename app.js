@@ -646,12 +646,16 @@ function updateRowCount() {
 }
 
 function renderTable() {
+  // Preserve horizontal scroll position across re-renders (e.g. after a sort)
+  const savedScrollLeft = gridContainer.querySelector(".table-pane--scroll")?.scrollLeft ?? 0;
+
   const allColumns = COLUMN_SETS[state.activeCategory];
   const frozenNames = allColumns.slice(0, STICKY_COLUMN_COUNT);
   const scrollNames = allColumns.slice(STICKY_COLUMN_COUNT);
 
   const { columns: frozenCols, totalWidth: frozenWidth } = buildColumnLayout(frozenNames);
-  const { columns: scrollCols, totalWidth: scrollWidth } = buildColumnLayout(scrollNames);
+  // Pass 1.3 mobile scale factor — non-frozen columns are 30% wider on compact viewports
+  const { columns: scrollCols, totalWidth: scrollWidth } = buildColumnLayout(scrollNames, 1.3);
 
   // ── Frozen pane ──────────────────────────────────────────────────────────
   const frozenTable = buildTable(frozenCols, frozenWidth, FROZEN_GROUP, "frozen");
@@ -671,6 +675,9 @@ function renderTable() {
   frame.append(frozenPane, scrollPane);
 
   gridContainer.replaceChildren(frame);
+
+  // Restore horizontal scroll position (avoids snap-to-left after sort/re-render)
+  scrollPane.scrollLeft = savedScrollLeft;
 
   // Vertical scroll sync: right pane is the sole scroll container; left pane follows via JS
   scrollPane.addEventListener("scroll", () => {
@@ -730,11 +737,12 @@ function buildTable(columns, totalWidth, groups, paneType) {
   return table;
 }
 
-function buildColumnLayout(columnNames) {
+function buildColumnLayout(columnNames, mobileScaleFactor = 1) {
   let totalWidth = 0;
+  const scale = state.isCompactViewport ? mobileScaleFactor : 1;
 
   const columns = columnNames.map((name, index) => {
-    const width = getColumnWidth(name);
+    const width = Math.round(getColumnWidth(name) * scale);
     totalWidth += width;
     return { name, index, width };
   });
