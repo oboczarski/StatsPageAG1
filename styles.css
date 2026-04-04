@@ -661,7 +661,7 @@ body::after {
 /* ── Column header row ─────────────────────────────────────────────────── */
 .stats-table thead th.stats-table__header-cell {
   position: sticky;
-  top: 26px; /* sits below the 26px group header row */
+  top: 30px; /* sits below the 26px group header row */
   z-index: 11;
   background: linear-gradient(180deg, rgb(53 61 80 / 99%), rgb(38 44 60 / 99%));
   border-bottom: 0;
@@ -788,10 +788,10 @@ body::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  max-width: 100%;
+  width: 67px;
+  max-width: 67px;
   min-height: 26px;
-  padding: 0 8px;
+  padding: 0 0px;
   border-radius: 999px;
   box-sizing: border-box;
   border: 1px solid transparent;
@@ -900,9 +900,7 @@ body::after {
     linear-gradient(180deg, rgba(102, 215, 255, 0.28), rgba(162, 127, 255, 0.16)),
     rgba(255, 255, 255, 0.02);
   border-color: rgba(145, 224, 255, 0.36);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 0 30px rgba(102, 215, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26);
 }
 
 .stats-table__empty-cell {
