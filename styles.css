@@ -42,15 +42,14 @@ body {
   overflow-x: hidden;
   font-family: var(--font-sans);
   color: var(--text-primary);
-  background:
-    radial-gradient(620px 560px at 12% 8%, rgba(90, 160, 255, 0.1), transparent 42%),
+  background: radial-gradient(620px 560px at 12% 8%, rgba(90, 160, 255, 0.1), transparent 42%),
     radial-gradient(980px 680px at 88% 10%, rgba(70, 190, 255, 0.12), transparent 38%),
     radial-gradient(800px 320px at 99% 52%, rgba(250, 60, 38, 0.07), transparent 36%),
     radial-gradient(900px 620px at 96% 28%, rgba(170, 0, 255, 0.13), transparent 34%),
-    radial-gradient(1160px 1140px at 92% 80%, rgba(255, 20, 140, 0.1), transparent 30%),
-    radial-gradient(980px 800px at 25% 52%, rgba(90, 0, 250, 0.13), transparent 29%),
-    radial-gradient(980px 800px at 1% 88%, rgba(0, 220, 220, 0.06), transparent 28%),
-    linear-gradient(180deg, rgba(170, 187, 255, 0.14) 0%, #091625 36%, #07111b 68%, #050c14 100%);
+    radial-gradient(1160px 1140px at 92% 80%, rgba(255, 20, 140, 0.1), transparent 40%),
+    radial-gradient(1584px 800px at 25% 52%, rgba(90, 0, 250, 0.15), transparent 43%),
+    radial-gradient(980px 808px at 1% 88%, rgba(0, 220, 220, 0.26), transparent 36%),
+    linear-gradient(180deg, rgba(170, 187, 255, 0.14) 0%, #091625 36%, #07112b 68%, #050c14 100%);
 }
 
 body::before,
@@ -63,13 +62,12 @@ body::after {
 
 body::before {
   opacity: 0.92;
-  background:
-    repeating-radial-gradient(
+  background: repeating-radial-gradient(
       circle at 16% 10%,
-      rgba(175, 90, 255, 0.055) 0 1px,
-      rgba(255, 255, 255, 0.01) 1px 2px,
-      rgba(255, 40, 125, 0.012) 2px 3px,
-      rgba(255, 255, 255, 0.018) 42px 82px
+      rgba(175, 90, 255, 0.085) 0 1px,
+      rgba(255, 255, 255, 0.02) 1px 2px,
+      rgba(255, 40, 125, 0.024) 2px 3px,
+      rgba(255, 255, 255, 0.068) 42px 82px
     );
   mix-blend-mode: screen;
 }
@@ -144,6 +142,7 @@ body::after {
     linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 32%),
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.14), transparent 34%);
   opacity: 0.9;
+  filter: blur(24px) saturate(140%);
 }
 
 .hero-shell,
