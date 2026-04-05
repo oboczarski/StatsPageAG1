@@ -152,6 +152,10 @@ body::after {
   margin-bottom: 16px;
 }
 
+.app-header--desktop {
+  display: none !important;
+}
+
 .main-nav {
   display: flex;
   align-items: center;
@@ -1290,11 +1294,16 @@ body::after {
     font-size: 1rem;
   }
 
-  .app-header {
-    display: flex;
+  .app-header--mobile {
+    display: none !important;
+  }
+
+  .app-header--desktop {
+    display: flex !important;
+    grid-column: 1 / -1;
     justify-content: center;
-    margin-bottom: -18px;
-    padding-top: 12px;
+    margin-bottom: 0px;
+    padding-top: 0px;
   }
 
   .main-nav {
@@ -1328,23 +1337,25 @@ body::after {
   }
   
   .hero-shell {
-    padding-top: 42px;
+    padding-top: 24px;
   }
 
   .page-tabs {
+    grid-column: 1 / -1;
+    justify-self: center;
     border-bottom: 2px solid rgba(255, 255, 255, 0.04);
     padding-bottom: 14px;
-    margin-bottom: 16px;
+    margin-bottom: 0px;
   }
 
   .page-tabs::before {
     content: "";
     position: absolute;
-    top: -42px;
+    top: -18px;
     left: 50%;
     transform: translateX(-50%);
     width: 130px;
-    height: 42px;
+    height: 18px;
     background: linear-gradient(180deg, rgba(126, 214, 255, 0.16) 0%, rgba(126, 214, 255, 0) 100%);
     pointer-events: none;
     z-index: -1;
