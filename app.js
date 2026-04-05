@@ -10,6 +10,39 @@ const CATEGORY_LABELS = {
   receiving: "RECEIVING (W/T)",
 };
 
+const ACTIVE_NAV_ITEM = "datahub";
+
+const NAV_ITEMS = [
+  { id: "home", label: "Home", icon: "house" },
+  { id: "rosters", label: "Rosters", icon: "clipboard-list" },
+  { id: "datahub", label: "DataHub", icon: "chart-column-big" },
+  { id: "leaguehub", label: "LeagueHub", icon: "trophy" },
+  { id: "research", label: "Research", icon: "flask-conical" },
+  { id: "more", label: "More", icon: "briefcase-business", hasMenu: true },
+];
+
+const NAV_MENU_ITEMS = [
+  { id: "rankings", label: "Rankings" },
+  { id: "draft-board", label: "Draft Board" },
+  { id: "settings", label: "Settings" },
+];
+
+const NAV_ICON_MARKUP = {
+  house:
+    '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/>',
+  "clipboard-list":
+    '<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4.5h6a1.5 1.5 0 0 1 1.5 1.5v1H7.5V6A1.5 1.5 0 0 1 9 4.5Z"/><path d="M9 11h6"/><path d="M9 15h6"/><path d="M9 19h4"/>',
+  "chart-column-big":
+    '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-8"/><path d="M22 20v-5"/><path d="M2 20h20"/>',
+  trophy:
+    '<path d="M8 4h8v3a4 4 0 0 1-4 4 4 4 0 0 1-4-4V4Z"/><path d="M6 5H4a2 2 0 0 0 0 4h2"/><path d="M18 5h2a2 2 0 1 1 0 4h-2"/><path d="M12 11v4"/><path d="M8.5 21h7"/><path d="M9.5 15h5v2a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-2Z"/>',
+  "flask-conical":
+    '<path d="M10 2v6.5l-5.8 9.7A2 2 0 0 0 5.9 21h12.2a2 2 0 0 0 1.7-2.8L14 8.5V2"/><path d="M8 2h8"/><path d="M8.5 13h7"/><path d="M9.8 16h4.4"/>',
+  "briefcase-business":
+    '<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/><path d="M12 12v3"/>',
+  "chevron-down": '<path d="m6 9 6 6 6-6"/>',
+};
+
 const COLUMN_SETS = {
   // GENERAL (frozen): RK, PLAYER, POS
   // INFO: TM, AGE
@@ -462,6 +495,7 @@ const MOBILE_COLUMN_WIDTHS = {
 const state = {
   primaryTab: "1-QB",
   activeCategory: "overview",
+  navMenuOpen: false,
   receivingFilters: {
     WR: true,
     TE: true,
@@ -488,6 +522,8 @@ const filePickerButton = document.querySelector("#file-picker-button");
 const filePickerInput = document.querySelector("#file-picker-input");
 const playerSearch = document.querySelector("#player-search");
 const gridContainer = document.querySelector("#player-grid");
+const desktopPlaceholderNav = document.querySelector("#desktop-placeholder-nav");
+const mobilePlaceholderNav = document.querySelector("#mobile-placeholder-nav");
 const primaryTabButtons = Array.from(
   document.querySelectorAll("[data-primary-tab]"),
 );
@@ -499,6 +535,7 @@ const receivingButtons = Array.from(
   document.querySelectorAll("[data-receiving-filter]"),
 );
 
+renderPlaceholderNav();
 attachEventListeners();
 syncUiState();
 renderTable();
@@ -510,6 +547,9 @@ showOverlay({
 loadInitialData();
 
 function attachEventListeners() {
+  document.addEventListener("click", handleDocumentClick);
+  document.addEventListener("keydown", handleDocumentKeydown);
+
   primaryTabButtons.forEach((button) => {
     button.addEventListener("click", () => {
       state.primaryTab = button.dataset.primaryTab;
@@ -640,6 +680,211 @@ function syncUiState() {
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
   });
+
+  syncPlaceholderNavState();
+}
+
+function renderPlaceholderNav() {
+  const mounts = [
+    [mobilePlaceholderNav, "mobile"],
+    [desktopPlaceholderNav, "desktop"],
+  ];
+
+  mounts.forEach(([mount, variant]) => {
+    if (!mount) {
+      return;
+    }
+
+    mount.replaceChildren(createPlaceholderNavRail(variant));
+  });
+
+  syncPlaceholderNavState();
+}
+
+function createPlaceholderNavRail(variant) {
+  const rail = document.createElement("div");
+  rail.className = `placeholder-nav__rail placeholder-nav__rail--${variant}`;
+  rail.setAttribute("role", "navigation");
+  rail.setAttribute("aria-label", "Primary navigation");
+
+  const list = document.createElement("div");
+  list.className = `placeholder-nav__list placeholder-nav__list--${variant}`;
+
+  NAV_ITEMS.forEach((item) => {
+    list.append(createNavButton(item, variant));
+  });
+
+  rail.append(list);
+  return rail;
+}
+
+function createNavButton(item, variant) {
+  const buttonClassName = [
+    "placeholder-nav__button",
+    `placeholder-nav__button--${variant}`,
+    item.hasMenu ? "placeholder-nav__button--menu" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  if (item.hasMenu) {
+    const shell = document.createElement("div");
+    shell.className = `placeholder-nav__more placeholder-nav__more--${variant}`;
+    shell.dataset.navMore = item.id;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = buttonClassName;
+    button.dataset.navMoreToggle = item.id;
+    button.setAttribute("aria-haspopup", "menu");
+    button.setAttribute("aria-expanded", "false");
+
+    const menuId = `${variant}-placeholder-nav-menu`;
+    button.setAttribute("aria-controls", menuId);
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      togglePlaceholderNavMenu();
+    });
+
+    button.append(createNavIcon(item.icon, "placeholder-nav__icon"));
+
+    const label = document.createElement("span");
+    label.className = "placeholder-nav__label";
+    label.textContent = item.label;
+    button.append(label);
+
+    const chevron = createNavIcon("chevron-down", "placeholder-nav__chevron");
+    chevron.dataset.navChevron = item.id;
+    button.append(chevron);
+
+    shell.append(button, createMoreMenu(menuId));
+    return shell;
+  }
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = buttonClassName;
+  button.dataset.navItem = item.id;
+  button.addEventListener("click", () => {
+    closePlaceholderNavMenu();
+  });
+
+  button.append(createNavIcon(item.icon, "placeholder-nav__icon"));
+
+  const label = document.createElement("span");
+  label.className = "placeholder-nav__label";
+  label.textContent = item.label;
+  button.append(label);
+
+  return button;
+}
+
+function createMoreMenu(menuId) {
+  const menu = document.createElement("div");
+  menu.id = menuId;
+  menu.className = "placeholder-nav__menu";
+  menu.dataset.navMenu = menuId;
+  menu.setAttribute("role", "menu");
+  menu.hidden = true;
+
+  NAV_MENU_ITEMS.forEach((item) => {
+    const menuItem = document.createElement("button");
+    menuItem.type = "button";
+    menuItem.className = "placeholder-nav__menu-item";
+    menuItem.textContent = item.label;
+    menuItem.setAttribute("role", "menuitem");
+    menuItem.dataset.navMenuItem = item.id;
+    menuItem.addEventListener("click", () => {
+      closePlaceholderNavMenu();
+    });
+    menu.append(menuItem);
+  });
+
+  return menu;
+}
+
+function createNavIcon(iconName, className) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+  svg.classList.add(className);
+  svg.innerHTML = NAV_ICON_MARKUP[iconName];
+  return svg;
+}
+
+function togglePlaceholderNavMenu() {
+  state.navMenuOpen = !state.navMenuOpen;
+  syncPlaceholderNavState();
+}
+
+function closePlaceholderNavMenu({ restoreFocus = false } = {}) {
+  if (!state.navMenuOpen) {
+    return;
+  }
+
+  state.navMenuOpen = false;
+  syncPlaceholderNavState();
+
+  if (restoreFocus) {
+    getVisibleMoreToggle()?.focus();
+  }
+}
+
+function syncPlaceholderNavState() {
+  document.querySelectorAll("[data-nav-item]").forEach((button) => {
+    const isActive = button.dataset.navItem === ACTIVE_NAV_ITEM;
+    button.classList.toggle("is-active", isActive);
+    if (isActive) {
+      button.setAttribute("aria-current", "page");
+    } else {
+      button.removeAttribute("aria-current");
+    }
+  });
+
+  document.querySelectorAll("[data-nav-more]").forEach((shell) => {
+    shell.classList.toggle("is-open", state.navMenuOpen);
+  });
+
+  document.querySelectorAll("[data-nav-more-toggle]").forEach((button) => {
+    button.classList.toggle("is-open", state.navMenuOpen);
+    button.setAttribute("aria-expanded", String(state.navMenuOpen));
+  });
+
+  document.querySelectorAll("[data-nav-chevron]").forEach((icon) => {
+    icon.classList.toggle("is-open", state.navMenuOpen);
+  });
+
+  document.querySelectorAll("[data-nav-menu]").forEach((menu) => {
+    menu.hidden = !state.navMenuOpen;
+    menu.classList.toggle("is-open", state.navMenuOpen);
+  });
+}
+
+function handleDocumentClick(event) {
+  if (!state.navMenuOpen) {
+    return;
+  }
+
+  if (event.target.closest("[data-nav-more]")) {
+    return;
+  }
+
+  closePlaceholderNavMenu();
+}
+
+function handleDocumentKeydown(event) {
+  if (event.key !== "Escape") {
+    return;
+  }
+
+  closePlaceholderNavMenu({ restoreFocus: true });
+}
+
+function getVisibleMoreToggle() {
+  return Array.from(document.querySelectorAll("[data-nav-more-toggle]")).find(
+    (button) => button.offsetParent !== null,
+  ) ?? null;
 }
 
 function updateRowCount() {
@@ -1065,6 +1310,8 @@ function handleViewportResize() {
     }
 
     state.isCompactViewport = nextCompact;
+    state.navMenuOpen = false;
+    syncPlaceholderNavState();
     refreshGrid();
   });
 }
