@@ -27,38 +27,164 @@
     <div class="background-orb background-orb--three" aria-hidden="true"></div>
 
     <main class="app-shell">
-      <section class="hero-shell glass-panel">
-        <div class="hero-copy">
-          <p class="eyebrow">DH DATA HUB – ADVANCED ANALYTICS</p>
-          <h1 id="main-title" class="page-title">
-            1QB ADP, TRADE VALUES &amp; 2025 STATS
-          </h1>
+      <section class="app-nav-shell" aria-label="Primary placeholder navigation">
+        <div class="brand-lockup">
+          <div class="brand-lockup__frame">
+            <img
+              class="brand-lockup__logo"
+              src="./dh-Logo.png"
+              alt="Dynasty Hub logo"
+            />
+          </div>
+          <div class="brand-lockup__text">
+            <p class="brand-lockup__eyebrow">Premium Dynasty Intelligence</p>
+            <p class="brand-lockup__name">Dynasty Hub</p>
+          </div>
         </div>
 
-        <div class="hero-actions">
-          <div class="top-tabs" role="tablist" aria-label="League format">
-            <button
-              type="button"
-              class="top-tab is-active"
-              data-primary-tab="1-QB"
-              role="tab"
-              aria-selected="true"
-            >
-              1-QB
-            </button>
-            <button
-              type="button"
-              class="top-tab"
-              data-primary-tab="SFLX"
-              role="tab"
-              aria-selected="false"
-            >
-              SFLX
+        <nav class="app-nav-rail" aria-label="Primary navigation">
+          <button type="button" class="app-nav-button">
+            <svg class="app-nav-button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M3 10.5 12 3l9 7.5" />
+              <path d="M5 9.5V21h14V9.5" />
+              <path d="M10 21v-6h4v6" />
+            </svg>
+            <span>Home</span>
+          </button>
+          <button type="button" class="app-nav-button">
+            <svg class="app-nav-button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Rosters</span>
+          </button>
+          <button type="button" class="app-nav-button is-active" aria-pressed="true">
+            <svg class="app-nav-button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <ellipse cx="12" cy="5" rx="9" ry="3" />
+              <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
+              <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3" />
+            </svg>
+            <span>DataHub</span>
+          </button>
+          <button type="button" class="app-nav-button">
+            <svg class="app-nav-button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M8 21h8" />
+              <path d="M12 17v4" />
+              <path d="M7 4h10v4a5 5 0 0 1-10 0V4Z" />
+              <path d="M5 9H4a2 2 0 0 1-2-2V5h3" />
+              <path d="M19 9h1a2 2 0 0 0 2-2V5h-3" />
+            </svg>
+            <span>LeagueHub</span>
+          </button>
+          <button type="button" class="app-nav-button">
+            <svg class="app-nav-button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="m10.5 13.5-3 3" />
+              <path d="m13.5 10.5 3-3" />
+              <path d="m12 12 7-7" />
+              <path d="m17 4 3 3" />
+              <path d="M4 20 9.5 8.5 15.5 14.5 4 20Z" />
+              <path d="M9.5 8.5 6 5" />
+            </svg>
+            <span>Research</span>
+          </button>
+          <button type="button" class="app-nav-button">
+            <svg class="app-nav-button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="5" cy="12" r="1.6" style="fill: currentColor; stroke: none" />
+              <circle cx="12" cy="12" r="1.6" style="fill: currentColor; stroke: none" />
+              <circle cx="19" cy="12" r="1.6" style="fill: currentColor; stroke: none" />
+            </svg>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section class="hero-shell glass-panel">
+        <div class="view-tab-strip" aria-label="Placeholder future views">
+          <button type="button" class="view-tab is-active" aria-pressed="true">
+            <svg class="view-tab__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M3 3v18h18" />
+              <path d="M7 16v-5" />
+              <path d="M12 16V8" />
+              <path d="M17 16v-2" />
+            </svg>
+            <span>Stats</span>
+          </button>
+          <button type="button" class="view-tab">
+            <svg class="view-tab__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 8V4" />
+              <path d="M8 4h8" />
+              <path d="m9 4-4 7 4 1 3-4" />
+              <path d="m15 4 4 7-4 1-3-4" />
+              <circle cx="12" cy="17" r="5" />
+            </svg>
+            <span>Rankings</span>
+          </button>
+          <button type="button" class="view-tab">
+            <svg class="view-tab__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 3v18" />
+              <path d="M3 7h18" />
+              <path d="m5 7-3 7h6l-3-7Z" />
+              <path d="m19 7-3 7h6l-3-7Z" />
+              <path d="M7 21h10" />
+            </svg>
+            <span>ADP &amp; Values</span>
+          </button>
+          <button type="button" class="view-tab">
+            <svg class="view-tab__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 20V10" />
+              <path d="M7 20h10" />
+              <path d="M12 10c0-3.6 2.6-6 6-6 0 3.4-2.4 6-6 6Z" />
+              <path d="M12 14c0-3.1-2.1-5.5-5.5-6 0 3.6 2.1 6 5.5 6Z" />
+            </svg>
+            <span>Rookies</span>
+          </button>
+          <button type="button" class="view-tab">
+            <svg class="view-tab__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="8.5" cy="15.5" r="4.5" />
+              <path d="m12 12 6-6" />
+              <path d="m18 6 2 2" />
+              <path d="m20.5 3.5 1 1" />
+              <path d="M5 19 2 22" />
+            </svg>
+            <span>Ownership</span>
+          </button>
+        </div>
+
+        <div class="hero-header">
+          <div class="hero-copy">
+            <p class="eyebrow">DH DATA HUB – ADVANCED ANALYTICS</p>
+            <h1 id="main-title" class="page-title">
+              1QB ADP, TRADE VALUES &amp; 2025 STATS
+            </h1>
+          </div>
+
+          <div class="hero-actions">
+            <div class="top-tabs" role="tablist" aria-label="League format">
+              <button
+                type="button"
+                class="top-tab is-active"
+                data-primary-tab="1-QB"
+                role="tab"
+                aria-selected="true"
+              >
+                1-QB
+              </button>
+              <button
+                type="button"
+                class="top-tab"
+                data-primary-tab="SFLX"
+                role="tab"
+                aria-selected="false"
+              >
+                SFLX
+              </button>
+            </div>
+            <button type="button" class="top-pill top-pill--ghost" aria-disabled="true">
+              PICK VALUES
             </button>
           </div>
-          <button type="button" class="top-pill top-pill--ghost" aria-disabled="true">
-            PICK VALUES
-          </button>
         </div>
       </section>
 
