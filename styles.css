@@ -526,7 +526,7 @@ body::after {
   min-width: 0;
   overflow: auto;
   max-height: clamp(500px, 62vh, 900px);
-  overscroll-behavior-x: contain;
+  overscroll-behavior-x: none;
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
 }
