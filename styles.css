@@ -160,8 +160,8 @@ body::after {
   color: var(--text-secondary);
   font-family: inherit;
   font-weight: 500;
-  font-size: 0.85rem;
-  letter-spacing: 0.02em;
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   outline: none;
@@ -1141,20 +1141,20 @@ body::after {
   .nav-desktop {
     grid-column: 1 / -1;
     justify-content: center;
-    align-self: flex-start; /* Ensures it restricts its width to content */
+     /* Ensures it restricts its width to content */
     margin: 0 0 32px 0;
     width: max-content; /* Pill wraps content */
-    gap: 4px;
+    gap: 1px;
     background: var(--panel-inner);
-    border: 1px solid var(--panel-edge);
-    padding: 6px;
+    padding: 2px;
     border-radius: 999px; /* Pill shape container */
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 8px 8px 19px rgb(0 0 0 / 42%), -3px -3px 21px rgb(170 170 184 / 25%);
+    justify-self: center;
   }
 
   .nav-item {
-    gap: 8px;
-    padding: 10px 20px;
+    gap: 6px;
+    padding: 13px 20px;
     border-radius: 999px; /* Pill shape buttons */
     background: transparent;
     position: relative;
@@ -1167,15 +1167,14 @@ body::after {
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%);
     opacity: 0;
     transition: opacity 0.25s ease;
     pointer-events: none;
   }
 
   .nav-icon {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
   }
 
   .nav-icon-chevron {
@@ -1194,9 +1193,9 @@ body::after {
   }
 
   .nav-item.is-active {
-    color: var(--text-primary);
-    background: rgba(102, 215, 255, 0.1);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 0 20px rgba(102, 215, 255, 0.15);
+    color: rgb(195 206 222 / 96%);
+    background: rgba(102, 215, 255, 0.09);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
   }
 
   .nav-item.is-active::after {
