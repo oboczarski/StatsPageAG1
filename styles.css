@@ -249,6 +249,7 @@ body::after {
 }
 
 .page-tab {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -267,8 +268,8 @@ body::after {
 
 .page-tab:hover {
   color: var(--text-secondary);
-  border-color: rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .page-tab:active {
@@ -276,14 +277,22 @@ body::after {
 }
 
 .page-tab.is-active {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.12);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
-    rgba(14, 22, 35, 0.54);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 6px 12px rgba(0, 0, 0, 0.24);
+  color: var(--accent-cyan, #66d7ff);
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-tab.is-active::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent-cyan, #66d7ff);
+  box-shadow: 0 0 10px rgba(102, 215, 255, 0.5);
 }
 
 .tab-icon {
