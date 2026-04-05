@@ -488,6 +488,7 @@ const filePickerButton = document.querySelector("#file-picker-button");
 const filePickerInput = document.querySelector("#file-picker-input");
 const playerSearch = document.querySelector("#player-search");
 const gridContainer = document.querySelector("#player-grid");
+const pageTabs = document.querySelector(".page-tabs");
 const primaryTabButtons = Array.from(
   document.querySelectorAll("[data-primary-tab]"),
 );
@@ -501,6 +502,7 @@ const receivingButtons = Array.from(
 
 attachEventListeners();
 syncUiState();
+updatePageTabsGlint();
 renderTable();
 showOverlay({
   title: "Preparing SZN.csv",
@@ -508,6 +510,14 @@ showOverlay({
     "Building the Data Hub table and mapping the requested stat views.",
 });
 loadInitialData();
+
+if (document.fonts?.ready) {
+  document.fonts.ready
+    .then(() => {
+      updatePageTabsGlint();
+    })
+    .catch(() => {});
+}
 
 function attachEventListeners() {
   primaryTabButtons.forEach((button) => {
@@ -542,6 +552,7 @@ function attachEventListeners() {
   filePickerButton.addEventListener("click", () => filePickerInput.click());
   filePickerInput.addEventListener("change", handlePickedFile);
 
+  window.addEventListener("load", updatePageTabsGlint);
   window.addEventListener("resize", handleViewportResize, { passive: true });
 }
 
@@ -640,6 +651,31 @@ function syncUiState() {
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
   });
+}
+
+function updatePageTabsGlint() {
+  if (!pageTabs) {
+    return;
+  }
+
+  if (isCompactViewport()) {
+    pageTabs.style.removeProperty("--page-tabs-glint-left");
+    pageTabs.style.removeProperty("--page-tabs-glint-width");
+    return;
+  }
+
+  const activeTab = pageTabs.querySelector(".page-tab.is-active");
+  if (!activeTab) {
+    return;
+  }
+
+  const tabsRect = pageTabs.getBoundingClientRect();
+  const activeRect = activeTab.getBoundingClientRect();
+  const glowCenter = activeRect.left - tabsRect.left + (activeRect.width / 2);
+  const glowWidth = Math.max(56, Math.min(activeRect.width * 0.72, 128));
+
+  pageTabs.style.setProperty("--page-tabs-glint-left", `${glowCenter}px`);
+  pageTabs.style.setProperty("--page-tabs-glint-width", `${glowWidth}px`);
 }
 
 function updateRowCount() {
@@ -1060,12 +1096,12 @@ function handleViewportResize() {
   cancelAnimationFrame(resizeFrame);
   resizeFrame = requestAnimationFrame(() => {
     const nextCompact = isCompactViewport();
-    if (nextCompact === state.isCompactViewport) {
-      return;
+    if (nextCompact !== state.isCompactViewport) {
+      state.isCompactViewport = nextCompact;
+      refreshGrid();
     }
 
-    state.isCompactViewport = nextCompact;
-    refreshGrid();
+    updatePageTabsGlint();
   });
 }
 

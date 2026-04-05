@@ -16,6 +16,7 @@
   --success-glow: rgba(113, 225, 199, 0.34);
   --shadow-soft: 10px 30px 20px rgba(0, 0, 0, 0.28);
   --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.28), 20px 26px 20px rgba(0, 0, 0, 0.2);
+  --desktop-header-side-width: clamp(144px, 16vw, 272px);
 }
 
 *,
@@ -154,19 +155,34 @@ body::after {
   display: none !important;
 }
 
+.header-shell {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01)),
+    rgba(14, 20, 32, 0.75);
+  box-shadow: var(--shadow-soft), var(--shadow-glass);
+}
+
+.header-shell--stacked {
+  display: grid;
+  gap: 10px;
+  padding: 10px 12px 12px;
+}
+
+.header-shell--stacked .main-nav {
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .main-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 4px;
   overflow-x: auto;
-  padding: 10px 12px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01)),
-    rgba(14, 20, 32, 0.75);
-  box-shadow: var(--shadow-soft), var(--shadow-glass);
+  min-width: 0;
   scrollbar-width: none;
 }
 
@@ -174,12 +190,55 @@ body::after {
   display: none;
 }
 
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.brand-lockup__logo {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(126, 214, 255, 0.18));
+}
+
+.brand-lockup__wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.28rem;
+  min-width: 0;
+  font-family: "Google Sans", var(--font-sans);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.brand-lockup__name,
+.brand-lockup__accent {
+  font-size: 1.25rem;
+  letter-spacing: -0.06em;
+}
+
+.brand-lockup__name {
+  color: #f8fbff;
+  font-weight: 700;
+}
+
+.brand-lockup__accent {
+  color: var(--accent-cyan);
+  font-weight: 400;
+}
+
 .nav-item {
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  min-width: 64px;
+  min-width: 0;
   padding: 8px 4px;
   border: 1px solid transparent;
   border-radius: 14px;
@@ -229,10 +288,13 @@ body::after {
   font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.04em;
+  white-space: nowrap;
   transition: color 200ms ease;
 }
 
 .page-tabs {
+  --page-tabs-glint-left: 50%;
+  --page-tabs-glint-width: 96px;
   position: relative;
   display: flex;
   align-items: center;
@@ -1099,6 +1161,19 @@ body::after {
 
 @media (max-width: 719px) {
 
+  .header-shell--stacked {
+    padding: 12px 12px 10px;
+  }
+
+  .header-shell--stacked .brand-lockup {
+    padding: 0 2px;
+  }
+
+  .header-shell--stacked .brand-lockup__logo {
+    width: 38px;
+    height: 38px;
+  }
+
   .table-pane--frozen,
   .table-pane--scroll {
     max-height: clamp(420px, 55vh, 700px);
@@ -1218,16 +1293,17 @@ body::after {
   }
 
   .controls-shell {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
+    grid-template-columns: 1fr;
+    align-items: stretch;
     gap: 16px;
     padding: 18px;
   }
 
   .utility-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
 
   .top-tab {
@@ -1313,17 +1389,21 @@ body::after {
   }
 
   .app-header--desktop {
-    display: flex !important;
+    display: block !important;
     grid-column: 1 / -1;
-    justify-content: center;
-    margin-bottom: 0px;
-    padding-top: 0px;
+    margin-bottom: 0;
+    padding-top: 0;
   }
 
-  .main-nav {
-    flex-direction: row;
-    padding: 6px 8px;
-    gap: 4px;
+  .header-layout {
+    display: grid;
+    grid-template-columns: var(--desktop-header-side-width) minmax(0, 1fr) var(--desktop-header-side-width);
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .header-shell {
     border-radius: 999px;
     background:
       linear-gradient(180deg, rgba(30, 42, 60, 0.9), rgba(16, 24, 38, 0.95));
@@ -1333,25 +1413,73 @@ body::after {
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .nav-item {
+  .header-shell--brand {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    padding: 9px 18px 9px 14px;
+  }
+
+  .header-shell--nav {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    padding: 6px 8px;
+  }
+
+  .app-header__balance {
+    width: 100%;
+    min-height: 1px;
+    pointer-events: none;
+  }
+
+  .main-nav {
     flex-direction: row;
-    gap: 8px;
-    padding: 10px 20px;
+    justify-content: center;
+  }
+
+  .nav-item {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: clamp(5px, 0.7vw, 7px);
+    padding: 8px clamp(10px, 1.1vw, 14px);
     min-width: auto;
     border-radius: 999px;
   }
 
   .nav-item span {
-    font-size: 0.74rem;
+    font-size: clamp(0.62rem, 0.55rem + 0.2vw, 0.7rem);
   }
 
   .nav-icon {
-    width: 17px;
-    height: 17px;
+    width: clamp(14px, 1vw + 7px, 16px);
+    height: clamp(14px, 1vw + 7px, 16px);
+  }
+
+  .brand-lockup {
+    gap: clamp(8px, 1vw, 12px);
+  }
+
+  .brand-lockup__logo {
+    width: clamp(30px, 2vw + 16px, 42px);
+    height: clamp(30px, 2vw + 16px, 42px);
+  }
+
+  .brand-lockup__name,
+  .brand-lockup__accent {
+    font-size: clamp(1.05rem, 0.8rem + 1vw, 1.56rem);
+  }
+
+  .brand-lockup__wordmark {
+    gap: clamp(0.18rem, 0.3vw, 0.34rem);
   }
 
   .hero-shell {
     padding-top: 24px;
+  }
+
+  .hero-copy {
+    margin-top: 0;
   }
 
   .page-tabs {
@@ -1383,9 +1511,10 @@ body::after {
     content: "";
     position: absolute;
     top: 0;
-    left: 42%;
-    right: 42%;
+    left: var(--page-tabs-glint-left, 50%);
+    width: var(--page-tabs-glint-width, 96px);
     height: 1px;
+    transform: translateX(-50%);
     background: linear-gradient(90deg, transparent, rgba(126, 214, 255, 0.6), transparent);
     box-shadow: 0 0 14px rgba(126, 214, 255, 0.8);
   }
@@ -1395,6 +1524,18 @@ body::after {
     padding: 8px 18px;
   }
 
+}
+
+@media (min-width: 960px) {
+  .controls-shell {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .utility-row {
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+  }
 }
 
 @media (min-width: 1080px) {
