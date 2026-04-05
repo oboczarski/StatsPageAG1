@@ -986,8 +986,12 @@ body::after {
 }
 
 @media (max-width: 719px) {
+  .nav-desktop {
+    display: none !important;
+  }
+
   /* Mobile Top-bar layout (mockup match) */
-  .main-nav {
+  .nav-mobile {
     margin: 0 0 16px 0;
     padding: 8px 12px;
     border-radius: 20px;
@@ -1000,7 +1004,7 @@ body::after {
     gap: 8px;
   }
 
-  .main-nav::-webkit-scrollbar {
+  .nav-mobile::-webkit-scrollbar {
     display: none;
   }
 
@@ -1129,11 +1133,16 @@ body::after {
 }
 
 @media (min-width: 720px) {
+  .nav-mobile {
+    display: none !important;
+  }
+
   /* Desktop integrated Floating Pill layout */
-  .main-nav {
+  .nav-desktop {
+    grid-column: 1 / -1;
     justify-content: center;
-    align-self: center; /* Center horizontally in app-shell */
-    margin: 0 auto 32px auto; /* Margin to separate from hero-shell */
+    align-self: flex-start; /* Ensures it restricts its width to content */
+    margin: 0 0 32px 0;
     width: max-content; /* Pill wraps content */
     gap: 4px;
     background: var(--panel-inner);
