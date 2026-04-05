@@ -63,13 +63,11 @@ body::after {
 body::before {
   opacity: 0.92;
   background:
-    repeating-radial-gradient(
-      circle at 16% 10%,
+    repeating-radial-gradient(circle at 16% 10%,
       rgba(175, 90, 255, 0.055) 0 1px,
       rgba(255, 255, 255, 0.01) 1px 2px,
       rgba(255, 40, 125, 0.012) 2px 3px,
-      rgba(255, 255, 255, 0.018) 42px 82px
-    );
+      rgba(255, 255, 255, 0.018) 42px 82px);
   mix-blend-mode: screen;
 }
 
@@ -314,6 +312,7 @@ body::after {
 .hero-copy {
   display: grid;
   gap: 4px;
+  margin-top: -50px;
 }
 
 .hero-actions {
@@ -689,7 +688,8 @@ body::after {
 .grid-stage__overlay {
   position: absolute;
   inset: 0;
-  z-index: 50; /* above sticky header (z-index: 20) and scrollbar */
+  z-index: 50;
+  /* above sticky header (z-index: 20) and scrollbar */
   display: grid;
   place-items: center;
   padding: 18px;
@@ -838,7 +838,8 @@ body::after {
 /* ── Column header row ─────────────────────────────────────────────────── */
 .stats-table thead th.stats-table__header-cell {
   position: sticky;
-  top: 36px; /* sits below the 26px group header row */
+  top: 36px;
+  /* sits below the 26px group header row */
   z-index: 11;
   background: linear-gradient(180deg, rgb(53 61 80 / 99%), rgb(38 44 60 / 99%));
   border-bottom: 0;
@@ -1088,6 +1089,7 @@ body::after {
 }
 
 @media (max-width: 719px) {
+
   .table-pane--frozen,
   .table-pane--scroll {
     max-height: clamp(420px, 55vh, 700px);
@@ -1105,7 +1107,8 @@ body::after {
   }
 
   .stats-table thead th.stats-table__header-cell {
-    top: 26px; /* matches mobile group header height */
+    top: 26px;
+    /* matches mobile group header height */
   }
 
   .stats-table__head-button {
@@ -1158,6 +1161,7 @@ body::after {
 }
 
 @keyframes driftPulse {
+
   0%,
   100% {
     transform: translateY(0) scale(1);
@@ -1165,6 +1169,7 @@ body::after {
       0 0 0 1px rgba(255, 255, 255, 0.12),
       0 0 60px rgba(102, 215, 255, 0.22);
   }
+
   50% {
     transform: translateY(-3px) scale(1.03);
     box-shadow:
@@ -1181,7 +1186,7 @@ body::after {
   .hero-shell {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: end;
-    gap: 20px;
+    gap: 12px;
     padding: 24px;
   }
 
@@ -1335,7 +1340,7 @@ body::after {
     width: 17px;
     height: 17px;
   }
-  
+
   .hero-shell {
     padding-top: 24px;
   }
@@ -1360,7 +1365,7 @@ body::after {
     pointer-events: none;
     z-index: -1;
   }
-  
+
   .page-tabs::after {
     content: "";
     position: absolute;
@@ -1409,6 +1414,7 @@ body::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
