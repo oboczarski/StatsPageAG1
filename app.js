@@ -1,8 +1,12 @@
+// ---------------------------------------------------------------------------
+// Display / UI state metadata
+// ---------------------------------------------------------------------------
 const PRIMARY_TITLES = {
   "1-QB": "1QB ADP, TRADE VALUES & 2025 STATS",
   SFLX: "SFLX ADP, TRADE VALUES & 2025 STATS",
 };
 
+// Category labels are displayed verbatim in the controls row + active view label.
 const CATEGORY_LABELS = {
   overview: "OVERVIEW (ALL)",
   passing: "PASSING (QB)",
@@ -10,6 +14,34 @@ const CATEGORY_LABELS = {
   receiving: "RECEIVING (W/T)",
 };
 
+const MOBILE_BREAKPOINT = 719;
+
+const state = {
+  // In this reference app, primaryTab updates the title and selected tab styling
+  // only. It does not swap datasets or change table columns.
+  primaryTab: "1-QB",
+  activeCategory: "overview",
+  receivingFilters: {
+    WR: true,
+    TE: true,
+  },
+  searchText: "",
+  rows: [],
+  displayedRows: [],
+  sort: {
+    column: "RK",
+    direction: "asc",
+  },
+  isCompactViewport: isCompactViewport(),
+  columnFormatting: Object.create(null),
+};
+
+// ---------------------------------------------------------------------------
+// Table schema metadata
+// COLUMN_SETS is the authoritative column-order contract for each table view.
+// Future merges should preserve these arrays exactly unless the reference table
+// structure itself is intentionally being changed.
+// ---------------------------------------------------------------------------
 const COLUMN_SETS = {
   // GENERAL (frozen): RK, PLAYER, POS
   // INFO: TM, AGE
@@ -174,6 +206,9 @@ const COLUMN_SETS = {
   ],
 };
 
+// Maps normalized table columns to CSV headers. A null alias means the column is
+// intentionally part of the reference layout but is not populated by the
+// current CSV source.
 const SOURCE_ALIASES = {
   PLAYER: "NM",
   RK: "PRK_PPR",
@@ -201,7 +236,6 @@ const COLUMN_ICONS = {
   VALUE:     "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6", // DollarSign
   ADP:       "M18 20V10M12 20V4M6 20v-6", // BarChart2
   "POS·ADP": "M3 6h18M7 12h10M11 18h2", // ListFilter (3 lines decreasing)
-  SNP:       "M22 12h-4l-3 9L9 3l-3 9H2", // Activity
   "SNP%":    "M22 12h-4l-3 9L9 3l-3 9H2", // Activity
   "YDS(t)":  "M22 3H2l8 9.46V19l4 2v-8.54L22 3z", // Filter/Ruler-like
   "YPG(t)":  "M18 20V10M12 20V4M6 20v-6", // BarChart
@@ -258,9 +292,9 @@ const COLUMN_ICONS = {
 };
 
 // ---------------------------------------------------------------------------
-// Column group definitions per view. Each group has a label and lists the
-// exact columns it spans (in-order, matching COLUMN_SETS). The frozen pane
-// always uses FROZEN_GROUP. The scrollable pane uses per-category groups.
+// Column group definitions per view. Group order and spans must stay aligned
+// with COLUMN_SETS, because the grouped header row is generated from this
+// metadata rather than from hard-coded DOM.
 // ---------------------------------------------------------------------------
 // GENERAL icon: User (person)
 const FROZEN_GROUP = [{ label: "GENERAL", icon: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", columns: ["RK", "PLAYER", "POS"] }];
@@ -297,7 +331,7 @@ const COLUMN_GROUPS = {
   ],
 };
 
-const LABEL_COLUMNS = new Set(["PLAYER", "POS", "TM"]);
+// Column families that drive alignment and percentile styling behavior.
 const NON_FORMATTED_COLUMNS = new Set(["PLAYER", "POS", "TM", "AGE", "G"]);
 const INVERTED_COLUMNS = new Set([
   "RK",
@@ -314,6 +348,7 @@ const FPTS_COLUMN = "FPTS";
 const STICKY_COLUMN_COUNT = 3;
 const ALL_COLUMNS = [...new Set(Object.values(COLUMN_SETS).flat())];
 
+// View predicates are part of the current UI behavior, not just presentation.
 const CATEGORY_FILTERS = {
   overview: (row) => Boolean(row.POS && row.POS !== "NA"),
   passing: (row) => row.POS === "QB",
@@ -323,8 +358,8 @@ const CATEGORY_FILTERS = {
     (row.POS === "TE" && state.receivingFilters.TE),
 };
 
-const MOBILE_BREAKPOINT = 719;
-
+// Width maps are part of the reference layout contract. The compact table uses
+// a separate tuned width set plus a scale factor for non-frozen columns.
 const COLUMN_WIDTHS = {
   RK: 78,
   PLAYER: 172,
@@ -459,24 +494,10 @@ const MOBILE_COLUMN_WIDTHS = {
   "RZ Tgt": 64,
 };
 
-const state = {
-  primaryTab: "1-QB",
-  activeCategory: "overview",
-  receivingFilters: {
-    WR: true,
-    TE: true,
-  },
-  searchText: "",
-  rows: [],
-  displayedRows: [],
-  sort: {
-    column: "RK",
-    direction: "asc",
-  },
-  isCompactViewport: isCompactViewport(),
-  columnFormatting: Object.create(null),
-};
-
+// ---------------------------------------------------------------------------
+// DOM bindings
+// These IDs and data attributes are the implementation contract with index.html.
+// ---------------------------------------------------------------------------
 const mainTitle = document.querySelector("#main-title");
 const activeViewLabel = document.querySelector("#active-view-label");
 const rowCount = document.querySelector("#row-count");
@@ -499,6 +520,9 @@ const receivingButtons = Array.from(
   document.querySelectorAll("[data-receiving-filter]"),
 );
 
+// ---------------------------------------------------------------------------
+// Boot sequence
+// ---------------------------------------------------------------------------
 attachEventListeners();
 syncUiState();
 renderTable();
@@ -509,6 +533,9 @@ showOverlay({
 });
 loadInitialData();
 
+// ---------------------------------------------------------------------------
+// Event wiring
+// ---------------------------------------------------------------------------
 function attachEventListeners() {
   primaryTabButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -545,6 +572,9 @@ function attachEventListeners() {
   window.addEventListener("resize", handleViewportResize, { passive: true });
 }
 
+// ---------------------------------------------------------------------------
+// Data loading
+// ---------------------------------------------------------------------------
 async function loadInitialData() {
   try {
     const csvText = await fetchCsvText();
@@ -552,6 +582,8 @@ async function loadInitialData() {
     hideOverlay();
   } catch (error) {
     console.error(error);
+    // Browsers commonly block fetch() from file:// origins. The overlay keeps
+    // the app usable by falling back to a manual file picker.
     showOverlay({
       title: "Local browser access blocked",
       description:
@@ -562,6 +594,7 @@ async function loadInitialData() {
 }
 
 async function fetchCsvText() {
+  // Keep the live reference pointed at the local CSV file in this folder.
   const response = await fetch("./SZN.csv", { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`Unable to load SZN.csv (${response.status})`);
@@ -606,6 +639,9 @@ function applyCsvText(csvText) {
   refreshGrid();
 }
 
+// ---------------------------------------------------------------------------
+// Render pipeline
+// ---------------------------------------------------------------------------
 function refreshGrid() {
   const visibleRows = getVisibleRows();
   state.columnFormatting = buildColumnFormatting(visibleRows);
@@ -616,6 +652,8 @@ function refreshGrid() {
 }
 
 function syncUiState() {
+  // The league-format tabs currently affect headline + active button state
+  // only. Column definitions and rows are driven by activeCategory.
   mainTitle.textContent = PRIMARY_TITLES[state.primaryTab];
   activeViewLabel.textContent = CATEGORY_LABELS[state.activeCategory];
 
@@ -648,7 +686,9 @@ function updateRowCount() {
 }
 
 function renderTable() {
-  // Preserve horizontal scroll position across re-renders (e.g. after a sort)
+  // Custom DOM table renderer: the left pane stays frozen while the right pane
+  // owns the scrollbars. No external grid library is involved.
+  // Preserve horizontal scroll position across re-renders (e.g. after a sort).
   const savedScrollLeft = gridContainer.querySelector(".table-pane--scroll")?.scrollLeft ?? 0;
 
   const allColumns = COLUMN_SETS[state.activeCategory];
@@ -695,7 +735,8 @@ function renderTable() {
   });
 }
 
-// Build one complete <table> (colgroup + thead with group row + column row + tbody)
+// Build one complete <table> from metadata (colgroup + grouped header +
+// sortable header row + body).
 function buildTable(columns, totalWidth, groups, paneType) {
   const table = document.createElement("table");
   table.className = "stats-table";
@@ -716,7 +757,7 @@ function buildTable(columns, totalWidth, groups, paneType) {
 
   // thead: group row + column row
   const thead = document.createElement("thead");
-  thead.append(buildGroupHeaderRow(columns, groups));
+  thead.append(buildGroupHeaderRow(groups));
   const columnRow = document.createElement("tr");
   columns.forEach((column) => columnRow.append(createHeaderCell(column)));
   thead.append(columnRow);
@@ -743,10 +784,10 @@ function buildColumnLayout(columnNames, mobileScaleFactor = 1) {
   let totalWidth = 0;
   const scale = state.isCompactViewport ? mobileScaleFactor : 1;
 
-  const columns = columnNames.map((name, index) => {
+  const columns = columnNames.map((name) => {
     const width = Math.round(getColumnWidth(name) * scale);
     totalWidth += width;
-    return { name, index, width };
+    return { name, width };
   });
 
   return { columns, totalWidth };
@@ -803,10 +844,7 @@ function createBodyCell(row, column) {
   td.classList.add("stats-table__body-cell");
   applyColumnStyle(td, column);
 
-  const cellClasses = getCellClass({
-    colDef: { field: column.name },
-    value,
-  })
+  const cellClasses = getCellClass(column.name, value)
     .split(/\s+/)
     .filter(Boolean);
 
@@ -851,10 +889,7 @@ function applyColumnStyle(cell, column) {
   cell.style.setProperty("--column-width", `${column.width}px`);
 }
 
-// ---------------------------------------------------------------------------
-// Group header row builder
-// ---------------------------------------------------------------------------
-function buildGroupHeaderRow(columns, groups) {
+function buildGroupHeaderRow(groups) {
   const tr = document.createElement("tr");
 
   groups.forEach((group) => {
@@ -889,7 +924,9 @@ function buildGroupHeaderRow(columns, groups) {
 }
 
 // ---------------------------------------------------------------------------
-// Row height synchronization — keeps frozen + scroll pane rows identical
+// Pane synchronization
+// Row height sync keeps the frozen and scroll panes visually identical even
+// though they are rendered as separate tables.
 // ---------------------------------------------------------------------------
 let _rowResizeObserver = null;
 
@@ -957,6 +994,9 @@ function observeRowResize(frozenTable, scrollTable) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Sorting / filtering
+// ---------------------------------------------------------------------------
 function getAriaSort(columnName) {
   if (getActiveSortColumn() !== columnName) {
     return "none";
@@ -1058,10 +1098,15 @@ function handleViewportResize() {
   });
 }
 
+// ---------------------------------------------------------------------------
+// CSV parsing / normalization
+// ---------------------------------------------------------------------------
 function normalizeRow(sourceRow) {
   const normalized = {};
 
   for (const columnName of ALL_COLUMNS) {
+    // SOURCE_ALIASES is the bridge between raw CSV headers and the normalized
+    // row shape consumed everywhere else in the app.
     const alias = Object.prototype.hasOwnProperty.call(SOURCE_ALIASES, columnName)
       ? SOURCE_ALIASES[columnName]
       : columnName;
@@ -1087,6 +1132,7 @@ function sanitizeValue(value) {
 }
 
 function parseCsv(csvText) {
+  // Minimal dependency-free CSV parser for the local reference dataset.
   const rows = [];
   let current = "";
   let row = [];
@@ -1144,10 +1190,11 @@ function parseCsv(csvText) {
     );
 }
 
-function getCellClass(params) {
-  const classes = ["dh-grid-cell"];
-  const columnName = params.colDef.field;
-  const missingValue = isMissingValue(params.value);
+// This stays custom to the current renderer: no grid-library params object,
+// just the normalized column name and raw cell value.
+function getCellClass(columnName, value) {
+  const classes = [];
+  const missingValue = isMissingValue(value);
 
   if (columnName === PLAYER_COLUMN) {
     classes.push("player-cell");
@@ -1155,9 +1202,7 @@ function getCellClass(params) {
     classes.push("center-cell");
   }
 
-  if (NON_FORMATTED_COLUMNS.has(columnName)) {
-    classes.push("plain-cell");
-  } else {
+  if (!NON_FORMATTED_COLUMNS.has(columnName)) {
     classes.push("formatted-cell");
   }
 
@@ -1167,13 +1212,12 @@ function getCellClass(params) {
   }
 
   if (columnName === FPTS_COLUMN) {
-    classes.push("fpts-cell", `fpts-cell--tier-${getFormattingTier(columnName, params.value)}`);
     return classes.join(" ");
   }
 
   if (!NON_FORMATTED_COLUMNS.has(columnName)) {
     const family = NEUTRAL_COLUMNS.has(columnName) ? "neutral" : "heat";
-    const tier = getFormattingTier(columnName, params.value);
+    const tier = getFormattingTier(columnName, value);
     classes.push("heat-cell", `heat-cell--${family}`, `heat-cell--tier-${tier}`);
   }
 
@@ -1208,6 +1252,11 @@ function abbreviatePlayerName(name) {
   return `${first.charAt(0)}. ${rest.join(" ")}`;
 }
 
+// ---------------------------------------------------------------------------
+// Formatting tiers
+// Percentile-derived color tiers are presentation only; they should not be
+// treated as source data or sorting logic.
+// ---------------------------------------------------------------------------
 function buildColumnFormatting(rows) {
   const formatting = Object.create(null);
   const columns = COLUMN_SETS[state.activeCategory];
@@ -1352,6 +1401,9 @@ function isMissingValue(value) {
   return value == null || value === "" || value === "NA" || value === "#N/A";
 }
 
+// ---------------------------------------------------------------------------
+// Overlay helpers
+// ---------------------------------------------------------------------------
 function showOverlay({ title, description, showActions = false }) {
   overlayTitle.textContent = title;
   overlayDescription.textContent = description;

@@ -27,7 +27,8 @@
     <div class="background-orb background-orb--three" aria-hidden="true"></div>
 
     <main class="app-shell">
-      <!-- MOBILE NAVIGATION (Separate Panel) -->
+      <!-- Mobile navigation lives outside the hero panel by design.
+           Keep this duplicated with the desktop nav unless parity is recreated another way. -->
       <nav class="main-nav nav-mobile" aria-label="Mobile Navigation">
         <button type="button" class="nav-item is-active">
           <svg class="nav-icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
@@ -56,8 +57,10 @@
         </button>
       </nav>
 
+      <!-- Hero panel: desktop nav + page title + top-level controls -->
       <section class="hero-shell glass-panel">
-        <!-- DESKTOP NAVIGATION (Integrated) -->
+        <!-- Desktop navigation is intentionally a separate DOM block from mobile navigation.
+             The future merge should preserve both breakpoint-specific layouts. -->
         <nav class="main-nav nav-desktop" aria-label="Desktop Navigation">
           <button type="button" class="nav-item is-active">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
@@ -93,6 +96,8 @@
           </h1>
         </div>
 
+        <!-- Primary tabs are currently presentation-level view controls:
+             they update the title and active state, but do not switch datasets yet. -->
         <div class="hero-actions">
           <div class="top-tabs" role="tablist" aria-label="League format">
             <button
@@ -114,12 +119,14 @@
               SFLX
             </button>
           </div>
+          <!-- Structural-only button in this reference app. Preserve its placement/appearance. -->
           <button type="button" class="top-pill top-pill--ghost" aria-disabled="true">
             PICK VALUES
           </button>
         </div>
       </section>
 
+      <!-- Filter / utility controls directly above the grid -->
       <section class="controls-shell glass-panel" aria-label="Filters and controls">
         <div class="controls-cluster">
           <div class="category-row" role="tablist" aria-label="Stat categories">
@@ -169,6 +176,7 @@
             </button>
           </div>
 
+          <!-- Secondary filters only appear for the receiving category. -->
           <div
             id="receiving-subfilters"
             class="receiving-subfilters"
@@ -195,6 +203,7 @@
         </div>
 
         <div class="utility-row">
+          <!-- Structural-only button in this reference app. Preserve its footprint and styling. -->
           <button type="button" class="mini-chip mini-chip--icon" aria-disabled="true">
             <svg
               class="mini-chip__icon"
@@ -209,6 +218,7 @@
             <span>KEY</span>
           </button>
 
+          <!-- Search is live-wired and filters across the currently visible column set. -->
           <label class="search-shell" for="player-search">
             <svg
               class="search-shell__icon"
@@ -232,6 +242,7 @@
         </div>
       </section>
 
+      <!-- Data table shell: metadata row, custom two-pane grid mount, and loading/error overlay -->
       <section class="grid-shell glass-panel">
         <div class="grid-shell__meta">
           <div>
@@ -249,6 +260,7 @@
             <div id="player-grid" class="data-grid" aria-label="Player stats table"></div>
           </div>
 
+          <!-- Overlay covers the grid during initial CSV loading and file:// fallback recovery. -->
           <div id="grid-overlay" class="grid-stage__overlay">
             <div class="overlay-card">
               <div class="overlay-card__pulse" aria-hidden="true"></div>
@@ -260,6 +272,7 @@
                 Building the Data Hub grid and mapping the requested stat views.
               </p>
 
+              <!-- File picker is only shown when the browser blocks fetch() access to the local CSV. -->
               <div id="overlay-actions" class="overlay-card__actions" hidden>
                 <button id="file-picker-button" type="button" class="overlay-card__button">
                   Select SZN.csv

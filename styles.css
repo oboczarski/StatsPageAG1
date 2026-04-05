@@ -1,3 +1,4 @@
+/* ── Page Shell / Background ────────────────────────────────────────────── */
 :root {
   --font-sans: "Product Sans", "Google Sans", "Helvetica Neue", Helvetica, Arial,
     sans-serif;
@@ -113,6 +114,7 @@ body::after {
   background: radial-gradient(circle at 50% 50%, rgba(255, 98, 195, 0.36), transparent 72%);
 }
 
+/* ── App Shell / Shared Panels ──────────────────────────────────────────── */
 .app-shell {
   position: relative;
   z-index: 1;
@@ -195,6 +197,7 @@ body::after {
   transform: translateY(1px);
 }
 
+/* ── Hero / Controls ────────────────────────────────────────────────────── */
 .hero-shell,
 .controls-shell,
 .grid-shell {
@@ -466,6 +469,7 @@ body::after {
   outline: none;
 }
 
+/* ── Grid Shell ─────────────────────────────────────────────────────────── */
 .grid-shell {
   margin-top: 14px;
   padding: 10px 6px;
@@ -533,6 +537,7 @@ body::after {
   border-radius: 24px;
 }
 
+/* Only the scroll pane owns scrollbars; the outer wrappers must stay passive. */
 .table-pane--scroll::-webkit-scrollbar {
   height: 12px;
   width: 12px;
@@ -562,7 +567,7 @@ body::after {
   align-items: flex-start;
 }
 
-/* Frozen pane: always visible on the left; body scrollTop driven by JS scroll-sync */
+/* Frozen pane: always visible on the left; JS mirrors the scroll pane's scrollTop. */
 .table-pane--frozen {
   flex-shrink: 0;
   overflow: hidden;
@@ -570,7 +575,7 @@ body::after {
   border-right: 2px solid #43516d;
 }
 
-/* Scrollable pane: sole scroll container — handles all horizontal and vertical scrolling */
+/* Scrollable pane: sole scroll container for both axes. Keep heights matched with the frozen pane. */
 .table-pane--scroll {
   flex: 1;
   min-width: 0;
@@ -581,6 +586,7 @@ body::after {
   -webkit-overflow-scrolling: touch;
 }
 
+/* ── Overlay / Load States ──────────────────────────────────────────────── */
 .grid-stage__overlay {
   position: absolute;
   inset: 0;
@@ -733,7 +739,7 @@ body::after {
 /* ── Column header row ─────────────────────────────────────────────────── */
 .stats-table thead th.stats-table__header-cell {
   position: sticky;
-  top: 36px; /* sits below the 26px group header row */
+  top: 36px; /* sits directly below the 36px desktop group header row */
   z-index: 11;
   background: linear-gradient(180deg, rgb(53 61 80 / 99%), rgb(38 44 60 / 99%));
   border-bottom: 0;
@@ -820,6 +826,7 @@ body::after {
   color: rgba(202, 222, 247, 0.88);
 }
 
+/* ── Table Body / Cell States ───────────────────────────────────────────── */
 .stats-table__cell-content {
   display: flex;
   align-items: center;
@@ -855,6 +862,7 @@ body::after {
   color: rgba(171, 186, 208, 0.48);
 }
 
+/* ── FPTS / Heat Tiers ──────────────────────────────────────────────────── */
 .stats-table__fpts-chip {
   display: inline-flex;
   align-items: center;
@@ -982,6 +990,7 @@ body::after {
   background: transparent !important;
 }
 
+/* ── Responsive: Mobile ─────────────────────────────────────────────────── */
 @media (max-width: 719px) {
   .nav-desktop {
     display: none !important;
@@ -1113,6 +1122,7 @@ body::after {
   }
 }
 
+/* ── Motion ─────────────────────────────────────────────────────────────── */
 @keyframes driftPulse {
   0%,
   100% {
@@ -1129,6 +1139,7 @@ body::after {
   }
 }
 
+/* ── Responsive: Desktop ────────────────────────────────────────────────── */
 @media (min-width: 720px) {
   .nav-mobile {
     display: none !important;
@@ -1138,7 +1149,7 @@ body::after {
   .nav-desktop {
     grid-column: 1 / -1;
     justify-content: center;
-     /* Ensures it restricts its width to content */
+    /* Keep width content-sized so the pill does not stretch across the hero. */
     margin: 0 0 8px 0;
     width: max-content; /* Pill wraps content */
     gap: 1px;
@@ -1331,6 +1342,7 @@ body::after {
 
 }
 
+/* ── Responsive: Large Desktop ──────────────────────────────────────────── */
 @media (min-width: 1080px) {
   .app-shell {
     padding-inline: 28px;
@@ -1360,6 +1372,7 @@ body::after {
   }
 }
 
+/* ── Accessibility / Reduced Motion ─────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
