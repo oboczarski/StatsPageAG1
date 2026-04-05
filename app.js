@@ -724,6 +724,8 @@ function renderTable() {
     }
   });
 
+  attachFrozenPaneScrollProxy(frozenPane, scrollPane);
+
   // Prevent left-edge overscroll bounce — block rightward pull when already at scrollLeft === 0
   let _txStart = 0;
   scrollPane.addEventListener("touchstart", (e) => { _txStart = e.touches[0].clientX; }, { passive: true });
@@ -736,6 +738,49 @@ function renderTable() {
     syncRowHeights(frozenTable, scrollTable);
     observeRowResize(frozenTable, scrollTable);
   });
+}
+
+function attachFrozenPaneScrollProxy(frozenPane, scrollPane) {
+  let lastTouchY = 0;
+
+  frozenPane.addEventListener("wheel", (event) => {
+    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
+      return;
+    }
+
+    const previousScrollTop = scrollPane.scrollTop;
+    scrollPane.scrollTop += event.deltaY;
+    if (scrollPane.scrollTop !== previousScrollTop) {
+      event.preventDefault();
+    }
+  }, { passive: false });
+
+  frozenPane.addEventListener("touchstart", (event) => {
+    lastTouchY = event.touches[0]?.clientY ?? 0;
+  }, { passive: true });
+
+  frozenPane.addEventListener("touchmove", (event) => {
+    const touch = event.touches[0];
+    if (!touch) {
+      return;
+    }
+
+    const deltaY = lastTouchY - touch.clientY;
+    lastTouchY = touch.clientY;
+
+    if (Math.abs(deltaY) < 0.5) {
+      return;
+    }
+
+    const previousScrollTop = scrollPane.scrollTop;
+    const maxScrollTop = scrollPane.scrollHeight - scrollPane.clientHeight;
+    const nextScrollTop = Math.max(0, Math.min(maxScrollTop, previousScrollTop + deltaY));
+
+    if (nextScrollTop !== previousScrollTop) {
+      scrollPane.scrollTop = nextScrollTop;
+      event.preventDefault();
+    }
+  }, { passive: false });
 }
 
 // Build one complete <table> (colgroup + thead with group row + column row + tbody)

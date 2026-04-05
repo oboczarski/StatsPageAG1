@@ -316,6 +316,7 @@ body::after {
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   padding: 8px 8px;
   border: 1px solid transparent;
@@ -360,10 +361,17 @@ body::after {
 }
 
 .tab-icon {
+  flex: 0 0 18px;
   width: 18px;
   height: 18px;
   stroke-width: 2.5px;
   opacity: 0.7;
+}
+
+.page-tab span {
+  display: block;
+  line-height: 1.05;
+  text-align: center;
 }
 
 .page-tab.is-active .tab-icon {
@@ -694,8 +702,9 @@ body::after {
 }
 
 .grid-stage {
+  --table-panel-height: clamp(500px, 62vh, 900px);
   position: relative;
-  min-height: 60vh;
+  min-height: var(--table-panel-height);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 17px;
   /* clip instead of hidden: visually clips rounded corners without becoming a
@@ -736,14 +745,16 @@ body::after {
 
 .table-frame {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
+  min-height: var(--table-panel-height);
 }
 
 /* Frozen pane: always visible on the left; body scrollTop driven by JS scroll-sync */
 .table-pane--frozen {
   flex-shrink: 0;
   overflow: hidden;
-  max-height: clamp(500px, 62vh, 900px);
+  height: var(--table-panel-height);
+  max-height: var(--table-panel-height);
   border-right: 2px solid #43516d;
 }
 
@@ -752,7 +763,8 @@ body::after {
   flex: 1;
   min-width: 0;
   overflow: auto;
-  max-height: clamp(500px, 62vh, 900px);
+  height: var(--table-panel-height);
+  max-height: var(--table-panel-height);
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
@@ -1163,6 +1175,31 @@ body::after {
 
 @media (max-width: 719px) {
 
+  .grid-stage {
+    --table-panel-height: clamp(420px, 55vh, 700px);
+  }
+
+  .page-tabs {
+    gap: 4px;
+  }
+
+  .page-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    gap: 5px;
+    padding: 8px 6px;
+  }
+
+  .page-tab span {
+    text-wrap: balance;
+  }
+
+  .tab-icon {
+    flex-basis: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
   .header-shell--stacked {
     padding: 4px 3px 5px;
     gap: 1px;
@@ -1177,11 +1214,6 @@ body::after {
   .header-shell--stacked .brand-lockup__logo {
     width: 53px;
     height: 53px;
-  }
-
-  .table-pane--frozen,
-  .table-pane--scroll {
-    max-height: clamp(420px, 55vh, 700px);
   }
 
   .stats-table {
@@ -1556,6 +1588,10 @@ body::after {
 }
 
 @media (min-width: 1080px) {
+  .grid-stage {
+    --table-panel-height: clamp(620px, 72vh, 940px);
+  }
+
   .app-shell {
     padding-inline: 28px;
   }
@@ -1578,10 +1614,6 @@ body::after {
     padding: 22px;
   }
 
-  .table-pane--frozen,
-  .table-pane--scroll {
-    max-height: clamp(620px, 72vh, 940px);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
