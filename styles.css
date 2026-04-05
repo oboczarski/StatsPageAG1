@@ -713,7 +713,7 @@ body::after {
   justify-content: center;
   gap: 0px;
   width: 100%;
-  min-height: 50px;
+  min-height: 44px;
   padding: 0 18px 0 10px;
   border: 0;
   background: transparent;
