@@ -126,9 +126,7 @@ body::after {
   overflow: hidden;
   border: 1px solid var(--panel-edge);
   border-radius: 28px;
-  background:
-    linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-    linear-gradient(180deg, rgba(8, 16, 28, 0.6), rgba(6, 12, 20, 0.4));
+  background: linear-gradient(155deg, rgb(153 166 210 / 8%), rgba(255, 255, 255, 0.015)), linear-gradient(180deg, rgba(8, 16, 28, 0.6), rgba(6, 12, 20, 0.4));
   box-shadow: var(--shadow-soft), var(--shadow-glass);
   backdrop-filter: blur(4px) saturate(140%);
   -webkit-backdrop-filter: blur(4px) saturate(140%);
@@ -140,7 +138,7 @@ body::after {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 32%),
+  background: linear-gradient(135deg, rgba(216, 228, 255, 0.22), transparent 42%),
     radial-gradient(circle at top left, rgba(215, 225, 255, 0.14), transparent 34%);
 }
 
@@ -312,8 +310,7 @@ body::after {
 .subfilter-chip.is-active {
   border-color: rgba(126, 214, 255, 0.6);
   color: #f3f8ff;
-  background:
-    linear-gradient(180deg, rgba(133, 215, 255, 0.24), rgba(162, 127, 255, 0.16)),
+  background: linear-gradient(180deg, rgba(133, 215, 255, 0.24), rgba(162, 127, 255, 0.16)),
     rgba(11, 22, 39, 0.74);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18),
     0 10px 16px rgba(44, 109, 214, 0.18);
@@ -1142,14 +1139,15 @@ body::after {
     grid-column: 1 / -1;
     justify-content: center;
      /* Ensures it restricts its width to content */
-    margin: 0 0 32px 0;
+    margin: 0 0 8px 0;
     width: max-content; /* Pill wraps content */
     gap: 1px;
-    background: var(--panel-inner);
+    background: linear-gradient(357deg, rgb(70 78 104 / 16%), rgb(131 161 249 / 43%));
     padding: 2px;
     border-radius: 999px; /* Pill shape container */
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 8px 8px 19px rgb(0 0 0 / 42%), -3px -3px 21px rgb(170 170 184 / 25%);
     justify-self: center;
+    border: 1px solid #6785;
   }
 
   .nav-item {
@@ -1194,20 +1192,21 @@ body::after {
 
   .nav-item.is-active {
     color: rgb(195 206 222 / 96%);
-    background: rgba(102, 215, 255, 0.09);
+    background: linear-gradient(180deg, rgb(156 212 239 / 39%), rgba(162, 127, 255, 0.19)), rgba(11, 22, 39, 0.05);
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    border: 1px solid #8fcdff48;
   }
 
   .nav-item.is-active::after {
     content: "";
     position: absolute;
-    bottom: -2px;
-    left: 25%;
-    width: 50%;
+    bottom: 50px;
+    left: 9%;
+    width: 90%;
     height: 2px;
     background: var(--accent-cyan);
     border-radius: 2px;
-    box-shadow: 0 0 10px var(--accent-cyan);
+    box-shadow: 0 0 65px #bbe8f9;
   }
 
   .app-shell {
@@ -1217,7 +1216,7 @@ body::after {
   .hero-shell {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: end;
-    gap: 20px;
+    gap: 0px;
     padding: 24px;
   }
 
