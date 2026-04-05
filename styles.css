@@ -943,8 +943,8 @@ body::after {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 8px;
-  padding: 12px 14px;
+  gap: 0px;
+  padding: 5px 0px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 22px;
   background:
@@ -960,13 +960,14 @@ body::after {
 .site-nav__brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   flex-shrink: 0;
+  margin-right: 26px;
 }
 
 .site-nav__logo {
-  width: 28px;
-  height: 28px;
+  width: 55px;
+  height: 55px;
   border-radius: 8px;
   object-fit: contain;
 }
@@ -978,17 +979,18 @@ body::after {
 }
 
 .site-nav__wordmark {
-  font-size: 0.94rem;
+  font-size: 2.04rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: 0em;
   color: rgba(240, 246, 255, 0.92);
 }
 
 .site-nav__wordmark-accent {
-  font-size: 0.94rem;
+  font-size: 2.04rem;
   font-weight: 300;
-  letter-spacing: -0.01em;
+  letter-spacing: 0em;
   color: var(--accent-cyan);
+  margin-left: 5px;
 }
 
 .site-nav__links {
@@ -997,6 +999,8 @@ body::after {
   justify-content: space-between;
   width: 100%;
   gap: 0;
+  border-top: 1px Solid #abc3;
+  padding-top: 4px;
 }
 
 .nav-btn {
@@ -1070,12 +1074,10 @@ body::after {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px;
+  gap: 0px;
+  padding: 2px;
   border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.06)),
-    rgba(6, 12, 22, 0.45);
+  background: linear-gradient(180deg, rgb(46 41 81 / 15%), rgba(0, 0, 0, 0.06)), rgba(6, 12, 22, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
   overflow-x: auto;
@@ -1092,9 +1094,10 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 1px;
   flex: 0 0 auto;
-  padding: 7px 12px;
+  padding: 7px 4px;
+  min-width: 58px;
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
@@ -1102,7 +1105,7 @@ body::after {
   font-family: inherit;
   font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.04em;
   cursor: pointer;
   transition:
     transform 160ms ease,
@@ -1131,9 +1134,7 @@ body::after {
 
 .view-tab.is-active {
   color: #f0f6ff;
-  background:
-    linear-gradient(180deg, rgba(162, 127, 255, 0.18), rgba(102, 215, 255, 0.06)),
-    rgba(14, 22, 38, 0.6);
+  background: linear-gradient(180deg, rgb(126 176 255 / 27%), rgb(85 112 146 / 21%)), rgba(14, 22, 38, 0.6);
   border-color: rgba(162, 127, 255, 0.26);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
