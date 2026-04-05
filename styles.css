@@ -674,7 +674,9 @@ body::after {
   flex-shrink: 0;
   opacity: 1;
   stroke: currentColor;
-  stroke-width: 2.5px;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   fill: none;
 }
 
