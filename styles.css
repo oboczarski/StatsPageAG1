@@ -986,18 +986,18 @@ body::after {
 }
 
 @media (max-width: 719px) {
-  /* Mobile Top-bar layout (inspired by mock) */
+  /* Mobile Top-bar layout (mockup match) */
   .main-nav {
-    margin: 0 0 16px 0; /* Separate panel above hero */
-    padding: 12px 16px;
-    border-radius: 24px;
-    background: var(--panel-fill);
-    border: 1px solid var(--panel-edge);
-    box-shadow: var(--shadow-soft), var(--shadow-glass);
+    margin: 0 0 16px 0;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(80, 100, 150, 0.4), rgba(40, 50, 90, 0.3));
+    border: 1px solid rgba(150, 180, 255, 0.2);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), 0 12px 24px rgba(0, 0, 0, 0.3);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    gap: 12px;
+    gap: 8px;
   }
 
   .main-nav::-webkit-scrollbar {
@@ -1006,18 +1006,21 @@ body::after {
 
   .nav-item {
     flex-direction: column;
-    gap: 6px;
-    min-width: 76px;
-    padding: 10px 14px;
-    border-radius: 16px;
-    background: var(--panel-fill);
+    gap: 4px;
+    min-width: 68px;
+    padding: 8px 10px;
+    border-radius: 14px;
+    background: transparent;
     border: 1px solid transparent;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: none;
+    color: rgba(220, 230, 255, 0.7);
+    font-size: 0.7rem;
+    font-weight: 600;
   }
 
   .nav-icon {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
   }
 
   .nav-icon-chevron {
@@ -1025,15 +1028,15 @@ body::after {
   }
 
   .nav-item:hover {
-    background: var(--panel-inner);
-    border-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
   }
 
   .nav-item.is-active {
-    color: var(--text-primary);
-    background: rgba(102, 215, 255, 0.06);
-    border-color: rgba(102, 215, 255, 0.2);
-    box-shadow: inset 0 1px 3px rgba(102, 215, 255, 0.1), 0 4px 12px rgba(0,0,0,0.3);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12), 0 4px 10px rgba(0, 0, 0, 0.2);
   }
 
   .nav-item.is-active .nav-icon {
