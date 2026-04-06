@@ -393,9 +393,9 @@ const COLUMN_WIDTHS = {
 };
 
 const MOBILE_COLUMN_WIDTHS = {
-  RK: 37,
-  PLAYER: 63,
-  POS: 35,
+  RK: 35,
+  PLAYER: 62,
+  POS: 37,
   TM: 52,
   AGE: 54,
   FPTS: 70,
