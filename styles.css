@@ -1191,8 +1191,8 @@ body::after {
 
   .stats-table {
     font-size: 11px;
-    width: 215px !important;
-    min-width: 215px !important;
+    width: 197px !important;
+    min-width: 198px !important;
   }
 
   .stats-table__group-header-cell {
