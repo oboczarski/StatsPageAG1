@@ -22,11 +22,14 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <!-- Decorative background layers for the standalone reference shell. -->
     <div class="background-orb background-orb--one" aria-hidden="true"></div>
     <div class="background-orb background-orb--two" aria-hidden="true"></div>
     <div class="background-orb background-orb--three" aria-hidden="true"></div>
 
     <main class="app-shell">
+      <!-- Mobile header: intentionally separate from the desktop header so the
+           stacked mobile layout can keep its own DOM order without re-parenting. -->
       <header class="app-header app-header--mobile">
         <div class="header-shell header-shell--stacked">
           <div class="brand-lockup" role="img" aria-label="Dynasty Hub">
@@ -66,7 +69,11 @@
         </div>
       </header>
 
+      <!-- Hero shell: this defines the top-of-page composition future Stats-page
+           implementations should preserve (desktop header, page tabs, title, actions). -->
       <section class="hero-shell glass-panel">
+        <!-- Desktop header: the nav is intentionally centered via a mirrored
+             balance column, so preserve this three-part layout during future ports. -->
         <header class="app-header app-header--desktop">
           <div class="header-layout">
             <div class="header-shell header-shell--brand">
@@ -112,6 +119,8 @@
           </div>
         </header>
 
+        <!-- Page-view tabs sit between the header system and hero copy. The
+             active-tab glint is positioned from JS against this exact container. -->
         <nav class="page-tabs" aria-label="Page Views">
           <button type="button" class="page-tab is-active" aria-selected="true">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
@@ -138,6 +147,8 @@
           </button>
         </nav>
 
+        <!-- Hero copy: the analytics chip + title relationship is part of the
+             reference composition and should remain visually tied to the page tabs. -->
         <div class="hero-copy">
           <p class="eyebrow">DH DATA HUB – ADVANCED ANALYTICS</p>
           <h1 id="main-title" class="page-title">
@@ -172,6 +183,8 @@
         </div>
       </section>
 
+      <!-- Controls shell: category filters and search live outside the hero but
+           remain part of the same reference system surrounding the table. -->
       <section class="controls-shell glass-panel" aria-label="Filters and controls">
         <div class="controls-cluster">
           <div class="category-row" role="tablist" aria-label="Stat categories">
@@ -285,6 +298,9 @@
         </div>
       </section>
 
+      <!-- Grid shell: this is the core reference table panel. Future
+           implementations should preserve the same meta area, two-pane table
+           structure, and overlay loading/import affordance. -->
       <section class="grid-shell glass-panel">
         <div class="grid-shell__meta">
           <div>
@@ -299,9 +315,13 @@
 
         <div class="grid-stage">
           <div class="grid-scroll-wrapper">
+            <!-- JS replaces this node's contents with the frozen-pane table and
+                 the scroll-pane table on every render. -->
             <div id="player-grid" class="data-grid" aria-label="Player stats table"></div>
           </div>
 
+          <!-- Overlay remains in the DOM even after load so file:// fallback and
+               local CSV re-import can reuse the same UI without changing layout. -->
           <div id="grid-overlay" class="grid-stage__overlay">
             <div class="overlay-card">
               <div class="overlay-card__pulse" aria-hidden="true"></div>

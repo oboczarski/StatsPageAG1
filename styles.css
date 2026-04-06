@@ -1,4 +1,5 @@
 :root {
+  /* Global type and surface tokens used across the standalone reference shell. */
   --font-sans: "Product Sans", "Google Sans", "Helvetica Neue", Helvetica, Arial,
     sans-serif;
   --page-bg: #050b13;
@@ -16,8 +17,17 @@
   --success-glow: rgba(113, 225, 199, 0.34);
   --shadow-soft: 10px 30px 20px rgba(0, 0, 0, 0.28);
   --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.28), 20px 26px 20px rgba(0, 0, 0, 0.2);
+  /* Desktop header balance slot must match the brand shell width so the nav
+     reads as centered even though branding sits on the left. */
   --desktop-header-side-width: clamp(144px, 16vw, 272px);
+  --table-panel-height-default: clamp(500px, 62vh, 900px);
+  --table-panel-height-mobile: clamp(420px, 55vh, 700px);
+  --table-panel-height-wide: clamp(620px, 72vh, 940px);
+  --table-group-header-height: 36px;
+  --table-group-header-height-mobile: 26px;
 }
+
+/* ── Base Page Shell ─────────────────────────────────────────────────────── */
 
 *,
 *::before,
@@ -143,7 +153,7 @@ body::after {
     radial-gradient(circle at top left, rgba(215, 225, 255, 0.14), transparent 34%);
 }
 
-/* ── Navigation & Tabs ─────────────────────────────────────────────────── */
+/* ── Header System, Navigation & Page Tabs ─────────────────────────────── */
 
 .app-header {
   position: relative;
@@ -296,6 +306,7 @@ body::after {
 }
 
 .page-tabs {
+  /* Desktop glint is positioned from JS against the active page tab. */
   --page-tabs-glint-left: 50%;
   --page-tabs-glint-width: 96px;
   position: relative;
@@ -382,6 +393,8 @@ body::after {
 .page-tab.is-active .tab-icon {
   opacity: 1;
 }
+
+/* ── Hero Composition ───────────────────────────────────────────────────── */
 
 .hero-shell,
 .controls-shell,
@@ -516,6 +529,8 @@ body::after {
 .mini-chip[aria-disabled="true"] {
   cursor: default;
 }
+
+/* ── Filters & Utility Controls ─────────────────────────────────────────── */
 
 .controls-shell {
   margin-top: 14px;
@@ -658,6 +673,8 @@ body::after {
   outline: none;
 }
 
+/* ── Grid Shell & Table Stage ───────────────────────────────────────────── */
+
 .grid-shell {
   margin-top: 14px;
   padding: 10px 6px;
@@ -709,7 +726,9 @@ body::after {
 }
 
 .grid-stage {
-  --table-panel-height: clamp(500px, 62vh, 900px);
+  /* Shared height token keeps the frozen pane, scroll pane, overlay, and
+     scroll wrapper visually locked to the same panel bounds. */
+  --table-panel-height: var(--table-panel-height-default);
   position: relative;
   min-height: var(--table-panel-height);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -750,7 +769,7 @@ body::after {
   background: transparent;
 }
 
-/* ── Two-pane table layout ─────────────────────────────────────────────── */
+/* ── Two-Pane Table Layout ──────────────────────────────────────────────── */
 
 .table-frame {
   display: flex;
@@ -887,7 +906,7 @@ body::after {
   position: sticky;
   top: 0;
   z-index: 12;
-  height: 36px;
+  height: var(--table-group-header-height);
   padding: 0 6px;
   text-align: center;
   white-space: nowrap;
@@ -933,8 +952,8 @@ body::after {
 /* ── Column header row ─────────────────────────────────────────────────── */
 .stats-table thead th.stats-table__header-cell {
   position: sticky;
-  top: 36px;
-  /* sits below the 26px group header row */
+  top: var(--table-group-header-height);
+  /* This offset must track the active group-header height for each breakpoint. */
   z-index: 11;
   background: linear-gradient(180deg, rgb(53 61 80 / 99%), rgb(38 44 60 / 99%));
   border-bottom: 0;
@@ -1183,10 +1202,12 @@ body::after {
   background: transparent !important;
 }
 
+/* ── Mobile Layout (< 720px) ────────────────────────────────────────────── */
+
 @media (max-width: 719px) {
 
   .grid-stage {
-    --table-panel-height: clamp(420px, 55vh, 700px);
+    --table-panel-height: var(--table-panel-height-mobile);
   }
 
   .hero-shell {
@@ -1247,13 +1268,12 @@ body::after {
   }
 
   .stats-table__group-header-cell {
-    height: 26px;
+    height: var(--table-group-header-height-mobile);
     font-size: 0.72rem;
   }
 
   .stats-table thead th.stats-table__header-cell {
-    top: 26px;
-    /* matches mobile group header height */
+    top: var(--table-group-header-height-mobile);
   }
 
   .stats-table__head-button {
@@ -1307,6 +1327,8 @@ body::after {
   }
 }
 
+/* ── Shared Motion ──────────────────────────────────────────────────────── */
+
 @keyframes driftPulse {
 
   0%,
@@ -1324,6 +1346,8 @@ body::after {
       0 0 76px rgba(162, 127, 255, 0.26);
   }
 }
+
+/* ── Desktop Layout (>= 720px) ──────────────────────────────────────────── */
 
 @media (min-width: 720px) {
   .app-shell {
@@ -1459,6 +1483,8 @@ body::after {
   }
 
   .header-layout {
+    /* Keep the center slot free for the nav while brand + balance columns
+       mirror each other on both sides. */
     display: grid;
     grid-template-columns: var(--desktop-header-side-width) minmax(0, 1fr) var(--desktop-header-side-width);
     align-items: center;
@@ -1601,6 +1627,8 @@ body::after {
 
 }
 
+/* ── Large Desktop Refinements ──────────────────────────────────────────── */
+
 @media (min-width: 960px) {
   .controls-shell {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -1615,7 +1643,7 @@ body::after {
 
 @media (min-width: 1080px) {
   .grid-stage {
-    --table-panel-height: clamp(620px, 72vh, 940px);
+    --table-panel-height: var(--table-panel-height-wide);
   }
 
   .app-shell {
@@ -1641,6 +1669,8 @@ body::after {
   }
 
 }
+
+/* ── Accessibility: Reduced Motion ──────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
 

@@ -1,3 +1,6 @@
+// ---------------------------------------------------------------------------
+// Hero copy and filter labels that drive the surrounding page shell.
+// ---------------------------------------------------------------------------
 const PRIMARY_TITLES = {
   "1-QB": "1QB ADP, TRADE VALUES & 2025 STATS",
   SFLX: "SFLX ADP, TRADE VALUES & 2025 STATS",
@@ -10,6 +13,14 @@ const CATEGORY_LABELS = {
   receiving: "RECEIVING (W/T)",
 };
 
+// ---------------------------------------------------------------------------
+// Column order is the main structural source of truth for each category view.
+// These arrays simultaneously define:
+// 1. visible column order
+// 2. which columns remain frozen (the first STICKY_COLUMN_COUNT entries)
+// 3. which fields participate in search/sort for that view
+// 4. how column groups must line up with the rendered table
+// ---------------------------------------------------------------------------
 const COLUMN_SETS = {
   // GENERAL (frozen): RK, PLAYER, POS
   // INFO: TM, AGE
@@ -174,6 +185,11 @@ const COLUMN_SETS = {
   ],
 };
 
+// ---------------------------------------------------------------------------
+// CSV alias map. A null alias means the current local CSV does not provide that
+// field, but the column still exists in the reference layout and should render
+// as "NA" until a future integration supplies live values.
+// ---------------------------------------------------------------------------
 const SOURCE_ALIASES = {
   PLAYER: "NM",
   RK: "PRK_PPR",
@@ -297,7 +313,9 @@ const COLUMN_GROUPS = {
   ],
 };
 
-const LABEL_COLUMNS = new Set(["PLAYER", "POS", "TM"]);
+// ---------------------------------------------------------------------------
+// Table formatting and layout invariants.
+// ---------------------------------------------------------------------------
 const NON_FORMATTED_COLUMNS = new Set(["PLAYER", "POS", "TM", "AGE", "G"]);
 const INVERTED_COLUMNS = new Set([
   "RK",
@@ -313,6 +331,9 @@ const PLAYER_COLUMN = "PLAYER";
 const FPTS_COLUMN = "FPTS";
 const STICKY_COLUMN_COUNT = 3;
 const ALL_COLUMNS = [...new Set(Object.values(COLUMN_SETS).flat())];
+const COMPACT_SCROLL_COLUMN_SCALE = 1.3;
+const DEFAULT_COLUMN_WIDTH = 94;
+const DEFAULT_COMPACT_COLUMN_WIDTH = 58;
 
 const CATEGORY_FILTERS = {
   overview: (row) => Boolean(row.POS && row.POS !== "NA"),
@@ -459,6 +480,10 @@ const MOBILE_COLUMN_WIDTHS = {
   "RZ Tgt": 64,
 };
 
+// ---------------------------------------------------------------------------
+// Runtime state. This app keeps a single in-memory dataset and re-renders the
+// two-pane table whenever view state changes.
+// ---------------------------------------------------------------------------
 const state = {
   primaryTab: "1-QB",
   activeCategory: "overview",
@@ -477,6 +502,9 @@ const state = {
   columnFormatting: Object.create(null),
 };
 
+// ---------------------------------------------------------------------------
+// DOM anchors that define the page shell around the custom table renderer.
+// ---------------------------------------------------------------------------
 const mainTitle = document.querySelector("#main-title");
 const activeViewLabel = document.querySelector("#active-view-label");
 const rowCount = document.querySelector("#row-count");
@@ -500,25 +528,37 @@ const receivingButtons = Array.from(
   document.querySelectorAll("[data-receiving-filter]"),
 );
 
-attachEventListeners();
-syncUiState();
-updatePageTabsGlint();
-renderTable();
-showOverlay({
-  title: "Preparing SZN.csv",
-  description:
-    "Building the Data Hub table and mapping the requested stat views.",
-});
-loadInitialData();
+initializeApp();
 
-if (document.fonts?.ready) {
-  document.fonts.ready
-    .then(() => {
-      updatePageTabsGlint();
-    })
-    .catch(() => {});
+// ---------------------------------------------------------------------------
+// Boot sequence. Order matters: the shell UI is synced first, the table frame
+// is rendered immediately, and the dataset loads on top of the persistent
+// overlay so the layout stays stable even before CSV import completes.
+// ---------------------------------------------------------------------------
+function initializeApp() {
+  attachEventListeners();
+  syncUiState();
+  updatePageTabsGlint();
+  renderTable();
+  showOverlay({
+    title: "Preparing SZN.csv",
+    description:
+      "Building the Data Hub table and mapping the requested stat views.",
+  });
+  loadInitialData();
+
+  if (document.fonts?.ready) {
+    document.fonts.ready
+      .then(() => {
+        updatePageTabsGlint();
+      })
+      .catch(() => {});
+  }
 }
 
+// ---------------------------------------------------------------------------
+// Event wiring
+// ---------------------------------------------------------------------------
 function attachEventListeners() {
   primaryTabButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -608,6 +648,8 @@ async function handlePickedFile(event) {
   }
 }
 
+// Normalize the current CSV payload into app state, then rebuild every derived
+// view (formatting tiers, search results, row count, and the two-pane table).
 function applyCsvText(csvText) {
   const parsedRows = parseCsv(csvText);
   state.rows = parsedRows
@@ -617,6 +659,8 @@ function applyCsvText(csvText) {
   refreshGrid();
 }
 
+// Refreshing the grid always follows the same pipeline:
+// category filter -> formatting metrics -> free-text search -> sort -> render.
 function refreshGrid() {
   const visibleRows = getVisibleRows();
   state.columnFormatting = buildColumnFormatting(visibleRows);
@@ -626,6 +670,8 @@ function refreshGrid() {
   updateRowCount();
 }
 
+// Sync the non-table shell controls so the header, chips, and receiving
+// subfilters stay aligned with the active in-memory state.
 function syncUiState() {
   mainTitle.textContent = PRIMARY_TITLES[state.primaryTab];
   activeViewLabel.textContent = CATEGORY_LABELS[state.activeCategory];
@@ -653,6 +699,9 @@ function syncUiState() {
   });
 }
 
+// Desktop-only glint positioning for the top page tabs. This depends on the
+// actual rendered tab widths, so it is recalculated on load, resize, and when
+// fonts finish loading.
 function updatePageTabsGlint() {
   if (!pageTabs) {
     return;
@@ -683,6 +732,10 @@ function updateRowCount() {
   rowCount.textContent = `${displayedRows} row${displayedRows === 1 ? "" : "s"}`;
 }
 
+// Render one frame composed of two synchronized tables:
+// - frozen pane: identity columns only
+// - scroll pane: category-dependent stats columns
+// Both tables must stay column-order compatible with COLUMN_SETS/COLUMN_GROUPS.
 function renderTable() {
   // Preserve horizontal scroll position across re-renders (e.g. after a sort)
   const savedScrollLeft = gridContainer.querySelector(".table-pane--scroll")?.scrollLeft ?? 0;
@@ -692,8 +745,12 @@ function renderTable() {
   const scrollNames = allColumns.slice(STICKY_COLUMN_COUNT);
 
   const { columns: frozenCols, totalWidth: frozenWidth } = buildColumnLayout(frozenNames);
-  // Pass 1.3 mobile scale factor — non-frozen columns are 30% wider on compact viewports
-  const { columns: scrollCols, totalWidth: scrollWidth } = buildColumnLayout(scrollNames, 1.3);
+  // Non-frozen columns are intentionally wider on compact viewports so the
+  // horizontal table section stays legible once headers and chips compress.
+  const { columns: scrollCols, totalWidth: scrollWidth } = buildColumnLayout(
+    scrollNames,
+    COMPACT_SCROLL_COLUMN_SCALE,
+  );
 
   // ── Frozen pane ──────────────────────────────────────────────────────────
   const frozenTable = buildTable(frozenCols, frozenWidth, FROZEN_GROUP, "frozen");
@@ -727,10 +784,12 @@ function renderTable() {
   attachFrozenPaneScrollProxy(frozenPane, scrollPane);
 
   // Prevent left-edge overscroll bounce — block rightward pull when already at scrollLeft === 0
-  let _txStart = 0;
-  scrollPane.addEventListener("touchstart", (e) => { _txStart = e.touches[0].clientX; }, { passive: true });
+  let touchStartX = 0;
+  scrollPane.addEventListener("touchstart", (event) => {
+    touchStartX = event.touches[0].clientX;
+  }, { passive: true });
   scrollPane.addEventListener("touchmove", (e) => {
-    if (scrollPane.scrollLeft === 0 && e.touches[0].clientX > _txStart) e.preventDefault();
+    if (scrollPane.scrollLeft === 0 && e.touches[0].clientX > touchStartX) e.preventDefault();
   }, { passive: false });
 
   // Sync row heights after paint (both panes are now in the DOM)
@@ -740,6 +799,9 @@ function renderTable() {
   });
 }
 
+// The frozen pane never owns vertical scrolling itself. It only proxies wheel
+// and touch gestures into the real scroll pane so both halves still feel like
+// one table when the pointer is over the locked columns.
 function attachFrozenPaneScrollProxy(frozenPane, scrollPane) {
   let lastTouchY = 0;
 
@@ -783,7 +845,8 @@ function attachFrozenPaneScrollProxy(frozenPane, scrollPane) {
   }, { passive: false });
 }
 
-// Build one complete <table> (colgroup + thead with group row + column row + tbody)
+// Build one complete <table> (colgroup + group header row + column row + body).
+// Both panes use this same builder so the header/body structure stays mirrored.
 function buildTable(columns, totalWidth, groups, paneType) {
   const table = document.createElement("table");
   table.className = "stats-table";
@@ -827,9 +890,9 @@ function buildTable(columns, totalWidth, groups, paneType) {
   return table;
 }
 
-function buildColumnLayout(columnNames, mobileScaleFactor = 1) {
+function buildColumnLayout(columnNames, compactScaleFactor = 1) {
   let totalWidth = 0;
-  const scale = state.isCompactViewport ? mobileScaleFactor : 1;
+  const scale = state.isCompactViewport ? compactScaleFactor : 1;
 
   const columns = columnNames.map((name, index) => {
     const width = Math.round(getColumnWidth(name) * scale);
@@ -891,14 +954,7 @@ function createBodyCell(row, column) {
   td.classList.add("stats-table__body-cell");
   applyColumnStyle(td, column);
 
-  const cellClasses = getCellClass({
-    colDef: { field: column.name },
-    value,
-  })
-    .split(/\s+/)
-    .filter(Boolean);
-
-  td.classList.add(...cellClasses);
+  td.classList.add(...getCellClassNames(column.name, value));
   td.title = formatCellValue(value);
 
   const content = document.createElement("div");
@@ -983,7 +1039,7 @@ function buildGroupHeaderRow(columns, groups) {
 // ---------------------------------------------------------------------------
 // Row height synchronization — keeps frozen + scroll pane rows identical
 // ---------------------------------------------------------------------------
-let _rowResizeObserver = null;
+let rowResizeObserver = null;
 
 function syncRowHeights(frozenTable, scrollTable) {
   // Sync thead rows (group row + column row)
@@ -1001,15 +1057,15 @@ function syncRowHeights(frozenTable, scrollTable) {
   const scrollRows = scrollTable.tBodies[0] ? Array.from(scrollTable.tBodies[0].rows) : [];
   const len = Math.max(frozenRows.length, scrollRows.length);
   for (let i = 0; i < len; i++) {
-    const fr = frozenRows[i];
-    const sr = scrollRows[i];
-    if (!fr || !sr) { continue; }
+    const frozenRow = frozenRows[i];
+    const scrollRow = scrollRows[i];
+    if (!frozenRow || !scrollRow) { continue; }
     // Reset to natural height first so we don't lock in a stale value
-    fr.style.height = "";
-    sr.style.height = "";
-    const h = Math.max(fr.offsetHeight, sr.offsetHeight);
-    fr.style.height = `${h}px`;
-    sr.style.height = `${h}px`;
+    frozenRow.style.height = "";
+    scrollRow.style.height = "";
+    const h = Math.max(frozenRow.offsetHeight, scrollRow.offsetHeight);
+    frozenRow.style.height = `${h}px`;
+    scrollRow.style.height = `${h}px`;
   }
 
   // Wire hover sync once per pair of rows
@@ -1036,19 +1092,22 @@ function attachHoverSync(frozenRows, scrollRows) {
 
 function observeRowResize(frozenTable, scrollTable) {
   if (typeof ResizeObserver === "undefined") { return; }
-  if (_rowResizeObserver) {
-    _rowResizeObserver.disconnect();
+  if (rowResizeObserver) {
+    rowResizeObserver.disconnect();
   }
   let frame = 0;
-  _rowResizeObserver = new ResizeObserver(() => {
+  rowResizeObserver = new ResizeObserver(() => {
     cancelAnimationFrame(frame);
     frame = requestAnimationFrame(() => syncRowHeights(frozenTable, scrollTable));
   });
   if (scrollTable.tBodies[0]) {
-    _rowResizeObserver.observe(scrollTable.tBodies[0]);
+    rowResizeObserver.observe(scrollTable.tBodies[0]);
   }
 }
 
+// ---------------------------------------------------------------------------
+// Sorting, filtering, and viewport responsiveness
+// ---------------------------------------------------------------------------
 function getAriaSort(columnName) {
   if (getActiveSortColumn() !== columnName) {
     return "none";
@@ -1128,7 +1187,8 @@ function getActiveSortColumn() {
 
 function getColumnWidth(columnName) {
   const widths = state.isCompactViewport ? MOBILE_COLUMN_WIDTHS : COLUMN_WIDTHS;
-  return widths[columnName] ?? (state.isCompactViewport ? 58 : 94);
+  return widths[columnName]
+    ?? (state.isCompactViewport ? DEFAULT_COMPACT_COLUMN_WIDTH : DEFAULT_COLUMN_WIDTH);
 }
 
 function isCompactViewport() {
@@ -1150,6 +1210,12 @@ function handleViewportResize() {
   });
 }
 
+// ---------------------------------------------------------------------------
+// CSV normalization and source parsing
+// ---------------------------------------------------------------------------
+// Convert source CSV rows into the layout-friendly record shape expected by the
+// renderer. Every column in ALL_COLUMNS is populated so the table structure can
+// stay stable even when the source file omits optional fields.
 function normalizeRow(sourceRow) {
   const normalized = {};
 
@@ -1236,10 +1302,15 @@ function parseCsv(csvText) {
     );
 }
 
-function getCellClass(params) {
+// ---------------------------------------------------------------------------
+// Cell styling and value formatting
+// ---------------------------------------------------------------------------
+// Class assignment mirrors the current table styling system. This deliberately
+// uses plain column/value inputs instead of old grid-library style params so
+// future agents can read it as custom renderer logic, not adapter code.
+function getCellClassNames(columnName, value) {
   const classes = ["dh-grid-cell"];
-  const columnName = params.colDef.field;
-  const missingValue = isMissingValue(params.value);
+  const missingValue = isMissingValue(value);
 
   if (columnName === PLAYER_COLUMN) {
     classes.push("player-cell");
@@ -1255,21 +1326,21 @@ function getCellClass(params) {
 
   if (missingValue) {
     classes.push("na-cell");
-    return classes.join(" ");
+    return classes;
   }
 
   if (columnName === FPTS_COLUMN) {
-    classes.push("fpts-cell", `fpts-cell--tier-${getFormattingTier(columnName, params.value)}`);
-    return classes.join(" ");
+    classes.push("fpts-cell", `fpts-cell--tier-${getFormattingTier(columnName, value)}`);
+    return classes;
   }
 
   if (!NON_FORMATTED_COLUMNS.has(columnName)) {
     const family = NEUTRAL_COLUMNS.has(columnName) ? "neutral" : "heat";
-    const tier = getFormattingTier(columnName, params.value);
+    const tier = getFormattingTier(columnName, value);
     classes.push("heat-cell", `heat-cell--${family}`, `heat-cell--tier-${tier}`);
   }
 
-  return classes.join(" ");
+  return classes;
 }
 
 function formatCellValue(value) {
