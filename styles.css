@@ -333,6 +333,15 @@ body::after {
   text-wrap-style: balance;
 }
 
+.page-tab__label {
+  display: block;
+  line-height: 1.05;
+}
+
+.page-tab__label--adp > span {
+  display: inline;
+}
+
 .page-tab:hover {
   color: var(--text-secondary);
   border-color: rgba(255, 255, 255, 0.04);
@@ -363,6 +372,7 @@ body::after {
 }
 
 .tab-icon {
+  flex: 0 0 18px;
   width: 18px;
   height: 18px;
   stroke-width: 2;
@@ -699,8 +709,9 @@ body::after {
 }
 
 .grid-stage {
+  --table-panel-height: clamp(500px, 62vh, 900px);
   position: relative;
-  min-height: 60vh;
+  min-height: var(--table-panel-height);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 17px;
   /* clip instead of hidden: visually clips rounded corners without becoming a
@@ -712,6 +723,7 @@ body::after {
 }
 
 .grid-scroll-wrapper {
+  min-height: var(--table-panel-height);
   border-radius: 24px;
 }
 
@@ -733,6 +745,7 @@ body::after {
 
 .data-grid {
   width: 100%;
+  min-height: var(--table-panel-height);
   height: auto;
   background: transparent;
 }
@@ -741,14 +754,17 @@ body::after {
 
 .table-frame {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
+  min-height: var(--table-panel-height);
+  height: var(--table-panel-height);
 }
 
 /* Frozen pane: always visible on the left; body scrollTop driven by JS scroll-sync */
 .table-pane--frozen {
   flex-shrink: 0;
   overflow: hidden;
-  max-height: clamp(500px, 62vh, 900px);
+  height: var(--table-panel-height);
+  max-height: var(--table-panel-height);
   border-right: 2px solid #43516d;
 }
 
@@ -757,7 +773,8 @@ body::after {
   flex: 1;
   min-width: 0;
   overflow: auto;
-  max-height: clamp(500px, 62vh, 900px);
+  height: var(--table-panel-height);
+  max-height: var(--table-panel-height);
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
@@ -1168,6 +1185,45 @@ body::after {
 
 @media (max-width: 719px) {
 
+  .grid-stage {
+    --table-panel-height: clamp(420px, 55vh, 700px);
+  }
+
+  .hero-shell {
+    position: relative;
+    padding-top: 50px;
+  }
+
+  .eyebrow {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    z-index: 1;
+    width: max-content;
+    max-width: calc(100% - 24px);
+    transform: translateX(-50%);
+  }
+
+  .page-tabs {
+    margin-bottom: 10px;
+  }
+
+  .page-tab {
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 6px;
+    min-width: 0;
+  }
+
+  .page-tab--adp {
+    gap: 3px;
+  }
+
+  .page-tab__label--adp > span {
+    display: block;
+  }
+
   .header-shell--stacked {
     padding: 4px 3px 5px;
     gap: 1px;
@@ -1182,11 +1238,6 @@ body::after {
   .header-shell--stacked .brand-lockup__logo {
     width: 67px;
     height: 67px;
-  }
-
-  .table-pane--frozen,
-  .table-pane--scroll {
-    max-height: clamp(420px, 55vh, 700px);
   }
 
   .stats-table {
@@ -1250,6 +1301,8 @@ body::after {
   }
 
   .hero-copy {
+    gap: 6px;
+    margin-top: 0;
     text-align: center;
   }
 }
@@ -1561,6 +1614,10 @@ body::after {
 }
 
 @media (min-width: 1080px) {
+  .grid-stage {
+    --table-panel-height: clamp(620px, 72vh, 940px);
+  }
+
   .app-shell {
     padding-inline: 28px;
   }
@@ -1583,10 +1640,6 @@ body::after {
     padding: 22px;
   }
 
-  .table-pane--frozen,
-  .table-pane--scroll {
-    max-height: clamp(620px, 72vh, 940px);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
